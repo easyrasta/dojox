@@ -121,7 +121,8 @@ define([
 			// need to resize dragged child when it's dropped.
 			this.subscribe("/dojox/mdnd/drop", "resizeChildAfterDrop");
 			this.subscribe("/dojox/mdnd/drag/start", "resizeChildAfterDragStart");
-			
+			this.subscribe("/dojox/mdnd/drag/moveRestriction", function(){connect.publish("/dojox/layout/gridContainer/moveRestriction", [this])});
+
 			this._dragManager = dojox.mdnd.areaManager();
 			// console.info("autorefresh ::: ", this.autoRefresh);
 			this._dragManager.autoRefresh = this.autoRefresh;
