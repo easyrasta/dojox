@@ -322,25 +322,8 @@ define([
 			var accept = this.acceptTypes.join(","),
 				i = 0;
 
-			var origWidths = this.colWidths || [];
-			var widths = [];
-			var colWidth;
-			var widthSum = 0;
-
-			// Calculate the widths of each column.
-			for(i = 0; i < this.nbZones; i++){
-				if(widths.length < origWidths.length){
-					widthSum += origWidths[i];
-					widths.push(origWidths[i]);
-				}else{
-					if(!colWidth){
-						colWidth = (100 - widthSum)/(this.nbZones - i);
-					}
-					widths.push(colWidth);
-				}
-			}
-
-			i = 0;
+			var widths = this._computeColWidth();
+			
 			while(i < this.nbZones){
 				// Add the parameter accept in each zone used by AreaManager
 				// (see method dojox.mdnd.AreaManager:registerByNode)
@@ -534,7 +517,15 @@ define([
 
 			//console.log("dojox.layout.GridContainer ::: _updateColumnsWidth");
 			var length = this._grid.length;
-
+			var widths = this._computeColWidth();
+	
+			// Set the widths of each node
+			for(var i = 0; i < length; i++){
+				this._grid[i].node.style.width = widths[i] + "%";
+			}
+		},
+		
+		_computeColWidth: function(){
 			var origWidths = this.colWidths || [];
 			var widths = [];
 			var colWidth;
@@ -542,7 +533,7 @@ define([
 			var i;
 
 			// Calculate the widths of each column.
-			for(i = 0; i < length; i++){
+			for(i = 0; i < this.nbZones; i++){
 				if(widths.length < origWidths.length){
 					widthSum += origWidths[i] * 1;
 					widths.push(origWidths[i]);
@@ -569,13 +560,9 @@ define([
 					widths[i] *= divisor;
 				}
 			}
-
-			// Set the widths of each node
-			for(i = 0; i < length; i++){
-				this._grid[i].node.style.width = widths[i] + "%";
-			}
+			return widths;
 		},
-
+		
 		_selectFocus: function(/*Event*/event){
 			// summary:
 			//		Enable keyboard accessibility into the GridContainer.
