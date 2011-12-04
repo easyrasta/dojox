@@ -140,8 +140,6 @@ define([
 				domStyle.set(this.domNode, "overflowY", "hidden");
 				domStyle.set(this.gridContainerTable, "height", "auto");
 			}
-			// Call postCreate of dijit.layout._LayoutWidget.
-			this.inherited(arguments);
 		},
 
 		startup: function(){
