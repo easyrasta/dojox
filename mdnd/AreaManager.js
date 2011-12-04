@@ -484,7 +484,8 @@ define(["dojo/_base/kernel",
 				this._accept = true;
 			}
 			else{
-				if(!this._isAccepted(this._dragItem.type, this._areaList[this._currentIndexArea].accept)){
+				this._isAccepted(this._dragItem.type, this._areaList[this._currentIndexArea].accept)
+				if(!this._accept){
 					connect.publish("/dojox/mdnd/drag/moveRestriction",[this._dragItem, this._areaList[this._currentIndexArea], this._sourceIndexArea]);
 				}
 			}
