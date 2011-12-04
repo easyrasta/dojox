@@ -21,8 +21,10 @@ define([
 	"dijit/_TemplatedMixin",
 	"dijit/layout/_LayoutWidget",
 	"dojo/_base/NodeList",
-	"dojox/mdnd/AreaManager", "dojox/mdnd/DropIndicator",
-	"dojox/mdnd/dropMode/OverDropMode","dojox/mdnd/AutoScroll"
+	"dojox/mdnd/AreaManager",
+	"dojox/mdnd/DropIndicator",
+	"dojox/mdnd/dropMode/OverDropMode",
+	"dojox/mdnd/AutoScroll"
 ],function(dojo, template, declare, query, has, domClass, domStyle, geom, domConstruct, domAttr, array, lang, events, keys, connect, registry, focus, baseFocus, _WidgetBase, _TemplatedMixin, _LayoutWidget, NodeList){
 
 	var gcl = declare(
@@ -121,7 +123,7 @@ define([
 			// need to resize dragged child when it's dropped.
 			this.subscribe("/dojox/mdnd/drop", "resizeChildAfterDrop");
 			this.subscribe("/dojox/mdnd/drag/start", "resizeChildAfterDragStart");
-			this.subscribe("/dojox/mdnd/drag/moveRestriction", function(){connect.publish("/dojox/layout/gridContainer/moveRestriction", [this])});
+			this.subscribe("/dojox/mdnd/drag/moveRestriction", function(){connect.publish("/dojox/layout/gridContainer/moveRestriction", [this]);});
 
 			this._dragManager = dojox.mdnd.areaManager();
 			// console.info("autorefresh ::: ", this.autoRefresh);
@@ -134,7 +136,7 @@ define([
 				this._border = {
 					h: has("ie") ? geom.getBorderExtents(this.gridContainerTable).h : 0,
 					w: (has("ie") == 6) ? 1 : 0
-				}
+				};
 			}
 			else{
 				domStyle.set(this.domNode, "overflowY", "hidden");
@@ -563,6 +565,21 @@ define([
 			return widths;
 		},
 		
+		_keyRemoveDragItem: function(focusNode, /*Integer?*/column, /*Integer?*/p){
+			var widget = registry.byNode(focusNode);
+			var parent = focusNode.parentNode;
+			
+			if(!widget.dragRestriction){
+				var r = this._dragManager.removeDragItem(parent, focusNode);
+				console.log("Remveo dragItem", r);
+				this.addChild(widget, column, p);
+				domAttr.set(r, "tabIndex", "0");
+				focus.focus(r);
+			}else{
+				connect.publish("/dojox/layout/gridContainer/moveRestriction", [this]);
+			}
+		},
+		
 		_selectFocus: function(/*Event*/event){
 			// summary:
 			//		Enable keyboard accessibility into the GridContainer.
@@ -578,11 +595,9 @@ define([
 				zone = null,
 				cFocus = baseFocus.getFocus(),
 				focusNode = cFocus.node,
-				m = this._dragManager,
 				found,
 				i,
 				j,
-				r,
 				children,
 				area,
 				widget;
@@ -603,7 +618,7 @@ define([
 									break;
 								}
 							}
-							if(found){ break };
+							if(found){ break; };
 						}
 					break;
 					case k.UP_ARROW:
@@ -621,7 +636,7 @@ define([
 									break;
 								}
 							}
-							if(found){ break };
+							if(found){ break; };
 						}
 					break;
 				}
@@ -640,7 +655,7 @@ define([
 								children = focusTemp.parentNode.childNodes;
 								var num = 0;
 								for(i = 0; i < children.length; i++){
-									if(children[i].style.display != "none"){ num++ };
+									if(children[i].style.display != "none"){ num++; };
 									if(num > 1){ break; }
 								}
 								if(num == 1){ return; }
@@ -670,18 +685,9 @@ define([
 										break;
 									}
 								}
-								if(has("mozilla") || has("webkit")){ i-- };
-
-								widget = registry.byNode(focusNode);
-								if(!widget.dragRestriction){
-									r = m.removeDragItem(parent, focusNode);
-									this.addChild(widget, i, j);
-									domAttr.set(focusNode, "tabIndex", "0");
-									focus.focus(focusNode);
-								}
-								else{
-									connect.publish("/dojox/layout/gridContainer/moveRestriction", [this]);
-								}
+								if(has("mozilla") || has("webkit")){ i--; };
+								
+								this._keyRemoveDragItem(focusNode, i, j);
 							}
 							else{
 								focus.focus(zone);
@@ -707,7 +713,7 @@ define([
 										}
 										z++;
 									}
-									if(has("mozilla") || has("webkit")){ z-- };
+									if(has("mozilla") || has("webkit")){ z--; };
 								}
 								widget = registry.byNode(focusNode);
 								var _dndType = focusNode.getAttribute("dndtype");
@@ -733,18 +739,13 @@ define([
 									}
 								}
 								if(accept && !widget.dragRestriction){
-									var parentSource = focusNode.parentNode,
-										place = 0;
+									var place = 0;
 									if(k.LEFT_ARROW == key){
 										var t = z;
-										if(has("mozilla") || has("webkit")){ t = z + 1 };
+										if(has("mozilla") || has("webkit")){ t = z + 1; }
 										place = this.gridNode.childNodes[t].childNodes.length;
 									}
-									// delete of manager :
-									r = m.removeDragItem(parentSource, focusNode);
-									this.addChild(widget, z, place);
-									domAttr.set(r, "tabIndex", "0");
-									focus.focus(r);
+									this._keyRemoveDragItem(focusNode, z, place);
 								}
 								else{
 									connect.publish("/dojox/layout/gridContainer/moveRestriction", [this]);
