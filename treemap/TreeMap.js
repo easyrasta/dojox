@@ -1,8 +1,8 @@
-define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "dojo/_base/Color",
+define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "dojo/_base/Color", "dojo/touch",
 		"dojo/_base/Deferred", "dojo/on", "dojo/query", "dojo/dom-construct", "dojo/dom-geometry", "dojo/dom-class", "dojo/dom-style",
 		"./_utils", "dijit/_WidgetBase", "dojox/widget/_Invalidating", "dojox/widget/Selection",
 		"dojo/_base/sniff", "dojo/uacss"],
-	function(arr, lang, declare, event, Color, Deferred, on, query, domConstruct, domGeom, domClass, domStyle,
+	function(arr, lang, declare, event, Color, touch, Deferred, on, query, domConstruct, domGeom, domClass, domStyle,
 		utils, _WidgetBase, _Invalidating, Selection, has){
 
 	/*=====
@@ -110,7 +110,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			this.inherited(arguments);
 			this.connect(this.domNode, "mouseover", this._onMouseOver);
 			this.connect(this.domNode, "mouseout", this._onMouseOut);
-			this.connect(this.domNode, "mouseup", this._onMouseUp);	
+			this.connect(this.domNode, touch.release, this._onMouseUp);
 		},
 		
 		buildRendering: function(){
@@ -186,25 +186,28 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 		},
 	
 		_setStoreAttr: function(value){
+			var r;
 			if(value != null){
 				var results = value.query(this.query);
 				if(results.observe){
 					// user asked us to observe the store
 					results.observe(lang.hitch(this, this._updateItem), true);
 				}				
-				Deferred.when(results, lang.hitch(this, this._initItems));
+				r = Deferred.when(results, lang.hitch(this, this._initItems));
 			}else{
-				this._initItems([]);
+				r = this._initItems([]);
 			}
 			this._set("store", value);
+			return r;
 		},
 	
 		_initItems: function(items){
 			this._dataChanged = true;
 			this._data = items;
 			this.invalidateRendering();
+			return items;
 		},
-		
+
 		_updateItem: function(item, previousIndex, newIndex){
 			if(previousIndex!=-1){
 				if(newIndex!=previousIndex){
@@ -502,6 +505,8 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 				renderer.item = child;
 				renderer.parentItem = parent;
 				this.itemToRenderer[this.getIdentity(child)] = renderer;
+				// update its selection status
+				this.updateRenderers(child);
 			}
 	
 			// in some cases the computation might be slightly incorrect (0.0000...1)
@@ -687,7 +692,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 		
 		_onMouseUp: function(e){
 			var renderer = this._getRendererFromTarget(e.target);
-			if(renderer.item){	
+			if(renderer.item){
 				this.selectFromEvent(e, renderer.item, e.currentTarget, true);
 				//event.stop(e);
 			}
@@ -730,6 +735,10 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			for(var i=0; i<items.length;i++){
 				var item = items[i];
 				var renderer = this._getRenderer(item);
+				// at init time the renderer might not be ready
+				if(!renderer){
+					continue;
+				}
 				var selected = this.isItemSelected(item);
 				var ie = has("ie");
 				var div;
@@ -772,6 +781,11 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 					}
 					domClass.remove(renderer, "dojoxTreeMapSelected");
 
+				}
+				if(this._hoveredItem == item){
+					domClass.add(renderer, "dojoxTreeMapHovered");
+				}else{
+					domClass.remove(renderer, "dojoxTreeMapHovered");
 				}
 				if(selected || this._hoveredItem == item){
 					domStyle.set(renderer, "zIndex", 20);
