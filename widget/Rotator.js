@@ -1,16 +1,25 @@
-dojo.provide("dojox.widget.Rotator");
-dojo.require("dojo.parser");
+define("dojox.widget.Rotator", [
+	"dojo/_base/declare", // declare
+	"dojo/_base/lang", // mixin()
+	"dojo/_base/array",
+	"dojo/parser",
+	"dojo/query", // query
+	"dojo/dom", // dom.byId
+	"dojo/dom-attr", // domAttr.set domAttr.remove
+	"dojo/dom-construct", // domConstruct.create domConstruct.destroy domConstruct.place
+	"dojo/dom-geometry",	// isBodyLtr
+	"dojo/dom-style", // domStyle.set, domStyle.get
+	
+	],
+    function(declare, lang, array, parser, query, dom, domAttr, domConstruct, domGeometry, domStyle) {
 
-(function(d){
-
-	// build friendly strings
 	var _defaultTransition = "dojox.widget.rotator.swap", // please do NOT change
-		_defaultTransitionDuration = 500,
-		_displayStr = "display",
-		_noneStr = "none",
-		_zIndex = "zIndex";
+	_defaultTransitionDuration = 500,
+	_displayStr = "display",
+	_noneStr = "none",
+	_zIndex = "zIndex";
 
-	d.declare("dojox.widget.Rotator", null, {
+	var rotator = declare("dojox.widget.Rotator", null, {
 		//	summary:
 		//		A widget for rotating through child nodes using transitions.
 		//
@@ -84,15 +93,15 @@ dojo.require("dojo.parser");
 		constructor: function(/*Object*/params, /*DomNode|string*/node){
 			//	summary:
 			//		Initializes the panes and events.
-			d.mixin(this, params);
+			lang.mixin(this, params);
 
 			var _t = this,
 				t = _t.transition,
 				tt = _t._transitions = {},
 				idm = _t._idMap = {},
 				tp = _t.transitionParams = eval("({ " + _t.transitionParams + " })"),
-				node = _t._domNode = dojo.byId(node),
-				cb = _t._domNodeContentBox = d.contentBox(node), // we are going to assume the rotator will not be changing size
+				node = _t._domNode = dom.byId(node),
+				cb = _t._domNodeContentBox = domGeometry.getContentBox(node), // we are going to assume the rotator will not be changing size
 
 				// default styles to apply to all the container node and rotator's panes
 				p = {
@@ -108,15 +117,15 @@ dojo.require("dojo.parser");
 			_t.id = node.id || (new Date()).getTime();
 
 			// force the rotator DOM node to a relative position and attach the container node to it
-			if(d.style(node, "position") == "static"){
-				d.style(node, "position", "relative");
+			if(domStyle.get(node, "position") == "static"){
+				domStyle.set(node, "position", "relative");
 			}
 
 			// create our object for caching transition objects
-			tt[t] = d.getObject(t);
+			tt[t] = lang.getObject(t);
 			if(!tt[t]){
 				warn(t, _defaultTransition);
-				tt[_t.transition = _defaultTransition] = d.getObject(_defaultTransition);
+				tt[_t.transition = _defaultTransition] = lang.getObject(_defaultTransition);
 			}
 
 			// clean up the transition params
@@ -125,20 +134,20 @@ dojo.require("dojo.parser");
 			}
 
 			// if there are any panes being passed in, add them to this node
-			d.forEach(_t.panes, function(p){
-				d.create("div", p, node);
+			array.forEach(_t.panes, function(p){
+				domConstruct.create("div", p, node);
 			});
 
 			// zero out our panes array to store the real pane instance
 			var pp = _t.panes = [];
 
 			// find and initialize the panes
-			d.query(">", node).forEach(function(n, i){
-				var q = { node: n, idx: i, params: d.mixin({}, tp, eval("({ " + (d.attr(n, "transitionParams") || "") + " })")) },
+			query(">", node).forEach(function(n, i){
+				var q = { node: n, idx: i, params: lang.mixin({}, tp, eval("({ " + (domAttr.get(n, "transitionParams") || "") + " })")) },
 					r = q.trans = d.attr(n, "transition") || _t.transition;
 
 				// cache each pane's title, duration, and waitForEvent attributes
-				d.forEach(["id", "title", "duration", "waitForEvent"], function(a){
+				array.forEach(["id", "title", "duration", "waitForEvent"], function(a){
 					q[a] = d.attr(n, a);
 				});
 
@@ -155,20 +164,20 @@ dojo.require("dojo.parser");
 				p.display = _noneStr;
 
 				// find the selected pane and initialize styles
-				if(_t.idx == null || d.attr(n, "selected")){
+				if(_t.idx == null || domAttr.get(n, "selected")){
 					if(_t.idx != null){
-						d.style(pp[_t.idx].node, _displayStr, _noneStr);
+						domStyle.set(pp[_t.idx].node, _displayStr, _noneStr);
 					}
 					_t.idx = i;
 					p.display = "";
 				}
-				d.style(n, p);
+				domStyle.set(n, p);
 
 				// check for any declarative script blocks
-				d.query("> script[type^='dojo/method']", n).orphan().forEach(function(s){
-					var e = d.attr(s, "event");
+				query("> script[type^='dojo/method']", n).orphan().forEach(function(s){
+					var e = domAttr.get(s, "event");
 					if(e){
-						q[e] = d.parser._functionFromScript(s);
+						q[e] = parser._functionFromScript(s);
 					}
 				});
 
@@ -182,7 +191,7 @@ dojo.require("dojo.parser");
 		destroy: function(){
 			//	summary:
 			//		Destroys the Rotator and its DOM node.
-			d.forEach([this._controlSub, this.wfe], d.unsubscribe);
+			array.forEach([this._controlSub, this.wfe], d.unsubscribe);
 			d.destroy(this._domNode);
 		},
 
@@ -226,8 +235,8 @@ dojo.require("dojo.parser");
 
 			// adjust the zIndexes so our animations look good... this must be done before
 			// the animation is created so the animation could override it if necessary
-			d.style(current.node, _zIndex, 2);
-			d.style(next.node, _zIndex, 1);
+			domStyle.set(current.node, _zIndex, 2);
+			domStyle.set(next.node, _zIndex, 1);
 
 			// info object passed to animations and onIn/Out events
 			var info = {
