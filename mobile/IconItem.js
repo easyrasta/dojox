@@ -36,19 +36,18 @@ define([
 		//		href or url parameters.
 
 		// lazy: String
-		//		If true, the content of the item, which includes dojo markup, is
-		//		instantiated lazily. That is, only when the icon is opened by
-		//		the user, the required modules are loaded and dojo widgets are
-		//		instantiated.
+		//		If true, the content of the widget, which includes dojo markup,
+		//		is instantiated lazily. That is, only when the widget is opened
+		//		by the user, the required modules are loaded and the content
+		//		widgets are instantiated.
 		lazy: false,
 
 		// requires: String
-		//		Comma-separated required module names to be loaded. All the
-		//		modules specified with dojoType and their depending modules are
-		//		automatically loaded by the IconItem. If you need other extra
-		//		modules to be loaded, use this parameter. If lazy is true, the
-		//		specified required modules are loaded when the user opens the
-		//		icon for the first time.
+		//		Comma-separated required module names to be lazily loaded. This
+		//		is effective only when lazy=true. All the modules specified with
+		//		dojoType and their depending modules are automatically loaded
+		//		when the widget is opened. However, if you need other extra
+		//		modules to be loaded, use this parameter.
 		requires: "",
 
 		// timeout: String
@@ -116,6 +115,7 @@ define([
 				p.paneContainerWidget.addChild(w, this.getIndexInParent());
 				w.set("label", this.label);
 				this._clickCloseHandle = this.connect(w.closeIconNode, "onclick", "_closeIconClicked");
+				this._keydownCloseHandle = this.connect(w.closeIconNode, "onkeydown", "_closeIconClicked"); // for desktop browsers
 			}));
 
 			this.inherited(arguments);
@@ -199,6 +199,7 @@ define([
 			// tags:
 			//		private
 			if(e){
+				if(e.type === "keydown" && e.keyCode !== 13){ return; }
 				if(this.closeIconClicked(e) === false){ return; } // user's click action
 				setTimeout(lang.hitch(this, function(d){ this._closeIconClicked(); }), 0);
 				return;
