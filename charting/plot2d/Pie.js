@@ -61,6 +61,14 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 		//	shadow: dojox.gfx.Stroke?
 		//		An optional stroke to use to draw any shadows for a series on a plot.
 		shadow:		{},
+
+		//	fill: dojox.gfx.Fill?
+		//		Any fill to be used for elements on the plot.
+		fill:		{},
+
+		//	styleFunc: Function?
+		//		A function that returns a styling object for the a given data item.
+		styleFunc:	null,
 	});
 	=====*/
 
@@ -89,6 +97,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			outline:	{},
 			shadow:		{},
 			fill:		{},
+			styleFunc:	null,
 			font:		"",
 			fontColor:	"",
 			labelWiring: {}
@@ -172,47 +181,9 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 				start = startAngle, step, filteredRun, slices, labels, shift, labelR,
 				run = this.run.data,
 				events = this.events();
-			if(typeof run[0] == "number"){
-				filteredRun = df.map(run, "x ? Math.max(x, 0) : 0");
-				if(df.every(filteredRun, "<= 0")){
-					return this;
-				}
-				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
-				if(this.opt.labels){
-					labels = arr.map(slices, function(x){
-						return x > 0 ? this._getLabel(x * 100) + "%" : "";
-					}, this);
-				}
-			}else{
-				filteredRun = df.map(run, "x ? Math.max(x.y, 0) : 0");
-				if(df.every(filteredRun, "<= 0")){
-					return this;
-				}
-				slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
-				if(this.opt.labels){
-					labels = arr.map(slices, function(x, i){
-						if(x <= 0){ return ""; }
-						var v = run[i];
-						return "text" in v ? v.text : this._getLabel(x * 100) + "%";
-					}, this);
-				}
-			}
-			var themes = df.map(run, function(v, i){
-				if(v === null || typeof v == "number"){
-					return t.next("slice", [this.opt, this.run], true);
-				}
-				return t.next("slice", [this.opt, this.run, v], true);
-			}, this);
-			if(this.opt.labels){
-				shift = df.foldl1(df.map(labels, function(label, i){
-					var font = themes[i].series.font;
-					return g._base._getTextBox(label, {font: font}).w;
-				}, this), "Math.max(a, b)") / 2;
-				if(this.opt.labelOffset < 0){
-					r = Math.min(rx - 2 * shift, ry - size) + this.opt.labelOffset;
-				}
-				labelR = r - this.opt.labelOffset;
-			}
+
+			this.dyn = [];
+
 			if("radius" in this.opt){
 				r = this.opt.radius;
 				labelR = r - this.opt.labelOffset;
@@ -231,8 +202,64 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 				scircle.cy += shadow.dy;
 				s.createCircle(scircle).setFill(shadow.color).setStroke(shadow);
 			}
-			
-			this.dyn = [];
+
+			if(typeof run[0] == "number"){
+				filteredRun = df.map(run, "x ? Math.max(x, 0) : 0");
+				if(df.every(filteredRun, "<= 0")){
+					s.createCircle(circle).setStroke(t.series.stroke);
+					this.dyn = arr.map(filteredRun, function(){
+						return {  };
+					});
+					return this;
+				}else{
+					slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
+				 	if(this.opt.labels){
+				 		labels = arr.map(slices, function(x){
+							return x > 0 ? this._getLabel(x * 100) + "%" : "";
+						}, this);
+					}
+				}
+			}else{
+				filteredRun = df.map(run, "x ? Math.max(x.y, 0) : 0");
+				if(df.every(filteredRun, "<= 0")){
+					s.createCircle(circle).setStroke(t.series.stroke);
+					this.dyn = arr.map(filteredRun, function(){
+						return {  };
+					});
+					return this;
+				}else{
+					slices = df.map(filteredRun, "/this", df.foldl(filteredRun, "+", 0));
+					if(this.opt.labels){
+						labels = arr.map(slices, function(x, i){
+							if(x <= 0){ return ""; }
+							var v = run[i];
+							return "text" in v ? v.text : this._getLabel(x * 100) + "%";
+						}, this);
+					}
+				}
+			}
+			var themes = df.map(run, function(v, i){
+				var tMixin = [this.opt, this.run];
+				if(v !== null && typeof v != "number"){
+					tMixin.push(v);
+				}
+				if(this.opt.styleFunc){
+					tMixin.push(this.opt.styleFunc(v));
+				}
+				return t.next("slice", tMixin, true);
+			}, this);
+
+			if(this.opt.labels){
+				shift = df.foldl1(df.map(labels, function(label, i){
+					var font = themes[i].series.font;
+					return g._base._getTextBox(label, {font: font}).w;
+				}, this), "Math.max(a, b)") / 2;
+				if(this.opt.labelOffset < 0){
+					r = Math.min(rx - 2 * shift, ry - size) + this.opt.labelOffset;
+				}
+				labelR = r - this.opt.labelOffset;
+			}
+
 			// draw slices
 			var eventSeries = new Array(slices.length);
 			arr.some(slices, function(slice, i){

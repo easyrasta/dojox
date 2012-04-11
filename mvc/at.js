@@ -1,9 +1,9 @@
 define([
 	"dojo/_base/kernel",
 	"dojo/_base/lang",
-	"./BindTwo",
+	"./sync",
 	"./_atBindingExtension"
-], function(kernel, lang, BindTwo){
+], function(kernel, lang, sync){
 	/*=====
 	dojox.mvc.at.handle = {
 		// summary:
@@ -18,10 +18,10 @@ define([
 		targetProp: "",
 
 		// direction: Number
-		//		The data binding direction, choose from: dojox.mvc.BindTwo.from, dojox.mvc.BindTwo.to or dojox.mvc.BindTwo.both.
-		direction: dojox.mvc.BindTwo.both,
+		//		The data binding direction, choose from: dojox.mvc.sync.from, dojox.mvc.sync.to or dojox.mvc.sync.both.
+		direction: dojox.mvc.sync.both,
 
-		// converter: dojox.mvc.BindTwo.converter
+		// converter: dojox.mvc.sync.converter
 		//		Class/object containing the converter functions used when the data goes between data binding target (e.g. data model or controller) to data binding origin (e.g. widget).
 		converter: null,
 
@@ -29,13 +29,13 @@ define([
 			// summary:
 			//		Sets data binding direction.
 			// direction: Number
-			//		The data binding direction, choose from: dojox.mvc.BindTwo.from, dojox.mvc.BindTwo.to or dojox.mvc.BindTwo.both.
+			//		The data binding direction, choose from: dojox.mvc.sync.from, dojox.mvc.sync.to or dojox.mvc.sync.both.
 		},
 
 		attach: function(converter){
 			// summary:
 			//		Attach a data converter.
-			// converter: dojox.mvc.BindTwo.converter
+			// converter: dojox.mvc.sync.converter
 			//		Class/object containing the converter functions used when the data goes between data binding target (e.g. data model or controller) to data binding origin (e.g. widget).
 		}
 	};
@@ -54,24 +54,46 @@ define([
 		// returns:
 		//		A handle of data binding target (a dojo.Stateful property), which is used for start synchronization with data binding source (another dojo.Stateful property).
 		// example:
-		//		Synchronize attrbinwidget attribute in my.widget with propertyname in stateful.
-		// |		<div data-dojo-type="my.widget" data-dojo-props="attribinwidget: dojox.mvc.at(stateful, 'propertyname')"></div>
+		//		Two seconds later, the text box changes from "Foo" to "Bar" as the "value" property in model changes.
+		// |		<html>
+		// |			<head>
+		// |				<script src="/path/to/dojo-toolkit/dojo/dojo.js" type="text/javascript" data-dojo-config="parseOnLoad: 0"></script>
+		// |				<script type="text/javascript">
+		// |					require([
+		// |						"dojo/parser", "dojo/Stateful", "dijit/form/TextBox", "dojox/mvc/at", "dojo/domReady!"
+		// |					], function(parser, Stateful){
+		// |						model = new Stateful({value: "Foo"});
+		// |						setTimeout(function(){ model.set("value", "Bar"); }, 2000);
+		// |						parser.parse();
+		// |					});
+		// |				</script>
+		// |			</head>
+		// |			<body>
+		// |				<input type="text" data-dojo-type="dijit.form.TextBox" data-dojo-props="value: dojox.mvc.at(model, 'value')">
+		// |			</body>
+		// |		</html>
 
 		return {
 			atsignature: "dojox.mvc.at",
 			target: target,
 			targetProp: targetProp,
-			direction: BindTwo.both,
+			direction: sync.both,
 			direct: function(/*Number*/ direction){
 				this.direction = direction;
 				return this;
 			},
-			attach: function(/*dojox.mvc.BindTwo.converter*/ converter){
+			attach: function(/*dojox.mvc.sync.converter*/ converter){
 				this.converter = converter;
 				return this;
 			}
 		}; // dojox.mvc.at.handle
 	};
 
+	// Data binding directions
+	at.from = sync.from;
+	at.to = sync.to;
+	at.both = sync.both;
+
+	// lang.setObject() thing is for back-compat, remove it in 2.0
 	return lang.setObject("dojox.mvc.at", at);
 });

@@ -24,7 +24,7 @@
 				onAnchorLabelClicked: function(e){
 					if(this.id == "item1" || this.id == "item2"){
 						// go to a different html page
-						var href = "test_iPhone-Icon.html";
+						var href = "test_IconContainer.html";
 						this.transitionTo(null, href);
 					}else if(this.id == "item3" || this.id == "item4"){
 						// load an external view into the current html page
@@ -41,25 +41,25 @@
 		<h1 data-dojo-type="dojox.mobile.Heading">Anchor Label</h1>
 		<h2 data-dojo-type="dojox.mobile.RoundRectCategory">Items</h2>
 		<ul data-dojo-type="dojox.mobile.RoundRectList">
-			<li id="item1" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-1.png", moveTo:"view2", anchorLabel:true'>
+			<li id="item1" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-1.png", moveTo:"bar", anchorLabel:true'>
 				Different page
 			</li>
-			<li id="item2" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-2.png", moveTo:"view2", anchorLabel:true'>
+			<li id="item2" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-2.png", moveTo:"bar", anchorLabel:true'>
 				Different page
 			</li>
-			<li id="item3" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-3.png", moveTo:"view2", anchorLabel:true'>
+			<li id="item3" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-3.png", moveTo:"bar", anchorLabel:true'>
 				External view
 			</li>
-			<li id="item4" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-4.png", moveTo:"view2", anchorLabel:true'>
+			<li id="item4" data-dojo-type="dojox.mobile.ListItemEx" data-dojo-props='icon:"images/i-icon-4.png", moveTo:"bar", anchorLabel:true'>
 				External view
 			</li>
 		</ul>
 		<div data-dojo-type="dojox.mobile.RoundRect">
-			Tapping on an item label text opens a different page (test_iPhone-Icon.html) or loads an external view (view2.html), while tapping on right-hand side of the label text shows another view in the same page.
+			Tapping on an item label text opens a different page (test_IconContainer.html) or loads an external view (view2.html), while tapping on right-hand side of the label text shows another view in the same page.
 		</div>
 	</div>
 
-	<div id="view2" data-dojo-type="dojox.mobile.View">
+	<div id="bar" data-dojo-type="dojox.mobile.View">
 		<h1 data-dojo-type="dojox.mobile.Heading" data-dojo-props='back:"Spaces", moveTo:"home"'>u1space</h1>
 		<h2 data-dojo-type="dojox.mobile.RoundRectCategory">Applications</h2>
 		<ul data-dojo-type="dojox.mobile.RoundRectList">

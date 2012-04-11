@@ -411,7 +411,7 @@ define([
 				// v: Anything
 				//		The value.
 
-				return lang.isArray(v) ? "array" : {}.toString.call(v) == "[object Object]" ? "object" : "value"; // String
+				return lang.isArray(v) ? "array" : v != null && {}.toString.call(v) == "[object Object]" ? "object" : "value"; // String
 			},
 
 			getStatefulArray: function(/*Anything[]*/ a){

@@ -13,7 +13,7 @@
   line-height: 43px;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   border-bottom: 1px solid #cccccc;
-  background-color: #f7f7f7;
+  background-color: #ffffff;
   color: black;
   font-weight: bold;
 }
@@ -53,6 +53,7 @@
   float: left;
   line-height: normal;
   margin-top: 7px;
+  margin-bottom: -7px;
   margin-right: 11px;
 }
 .mblListItemIcon {
@@ -60,6 +61,7 @@
   float: left;
   line-height: normal;
   margin-top: 7px;
+  margin-bottom: -7px;
   margin-right: 11px;
 }
 .mblListItemRightIcon, .mblListItemRightIcon2, .mblListItemUncheckIcon {

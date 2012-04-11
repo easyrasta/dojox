@@ -6,8 +6,9 @@ define([
 	"dojo/dom-class",
 	"dijit/registry",	// registry.byNode
 	"./View",
-	"./_ScrollableMixin"
-], function(array, connect, declare, dom, domClass, registry, View, ScrollableMixin){
+	"./_ScrollableMixin",
+	"./sniff"
+], function(array, connect, declare, dom, domClass, registry, View, ScrollableMixin, has){
 
 /*=====
 	var View = dojox.mobile.View;
@@ -41,6 +42,7 @@ define([
 			this.containerNode = this.domNode;
 			this.subscribe("/dojox/mobile/nextPage", "handleNextPage");
 			this.subscribe("/dojox/mobile/prevPage", "handlePrevPage");
+			this.noResize = true; // not to call resize() from scrollable#init
 		},
 
 		startup: function(){
@@ -96,18 +98,20 @@ define([
 			this.goTo(-1);
 		},
 
-		goTo: function(/*Number*/dir){
+		goTo: function(/*Number*/dir, /*String?*/moveTo){
 			// summary:
 			//		Moves to the next or previous view.
-			var w = this.domNode.offsetWidth;
-			var view = (dir == 1) ? this.nextView(this.domNode) : this.previousView(this.domNode);
-			if(!view){ return; }
-			view._beingFlipped = true;
-			view.scrollTo({x:w*dir});
-			view._beingFlipped = false;
-			view.domNode.style.display = "";
-			domClass.add(view.domNode, "mblIn");
-			this.slideTo({x:0}, 0.5, "ease-out", {x:-w*dir});
+			var view = moveTo ? registry.byId(moveTo) :
+				((dir == 1) ? this.nextView(this.domNode) : this.previousView(this.domNode));
+			if(view && view !== this){
+				this.stopAnimation(); // clean-up animation states
+				view.stopAnimation();
+				this.domNode._isShowing = false; // update isShowing flag
+				view.domNode._isShowing = true;
+				this.performTransition(view.id, dir, "slide", null, function(){
+					connect.publish("/dojox/mobile/viewChanged", [view]);
+				});
+			}
 		},
 
 		isSwapView: function(node){
@@ -147,7 +151,10 @@ define([
 					x = to.x - this.domNode.offsetWidth;
 				}
 				if(newView){
-					newView.domNode.style.display = "";
+					if(newView.domNode.style.display === "none"){
+						newView.domNode.style.display = "";
+						newView.resize();
+					}
 					newView._beingFlipped = true;
 					newView.scrollTo({x:x});
 					newView._beingFlipped = false;
@@ -204,28 +211,38 @@ define([
 			this.inherited(arguments);
 		},
 
+		onAnimationEnd: function(e){
+			// summary:
+			//		Overrides dojox.mobile.View.onAnimationEnd().
+			if(e && e.target && domClass.contains(e.target, "mblScrollableScrollTo2")){ return; }
+			this.inherited(arguments);
+		},
+
 		onFlickAnimationEnd: function(e){
 			// summary:
 			//		Overrides dojox.mobile.scrollable.onFlickAnimationEnd().
-			if(e && e.animationName && e.animationName !== "scrollableViewScroll2"){ return; }
-			// Hide all the views other than the currently showing one.
-			// Otherwise, when the orientation is changed, other views
-			// may appear unexpectedly.
-			var children = this.domNode.parentNode.childNodes;
-			for(var i = 0; i < children.length; i++){
-				var c = children[i];
-				if(this.isSwapView(c)){
-					domClass.remove(c, "mblIn");
-					if(!c._isShowing){
-						c.style.display = "none";
-					}
-				}
-			}
+			if(e && e.target && !domClass.contains(e.target, "mblScrollableScrollTo2")){ return; }
 			this.inherited(arguments);
-			if(this.getShowingView() === this){
+
+			if(this.domNode._isShowing){
+				// Hide all the views other than the currently showing one.
+				// Otherwise, when the orientation is changed, other views
+				// may appear unexpectedly.
+				array.forEach(this.domNode.parentNode.childNodes, function(c){
+					if(this.isSwapView(c)){
+						domClass.remove(c, "mblIn");
+						if(!c._isShowing){
+							c.style.display = "none";
+							c.style.webkitTransform = "";
+							c.style.left = "0px"; // top/left mode needs this
+						}
+					}
+				}, this);
 				connect.publish("/dojox/mobile/viewChanged", [this]);
 				// Reset the temporary padding
 				this.containerNode.style.paddingTop = "";
+			}else if(!has("webkit")){
+				this.containerNode.style.left = "0px"; // compat mode needs this
 			}
 		}
 	});

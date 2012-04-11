@@ -11,13 +11,14 @@
 
 	<script type="text/javascript">
 		require([
+			"dojo/_base/lang",
 			"dojo/data/ItemFileWriteStore",
 			"dijit/registry",
 			"dojox/mobile/parser",
 			"dojox/mobile",
 			"dojox/mobile/compat",
 			"dojox/mobile/RoundRectDataList"
-		], function(ItemFileWriteStore, registry){
+		], function(lang, ItemFileWriteStore, registry){
 			var static_data = { 
 				items: [ 
 					{label: "Apple", 	moveTo: "dummy"},
@@ -32,7 +33,7 @@
 				]
 			};
 			store1 = new ItemFileWriteStore({url: "data/settings.json", clearOnClose: true});
-			store2 = new ItemFileWriteStore({data: static_data});
+			store2 = new ItemFileWriteStore({data: lang.clone(static_data), clearOnClose: true});
 			store = store1;
 			var newItems = [[],[]];
 
@@ -53,6 +54,13 @@
 					store.deleteItem(item);
 				}
 			};
+			reload1 = function(){
+				store.save({onComplete: function(){console.log("Saved");}, onError: function(e){console.log(e);}});
+				if(store === store2){
+					store.data = lang.clone(static_data);
+				}
+				store.close();
+			};
 		});
 	</script>
 </head>
@@ -66,6 +74,7 @@
 		<p>alter the object store:<br>
 		<input type="button" value="Add" onclick="add1()">
 		<input type="button" value="Delete" onclick="delete1()">
+		<input type="button" value="Reload" onclick="reload1()">
 	</div>
 </body>
 </html>

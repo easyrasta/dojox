@@ -1,5 +1,6 @@
 define([
 	"dojo/_base/array",
+	"dojo/_base/config",
 	"dojo/_base/connect",
 	"dojo/_base/event",
 	"dojo/_base/lang",
@@ -7,7 +8,7 @@ define([
 	"dojo/dom-construct",
 	"dojo/dom-style",
 	"./sniff"
-], function(array, connect, event, lang, domClass, domConstruct, domStyle, has){
+], function(array, config, connect, event, lang, domClass, domConstruct, domStyle, has){
 
 	var dm = lang.getObject("dojox.mobile", true);
 
@@ -141,6 +142,7 @@ define([
 			//		If node exists, updates the existing node. Otherwise, creates a new one.
 			// icon:
 			//		Path for an image, or DOM button class name.
+			title = title || "";
 			if(icon && icon.indexOf("mblDomButton") === 0){
 				// DOM button
 				if(!node){
@@ -158,7 +160,7 @@ define([
 				if(!node || node.nodeName !== "IMG"){
 					node = domConstruct.create("img", {
 						alt: title
-					}, refNode || parent, pos); /* 1.8 */
+					}, refNode || parent, pos);
 				}
 				node.src = (icon || "").replace("${theme}", dm.currentTheme);
 				this.setupSpriteIcon(node, iconPos);
@@ -170,7 +172,7 @@ define([
 					});
 					domClass.add(parent, "mblSpriteIconParent");
 				}
-				connect.connect(node, "ondragstart", event, "stop"); /* 1.8 */
+				connect.connect(node, "ondragstart", event, "stop");
 			}
 			return node;
 		};
@@ -214,7 +216,10 @@ define([
 					if(!iconNode){
 						iconNode = domConstruct.create("div", null, refNode || parent, pos);
 					}
-					this.createIcon(icon, iconPos, null, alt, iconNode);
+					this.createIcon(icon, iconPos, null, null, iconNode);
+					if(alt){
+						iconNode.title = alt;
+					}
 				}
 				domClass.remove(parent, "mblNoIcon");
 				return iconNode;

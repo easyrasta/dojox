@@ -7,10 +7,11 @@ define([
 	"dojo/dom-class",
 	"dojo/dom-construct",
 	"dojo/dom-style",
+	"dojo/touch",
 	"dijit/_Contained",
 	"dijit/_WidgetBase",
 	"./sniff"
-], function(array, connect, declare, event, win, domClass, domConstruct, domStyle, Contained, WidgetBase, has){
+], function(array, connect, declare, event, win, domClass, domConstruct, domStyle, touch, Contained, WidgetBase, has){
 
 /*=====
 	Contained = dijit._Contained;
@@ -62,16 +63,18 @@ define([
 
 		/* internal properties */
 		baseClass: "mblSwitch",
+		role: "", // a11y
 		_createdMasks: [],
 
 		buildRendering: function(){
-			this.domNode = domConstruct.create("table", {cellPadding:"0",cellSpacing:"0",border:"0"});
-			var cell = this.domNode.insertRow(-1).insertCell(-1);
+			this.domNode = (this.srcNodeRef && this.srcNodeRef.tagName === "SPAN") ?
+				this.srcNodeRef : domConstruct.create("span");
+			this.inherited(arguments);
 			var c = (this.srcNodeRef && this.srcNodeRef.className) || this.className || this["class"];
 			if((c = c.match(/mblSw.*Shape\d*/))){ this.shape = c; }
-			this.domNode.className = this.baseClass + " " + this.shape;
+			domClass.add(this.domNode, this.shape);
 			var nameAttr = this.name ? " name=\"" + this.name + "\"" : "";
-			cell.innerHTML =
+			this.domNode.innerHTML =
 				  '<div class="mblSwitchInner">'
 				+	'<div class="mblSwitchBg mblSwitchBgLeft">'
 				+		'<div class="mblSwitchText mblSwitchTextLeft"></div>'
@@ -82,7 +85,7 @@ define([
 				+	'<div class="mblSwitchKnob"></div>'
 				+	'<input type="hidden"'+nameAttr+'></div>'
 				+ '</div>';
-			var n = this.inner = cell.firstChild;
+			var n = this.inner = this.domNode.firstChild;
 			this.left = n.childNodes[0];
 			this.right = n.childNodes[1];
 			this.knob = n.childNodes[2];
@@ -92,7 +95,7 @@ define([
 		postCreate: function(){
 			this._clickHandle = this.connect(this.domNode, "onclick", "_onClick");
 			this._keydownHandle = this.connect(this.domNode, "onkeydown", "_onClick"); // for desktop browsers
-			this._startHandle = this.connect(this.domNode, has('touch') ? "ontouchstart" : "onmousedown", "onTouchStart");
+			this._startHandle = this.connect(this.domNode, touch.press, "onTouchStart");
 			this._initialValue = this.value; // for reset()
 		},
 
@@ -182,9 +185,10 @@ define([
 			this._moved = false;
 			this.innerStartX = this.inner.offsetLeft;
 			if(!this._conn){
-				this._conn = [];
-				this._conn.push(connect.connect(this.inner, has('touch') ? "ontouchmove" : "onmousemove", this, "onTouchMove"));
-				this._conn.push(connect.connect(this.inner, has('touch') ? "ontouchend" : "onmouseup", this, "onTouchEnd"));
+				this._conn = [
+					this.connect(this.inner, touch.move, "onTouchMove"),
+					this.connect(this.inner, touch.release, "onTouchEnd")
+				];
 			}
 			this.touchStartX = e.touches ? e.touches[0].pageX : e.clientX;
 			this.left.style.display = "";
