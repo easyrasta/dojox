@@ -86,20 +86,20 @@ var TableHandler = declare(_Plugin, {
 		
 		dojo.mixin(this.editor,{
 			getAncestorElement: function(tagName){
-				return dojo.withGlobal(this.window, "getAncestorElement",dijit._editor.selection, [tagName]);
+				return this._sCall("getAncestorElement", [tagName]);
 			},
 			hasAncestorElement: function(tagName){
-				return dojo.withGlobal(this.window, "hasAncestorElement",dijit._editor.selection, [tagName]);
+				return this._sCall("hasAncestorElement", [tagName]);
 			},
 			selectElement: function(elem){
-				dojo.withGlobal(this.window, "selectElement",dijit._editor.selection, [elem]);
+				this._sCall("selectElement", [elem]);
 			},
 			byId: function(id){
-				return dojo.withGlobal(this.window, "byId", dojo, [id]);
+				return dojo.byId(id, this.document);
 			},
 			query: function(arg, scope, returnFirstOnly){
 				// this shortcut is dubious - not sure scoping is necessary
-				var ar = dojo.withGlobal(this.window, "query", dojo, [arg, scope]);
+				var ar = dojo.query(arg, scope || this.document);
 				return (returnFirstOnly) ? ar[0] : ar;
 			}
 		});
@@ -216,7 +216,7 @@ var TableHandler = declare(_Plugin, {
 		tbl.addEventListener("drag", dojo.hitch(this, "onDragStart2"), false);
 		tbl.addEventListener("dragend", dojo.hitch(this, "onDragStart3"), false);
 	
-		dojo.withGlobal(this.editor.window, "selectElement",dijit._editor.selection, [tbl]);
+		this.editor._sCall("selectElement", [tbl]);
 		
 		tbl.ondragstart = function(){
 			//console.log("ondragstart");
@@ -248,7 +248,7 @@ var TableHandler = declare(_Plugin, {
 		var e = window.event;
 		var node = e.srcElement;
 		var id = node.id;
-		var win = this.editor.window;
+		var doc = this.editor.document;
 		//console.log("NODE:", node.tagName, node.id,  dojo.attr(node, "align"));
 		
 		// clearing a table's align attr
@@ -256,7 +256,7 @@ var TableHandler = declare(_Plugin, {
 		//	should move to its own method
 		if(node.tagName.toLowerCase()=="table"){
 			setTimeout(function(){
-				var node =  dojo.withGlobal(win, "byId", dojo, [id]);
+				var node = dojo.byId(id, doc);
 				dojo.removeAttr(node, "align");
 				//console.log("set", node.tagName, dojo.attr(node, "align"))
 			}, 100);
@@ -509,7 +509,7 @@ var TablePlugins = declare("dojox.editor.plugins.TablePlugins", _Plugin, {
 			// selects table that is in focus
 			var o = this.getTableInfo();
 			if(o && o.tbl){
-				dojo.withGlobal(this.editor.window, "selectElement",dijit._editor.selection, [o.tbl]);
+				this.editor._sCall("selectElement", [o.tbl]);
 			}
 		},
 		
@@ -676,7 +676,7 @@ var TablePlugins = declare("dojox.editor.plugins.TablePlugins", _Plugin, {
 
 			// Lets do this the way IE originally was (Looking up ids).  Walking the selection
 			// is inconsistent in the browsers (and painful), so going by ids is simpler.
-			var text = dojo.withGlobal(e.window, "getSelectedHtml",dijit._editor.selection, [null]);
+			var text = e._sCall("getSelectedHtml", [null]);
 			var str = text.match(/id="*\w*"*/g);
 			dojo.forEach(str, function(a){
 				var id = a.substring(3, a.length);
