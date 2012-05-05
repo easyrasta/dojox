@@ -197,7 +197,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 				var s = this.group;
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
-			var t = this.chart.theme, stroke, outline, marker, events = this.events();
+			var t = this.chart.theme, events = this.events();
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
@@ -218,188 +218,234 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 				}
 
 				var theme = t.next(this.opt.areas ? "area" : "line", [this.opt, run], true),
-					s = run.group, rsegments = [], startindexes = [], rseg = null, lpoly,
+					lpoly, height = dim.height - offsets.b,
 					ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
-					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
-					eventSeries = this._eventSeries[run.name] = new Array(run.data.length);
+					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
+				this._eventSeries[run.name] = new Array(run.data.length);
 				
 				// optim works only for index based case
 				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number";
 				});
-				var min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0, 
-						max = indexed?Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to)):run.data.length;
-
-				// split the run data into dense segments (each containing no nulls)
-				// except if interpolates is false in which case ignore null between valid data
-				for(var j = min; j < max; j++){
-					if(run.data[j] != null && (indexed || run.data[j].y != null)){
-						if(!rseg){
-							rseg = [];
-							startindexes.push(j);
-							rsegments.push(rseg);
-						}
-						rseg.push(run.data[j]);
-					}else{
-						if(!this.opt.interpolate || indexed){
-							// we break the line only if not interpolating or if we have indexed data
-							rseg = null;
-						}
+				
+				var segments = this.buildSegments(i, indexed);
+				for(var seg = 0; seg < segments.length; seg++){
+					lpoly = this.buildPoly(segments[seg], ht, vt, height, offsets);
+					if(indexed){
+						seg = this.interpolatePoly(lpoly, segments, seg, ht, vt, height, offsets);
 					}
-				}
-
-				for(var seg = 0; seg < rsegments.length; seg++){
-					if(typeof rsegments[seg][0] == "number"){
-						lpoly = arr.map(rsegments[seg], function(v, i){
-							return {
-								x: ht(i + startindexes[seg] + 1) + offsets.l,
-								y: dim.height - offsets.b - vt(v),
-								data: v
-							};
-						}, this);
-					}else{
-						lpoly = arr.map(rsegments[seg], function(v){
-							return {
-								x: ht(v.x) + offsets.l,
-								y: dim.height - offsets.b - vt(v.y),
-								data: v
-							};
-						}, this);
-					}
-
-					// if we are indexed & we interpolate we need to put all the segments as a single one now
-					if(indexed && this.opt.interpolate){
-						while(seg < rsegments.length) {
-							seg++;
-							lpoly = lpoly.concat(arr.map(rsegments[seg], function(v, i){
-								return {
-									x: ht(i + startindexes[seg] + 1) + offsets.l,
-									y: dim.height - offsets.b - vt(v),
-									data: v
-								};
-							}, this));
-						}
-					} 
-
 					var lpath = this.opt.tension ? dc.curve(lpoly, this.opt.tension) : "";
 
-					if(this.opt.areas && lpoly.length > 1){
-						var fill = theme.series.fill;
-						var apoly = lang.clone(lpoly);
-						if(this.opt.tension){
-							var apath = "L" + apoly[apoly.length-1].x + "," + (dim.height - offsets.b) +
-								" L" + apoly[0].x + "," + (dim.height - offsets.b) +
-								" L" + apoly[0].x + "," + apoly[0].y;
-							run.dyn.fill = s.createPath(lpath + " " + apath).setFill(fill).getFill();
-						} else {
-							apoly.push({x: lpoly[lpoly.length - 1].x, y: dim.height - offsets.b});
-							apoly.push({x: lpoly[0].x, y: dim.height - offsets.b});
-							apoly.push(lpoly[0]);
-							run.dyn.fill = s.createPolyline(apoly).setFill(fill).getFill();
-						}
-					}
-					if(this.opt.lines || this.opt.markers){
-						// need a stroke
-						stroke = theme.series.stroke;
-						if(theme.series.outline){
-							outline = run.dyn.outline = dc.makeStroke(theme.series.outline);
-							outline.width = 2 * outline.width + stroke.width;
-						}
-					}
-					if(this.opt.markers){
-						run.dyn.marker = theme.symbol;
-					}
-					var frontMarkers = null, outlineMarkers = null, shadowMarkers = null;
-					if(stroke && theme.series.shadow && lpoly.length > 1){
-						var shadow = theme.series.shadow,
-							spoly = arr.map(lpoly, function(c){
-								return {x: c.x + shadow.dx, y: c.y + shadow.dy};
-							});
-						if(this.opt.lines){
-							if(this.opt.tension){
-								run.dyn.shadow = s.createPath(dc.curve(spoly, this.opt.tension)).setStroke(shadow).getStroke();
-							} else {
-								run.dyn.shadow = s.createPolyline(spoly).setStroke(shadow).getStroke();
-							}
-						}
-						if(this.opt.markers && theme.marker.shadow){
-							shadow = theme.marker.shadow;
-							shadowMarkers = arr.map(spoly, function(c){
-								return this.createPath(run, s, "M" + c.x + " " + c.y + " " + theme.symbol).
-									setStroke(shadow).setFill(shadow.color);
-							}, this);
-						}
-					}
-					if(this.opt.lines && lpoly.length > 1){
-						if(outline){
-							if(this.opt.tension){
-								run.dyn.outline = s.createPath(lpath).setStroke(outline).getStroke();
-							} else {
-								run.dyn.outline = s.createPolyline(lpoly).setStroke(outline).getStroke();
-							}
-						}
-						if(this.opt.tension){
-							run.dyn.stroke = s.createPath(lpath).setStroke(stroke).getStroke();
-						} else {
-							run.dyn.stroke = s.createPolyline(lpoly).setStroke(stroke).getStroke();
-						}
-					}
-					if(this.opt.markers){
-						var markerTheme = theme; 
-						frontMarkers = new Array(lpoly.length);
-						outlineMarkers = new Array(lpoly.length);
-						outline = null;
-						if(markerTheme.marker.outline){
-							outline = dc.makeStroke(markerTheme.marker.outline);
-							outline.width = 2 * outline.width + (markerTheme.marker.stroke ? markerTheme.marker.stroke.width : 0);
-						}
-						arr.forEach(lpoly, function(c, i){
-							if(this.opt.styleFunc || typeof c.data != "number"){
-								var tMixin = typeof c.data != "number" ? [c.data] : [];
-								if(this.opt.styleFunc){
-									tMixin.push(this.opt.styleFunc(c.data));
-								}
-								markerTheme = t.addMixin(theme, "marker", tMixin, true);
-							}else{
-								markerTheme = t.post(theme, "marker");
-							}
-							var path = "M" + c.x + " " + c.y + " " + markerTheme.symbol;
-							if(outline){
-								outlineMarkers[i] = this.createPath(run, s, path).setStroke(outline);
-							}
-							frontMarkers[i] = this.createPath(run, s, path).setStroke(markerTheme.marker.stroke).setFill(markerTheme.marker.fill);
-						}, this);
-						run.dyn.markerFill = markerTheme.marker.fill;
-						run.dyn.markerStroke = markerTheme.marker.stroke;
-						if(events){
-							arr.forEach(frontMarkers, function(s, i){
-								var o = {
-									element: "marker",
-									index:   i + startindexes[seg],
-									run:     run,
-									shape:   s,
-									outline: outlineMarkers[i] || null,
-									shadow:  shadowMarkers && shadowMarkers[i] || null,
-									cx:      lpoly[i].x,
-									cy:      lpoly[i].y
-								};
-								if(typeof rsegments[seg][0] == "number"){
-									o.x = i + startindexes[seg] + 1;
-									o.y = rsegments[seg][i];
-								}else{
-									o.x = rsegments[seg][i].x;
-									o.y = rsegments[seg][i].y;
-								}
-								this._connectEvents(o);
-								eventSeries[i + startindexes[seg]] = o;
-							}, this);
-						}else{
-							delete this._eventSeries[run.name];
-						}
-					}
+					this.renderArea(theme, run, lpoly, lpath, height);
+					this.renderLines(theme, run, lpoly, lpath);
+					this.renderMarkers(theme, lpoly, events, run, segments[seg]);
 				}
 				run.dirty = false;
 			}
+			
+			this.animateRenderer(dim.height - offsets.b);
+			
+			this.dirty = false;
+			return this;	//	dojox.charting.plot2d.Default
+		},
+		
+		buildSegments: function(i, indexed){
+			var run = this.series[i],
+				min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0, 
+				max = indexed?Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to)):run.data.length,
+				rseg = null, segments = [];
+
+			// split the run data into dense segments (each containing no nulls)
+			// except if interpolates is false in which case ignore null between valid data
+			for(var j = min; j < max; j++){
+				if(run.data[j] != null && (indexed || run.data[j].y != null)){
+					if(!rseg){
+						rseg = [];
+						segments.push({index: j, rseg: rseg});
+					}
+					rseg.push(this.getSeriesValue(i, j));
+				}else{
+					if(!this.opt.interpolate || indexed){
+						// we break the line only if not interpolating or if we have indexed data
+						rseg = null;
+					}
+				}
+			}
+			return segments;
+		},
+		
+		getSeriesValue: function(i, index){
+			return this.series[i].data[index];
+		},
+		
+		interpolatePoly: function(lpoly, segments, seg, ht, vt, height, offsets){
+			// if we are indexed & we interpolate we need to put all the segments as a single one now
+			if(this.opt.interpolate){
+				while(seg < segments.length) {
+					seg++;
+					lpoly = lpoly.concat(arr.map(segments[seg].rseg, function(v, i){
+						return {
+							x: ht(i + segmesegmentsnt[seg].index + 1) + offsets.l,
+							y: height - vt(v),
+							data: v
+						};
+					}, this));
+				}
+			}
+			return seg;
+		},
+		
+		buildPoly: function(segment, ht, vt, height, offsets){
+			var lpoly;
+			if(typeof segment.rseg[0] == "number"){
+				lpoly = arr.map(segment.rseg, function(v, i){
+					return {
+						x: ht(i + segment.index + 1) + offsets.l,
+						y: height - vt(v),
+						data: v
+					};
+				}, this);
+			}else{
+				lpoly = arr.map(segment.rseg, function(v){
+					return {
+						x: ht(v.x) + offsets.l,
+						y: height - vt(v.y),
+						data: v
+					};
+				}, this);
+			}
+			return lpoly;
+		},
+		
+		renderArea: function(theme, run, lpoly, lpath, height){
+			if(this.opt.areas && lpoly.length > 1){
+				var fill = theme.series.fill;
+				var apoly = lang.clone(lpoly);
+				if(this.opt.tension){
+					var apath = "L" + apoly[apoly.length-1].x + "," + height +
+						" L" + apoly[0].x + "," + height +
+						" L" + apoly[0].x + "," + apoly[0].y;
+					run.dyn.fill = run.group.createPath(lpath + " " + apath).setFill(fill).getFill();
+				} else {
+					apoly.push({x: lpoly[lpoly.length - 1].x, y: height});
+					apoly.push({x: lpoly[0].x, y: height});
+					apoly.push(lpoly[0]);
+					run.dyn.fill = run.group.createPolyline(apoly).setFill(fill).getFill();
+				}
+			}
+		},
+		
+		renderLines: function(theme, run, lpoly, lpath){
+			if(this.opt.lines){
+				// need a stroke
+				var stroke = theme.series.stroke,
+				s = run.group,
+				outline = null;
+				if(theme.series.outline){
+					outline = run.dyn.outline = dc.makeStroke(theme.series.outline);
+					outline.width = 2 * outline.width + stroke.width;
+				}
+				if(lpoly.length > 1){
+					if(theme.series.shadow){
+						var shadow = theme.series.shadow,
+						spoly = arr.map(lpoly, function(c){
+							return {x: c.x + shadow.dx, y: c.y + shadow.dy};
+						});
+						if(this.opt.tension){
+							run.dyn.shadow = s.createPath(dc.curve(spoly, this.opt.tension)).setStroke(shadow).getStroke();
+						} else {
+							run.dyn.shadow = s.createPolyline(spoly).setStroke(shadow).getStroke();
+						}
+					}
+				
+					if(outline){
+						if(this.opt.tension){
+							run.dyn.outline = s.createPath(lpath).setStroke(outline).getStroke();
+						} else {
+							run.dyn.outline = s.createPolyline(lpoly).setStroke(outline).getStroke();
+						}
+					}
+					if(this.opt.tension){
+						run.dyn.stroke = s.createPath(lpath).setStroke(stroke).getStroke();
+					} else {
+						run.dyn.stroke = s.createPolyline(lpoly).setStroke(stroke).getStroke();
+					}
+				}
+			}
+		},
+		
+		renderMarkers: function(theme, lpoly, events, run, segments){
+			var markerTheme = theme;
+			if(this.opt.markers){
+				var frontMarkers = new Array(lpoly.length),
+				outlineMarkers = new Array(lpoly.length),
+				outline = null;
+				run.dyn.marker = theme.symbol;
+				
+				var shadowMarkers = null;
+				if(theme.series.stroke && lpoly.length > 1 && theme.marker.shadow){
+					var spoly = arr.map(lpoly, function(c){
+						return {x: c.x + theme.series.shadow.dx, y: c.y + theme.series.shadow.dy};
+					});
+					shadowMarkers = arr.map(spoly, function(c){
+						return this.createPath(run, run.group, "M" + c.x + " " + c.y + " " + theme.symbol).
+							setStroke(theme.marker.shadow).setFill(theme.marker.shadow.color);
+					}, this);
+				}
+				
+				if(markerTheme.marker.outline){
+					outline = dc.makeStroke(markerTheme.marker.outline);
+					outline.width = 2 * outline.width + (markerTheme.marker.stroke ? markerTheme.marker.stroke.width : 0);
+				}
+				
+				arr.forEach(lpoly, function(c, i){
+					if(this.opt.styleFunc || typeof c.data != "number"){
+						var tMixin = typeof c.data != "number" ? [c.data] : [];
+						if(this.opt.styleFunc){
+							tMixin.push(this.opt.styleFunc(c.data));
+						}
+						markerTheme = this.chart.theme.addMixin(theme, "marker", tMixin, true);
+					}else{
+						markerTheme = this.chart.theme.post(theme, "marker");
+					}
+					var path = "M" + c.x + " " + c.y + " " + markerTheme.symbol;
+					if(outline){
+						outlineMarkers[i] = this.createPath(run, run.group, path).setStroke(outline);
+					}
+					frontMarkers[i] = this.createPath(run, run.group, path).setStroke(markerTheme.marker.stroke).setFill(markerTheme.marker.fill);
+				}, this);
+				
+				run.dyn.markerFill = markerTheme.marker.fill;
+				run.dyn.markerStroke = markerTheme.marker.stroke;
+				if(events){
+					arr.forEach(frontMarkers, function(s, i){
+						var o = {
+							element: "marker",
+							index:   i + segments.index,
+							run:     run,
+							shape:   s,
+							outline: outlineMarkers[i] || null,
+							shadow:  shadowMarkers && shadowMarkers[i] || null,
+							cx:      lpoly[i].x,
+							cy:      lpoly[i].y
+						};
+						if(typeof segments.rseg[0] == "number"){
+							o.x = i + segments.index + 1;
+							o.y = segments.rseg[i];
+						}else{
+							o.x = segments.rseg[i].x;
+							o.y = segments.rseg[i].y;
+						}
+						this._connectEvents(o);
+						this._eventSeries[run.name][i + segments.index] = o;
+					}, this);
+				}else{
+					delete this._eventSeries[run.name];
+				}
+			}
+		},
+		
+		animateRenderer: function(height){
 			if(this.animate){
 				// grow from the bottom
 				var plotGroup = this.group;
@@ -407,14 +453,12 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					shape: plotGroup,
 					duration: DEFAULT_ANIMATION_LENGTH,
 					transform:[
-						{name:"translate", start: [0, dim.height - offsets.b], end: [0, 0]},
+						{name:"translate", start: [0, height], end: [0, 0]},
 						{name:"scale", start: [1, 0], end:[1, 1]},
 						{name:"original"}
 					]
 				}, this.animate)).play();
 			}
-			this.dirty = false;
-			return this;	//	dojox.charting.plot2d.Default
 		}
 	});
 });
