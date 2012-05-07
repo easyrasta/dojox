@@ -1,0 +1,164 @@
+<!--[if IE 7]>
+<!DOCTYPE>
+<html lang="en">
+	<head>
+<![endif]-->
+<!--[if IE 8]>
+<!DOCTYPE>
+<html lang="en">
+    <head>
+           <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+<![endif]-->
+<![if gte IE 9]>
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+<![endif]>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Test Missing point interpolation</title>
+		<style type="text/css">
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dijit/tests/css/dijitTests.css";
+		</style>
+		<!-- required for Tooltip: a default dijit theme: -->
+		<link rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+		<script type="text/javascript" src="../../../dojo/dojo.js" data-dojo-config="isDebug: true, async: false, parseOnLoad: true"></script>
+
+		<script type="text/javascript">
+			var seriesA = [
+				{ x: 1, y : null },
+				{ x: 2, y : 2 },
+				{ x: 3, y : 2 },
+				{ x: 4, y : 3 },
+				{ x: 5, y: null },
+				{ x: 6, y: 3 },
+				{ x: 7, y: 4 },
+				{ x: 8, y: null },
+				{ x: 9, y: 5 },
+				{ x: 10, y: 4 }
+			];
+			var seriesC = [
+				{ x: 2, y: 4 },
+				{ x: 3, y: 4 },
+				{ x: 5, y: 5 },
+				{ x: 6, y: 5 },
+				{ x: 7, y: 6 },
+				{ x: 9, y: 3 },
+				{ x: 10, y: 4 }
+			];
+			// in theory this should not happen, this is really invalid data set...
+			var seriesD = [
+				null,
+				{ x: 2, y : 5 },
+				{ x: 3, y : 5 },
+				null,
+				null,
+				{ x: 6, y: 6 },
+				{ x: 7, y: 7 },
+			    null,
+				{ x: 9, y: 3 },
+				{ x: 10, y: 2 }
+			];
+			require([
+			         "dojo/ready",
+			         "dojo/dom",
+			         "dojo/dom-style",
+			"dojox/charting/Chart",
+			"dojox/charting/axis2d/Default",
+			"dojox/charting/plot2d/Lines",
+			"dojox/charting/plot2d/StackedLines",
+			"dojox/charting/themes/Adobebricks",
+			"dojox/dtl",
+			"dojox/dtl/Context"
+			], function(ready, dom, domStyle, Chart, Default, Lines, StackedLines, Adobebricks, dtl, Context){
+				charts = [
+				{
+					description: "Test missing points on Lines chart",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+							addPlot("default", { type: "Lines"}).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				},
+				
+				{
+					description: "Test missing points with interpolate on Lines chart ",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+							addPlot("default", { type: "Lines", interpolate: true}).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				},
+				
+				{
+					description: "Test missing points on StackedLines chart",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+							addPlot("default", { type: "StackedLines"}).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				},
+				
+				{
+					description: "Test missing points with interpolate on StackedLines chart ",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+							addPlot("default", { type: "StackedLines", interpolate: true}).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				}
+				];
+				
+				ready(function(){
+					var defaultStyle = { width: "400px", height: "200px" };
+					var tmpl = new dtl.Template(dom.byId("template").value);
+					var context = new Context({ charts: charts });
+					dom.byId("charts").innerHTML = tmpl.render(context);
+
+					dojo.forEach(charts, function(item, idx){
+						var n = dojo.byId("chart_"+idx);
+						domStyle.set(n, item.style||defaultStyle);
+						item.makeChart(n);
+					});
+				});
+			});
+		</script>
+	</head>
+	<body class="tundra">
+		<textarea id="template" style="display: none;">
+			{% for item in charts %}
+				<p>{{ forloop.counter }}: {{ item.description }}</p>
+				<div id="chart_{{ forloop.counter0 }}"></div>
+			{% endfor %}
+		</textarea>
+	
+		<h1>Chart 2D: Animation tests</h1>
+	
+		<div id="charts"></div>
+		<p>That's all Folks!</p>
+	</body>
+</html>
