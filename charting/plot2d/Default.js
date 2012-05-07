@@ -201,6 +201,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
+				console.log("render Serie "+i, run);
 				if(!this.dirty && !run.dirty){
 					t.skip();
 					this._reconnectEvents(run.name);
@@ -263,7 +264,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 						rseg = [];
 						segments.push({index: j, rseg: rseg});
 					}
-					rseg.push(this.getSeriesValue(i, j));
+					rseg.push(this.getSeriesValue(i, j, indexed));
 				}else{
 					if(!this.opt.interpolate || indexed){
 						// we break the line only if not interpolating or if we have indexed data
@@ -274,7 +275,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			return segments;
 		},
 		
-		getSeriesValue: function(i, index){
+		getSeriesValue: function(i, index, indexed){
 			return this.series[i].data[index];
 		},
 		
@@ -285,7 +286,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					seg++;
 					lpoly = lpoly.concat(arr.map(segments[seg].rseg, function(v, i){
 						return {
-							x: ht(i + segmesegmentsnt[seg].index + 1) + offsets.l,
+							x: ht(i + segments[seg].index + 1) + offsets.l,
 							y: height - vt(v),
 							data: v
 						};
