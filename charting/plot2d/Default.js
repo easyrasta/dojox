@@ -201,7 +201,6 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
-				console.log("render Serie "+i, run);
 				if(!this.dirty && !run.dirty){
 					t.skip();
 					this._reconnectEvents(run.name);
@@ -233,7 +232,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 				for(var seg = 0; seg < segments.length; seg++){
 					lpoly = this.buildPoly(segments[seg], ht, vt, height, offsets);
 					if(indexed){
-						seg = this.interpolatePoly(lpoly, segments, seg, ht, vt, height, offsets);
+						var r = this.interpolatePoly(lpoly, segments, seg, ht, vt, height, offsets);
+						seg = r.seg, lpoly = r.lpoly;
 					}
 					var lpath = this.opt.tension ? dc.curve(lpoly, this.opt.tension) : "";
 
@@ -284,7 +284,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			if(this.opt.interpolate){
 				while(seg < segments.length) {
 					seg++;
-					lpoly = lpoly.concat(arr.map(segments[seg].rseg, function(v, i){
+					lpoly = lpoly.concat(arr.map(segments[seg] ? segments[seg].rseg: [], function(v, i){
 						return {
 							x: ht(i + segments[seg].index + 1) + offsets.l,
 							y: height - vt(v),
@@ -293,7 +293,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					}, this));
 				}
 			}
-			return seg;
+			return {seg:seg, lpoly:lpoly};
 		},
 		
 		buildPoly: function(segment, ht, vt, height, offsets){
