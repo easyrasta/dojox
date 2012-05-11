@@ -11,10 +11,6 @@ define([
 	"./iconUtils"
 ], function(array, declare, event, lang, win, domClass, domConstruct, touch, WidgetBase, iconUtils){
 
-/*=====
-	var WidgetBase = dijit._WidgetBase;
-=====*/
-
 	// module:
 	//		dojox/mobile/ValuePickerSlot
 	// summary:
@@ -219,8 +215,12 @@ define([
 			this.touchStartY = e.touches ? e.touches[0].pageY : e.clientY;
 			domClass.add(e.currentTarget, "mblValuePickerSlotButtonSelected");
 			this._btn = e.currentTarget;
+			if(this._timer){
+				clearTimeout(this._timer); // fail safe
+				this._timer = null;
+			}
 			if(this._interval){
-				clearTimeout(this._interval); // fail safe
+				clearInterval(this._interval); // fail safe
 				this._interval = null;
 			}
 			this._timer = setTimeout(lang.hitch(this, function(){
@@ -237,8 +237,12 @@ define([
 			var y = e.touches ? e.touches[0].pageY : e.clientY;
 			if(Math.abs(x - this.touchStartX) >= 4 ||
 			   Math.abs(y - this.touchStartY) >= 4){ // dojox.mobile.scrollable#threshold
+			   	if(this._timer){
+					clearTimeout(this._timer); // fail safe
+					this._timer = null;
+				}
 				if(this._interval){
-					clearTimeout(this._interval);
+					clearInterval(this._interval); // fail safe
 					this._interval = null;
 				}
 				array.forEach(this._conn, this.disconnect, this);
@@ -254,7 +258,7 @@ define([
 			array.forEach(this._conn, this.disconnect, this);
 			domClass.remove(this._btn, "mblValuePickerSlotButtonSelected");
 			if(this._interval){
-				clearTimeout(this._interval);
+				clearInterval(this._interval);
 				this._interval = null;
 			}else{
 				this._onClick(e);

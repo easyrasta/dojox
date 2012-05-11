@@ -9,22 +9,20 @@
 			@import "css/app-format.css";
 			@import "../../../dijit/themes/claro/claro.css";
 		</style>
-<script type="text/javascript" data-dojo-config="parseOnLoad:0,isDebug:1,async:1" src="../../../dojo/dojo.js"></script>
+<script type="text/javascript" data-dojo-config="parseOnLoad:0,isDebug:1,async:1,mvc:{debugBindings:1}" src="../../../dojo/dojo.js"></script>
 <script type="text/javascript">
  		var model;
  
 		require([
 		'dojo/parser',
-        'dojox/mvc/at',
+		'dojo/when',
        	'dojox/mvc/EditModelRefController',
 		'dojo/Stateful',
  		'dojox/mvc/Group',
 		'dojox/mvc/Output',
 		'dojo/parser',
 		'dijit/form/TextBox',
-		'dijit/form/Button'], function(parser, at, EditModelRefController, Stateful){
-			window.at = at;
-			dojox.debugDataBinding=true;
+		'dijit/form/Button'], function(parser, when, EditModelRefController, Stateful){
 
 			// The dojox.mvc.StatefulModel class creates a data model instance
 			// where each leaf within the data model is decorated with dojo.Stateful
@@ -39,11 +37,13 @@
 					'dojo/domReady!'
 					], function(){
 						doh.register("parse", function() {
-							dojo.parser.parse();
-
-							var detailsGroup = dijit.byId('detailsGroup');
-							detailsGroup.set('target', model);
-
+							var dfd = new doh.Deferred();
+							when(dojo.parser.parse(), function(){
+								var detailsGroup = dijit.byId('detailsGroup');
+								detailsGroup.set('target', model);
+								dfd.callback(true);
+							});
+							return dfd;
 						});
 						// should be able to verify all of the inputs 
 						doh.register("check initial values and bindings", [{
@@ -122,6 +122,7 @@
 		</script>
 </head>
 	<body class="claro">
+		<script type="dojo/require">at: "dojox/mvc/at"</script>
 		<div id="wrapper">
 			<div id="header">
 				<div id="navigation"></div>

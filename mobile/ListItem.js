@@ -11,10 +11,6 @@ define([
 	"./ProgressIndicator"
 ], function(array, declare, lang, domClass, domConstruct, domStyle, registry, iconUtils, ItemBase, ProgressIndicator){
 
-/*=====
-	var ItemBase = dojox.mobile._ItemBase;
-=====*/
-
 	// module:
 	//		dojox/mobile/ListItem
 	// summary:
@@ -196,7 +192,7 @@ define([
 			}
 			if(this.variableHeight){
 				domClass.add(this.domNode, "mblVariableHeight");
-				setTimeout(lang.hitch(this, "layoutVariableHeight"), 0);
+				this.defer(lang.hitch(this, "layoutVariableHeight"), 0);
 			}
 
 			if(!this._isOnLine){
