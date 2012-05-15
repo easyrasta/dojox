@@ -172,6 +172,31 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			return path;
 		},
 
+		buildSegments: function(i, indexed){
+			var run = this.series[i],
+				min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0,
+				max = indexed?Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to)):run.data.length,
+				rseg = null, segments = [];
+
+			// split the run data into dense segments (each containing no nulls)
+			// except if interpolates is false in which case ignore null between valid data
+			for(var j = min; j < max; j++){
+				if(run.data[j] != null && (indexed || run.data[j].y != null)){
+					if(!rseg){
+						rseg = [];
+						segments.push({index: j, rseg: rseg});
+					}
+					rseg.push(run.data[j]);
+				}else{
+					if(!this.opt.interpolate || indexed){
+						// we break the line only if not interpolating or if we have indexed data
+						rseg = null;
+					}
+				}
+			}
+			return segments;
+		},
+
 		render: function(dim, offsets){
 			//	summary:
 			//		Render/draw everything on this plot.
@@ -189,12 +214,12 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			this.resetEvents();
 			this.dirty = this.isDirty();
+			var s = this.group;
 			if(this.dirty){
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				this.group.setTransform(null);
-				var s = this.group;
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, events = this.events();
@@ -353,6 +378,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 						spoly = arr.map(lpoly, function(c){
 							return {x: c.x + shadow.dx, y: c.y + shadow.dy};
 						});
+
 						if(this.opt.tension){
 							run.dyn.shadow = s.createPath(dc.curve(spoly, this.opt.tension)).setStroke(shadow).getStroke();
 						} else {
