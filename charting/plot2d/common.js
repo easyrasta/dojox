@@ -132,7 +132,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color",
 			}
 			return stats;
 		},
-
+		
 		curve: function(/* Number[] */a, /* Number|String */tension){
 			//	FIX for #7235, submitted by Enzo Michelangeli.
 			//	Emulates the smoothing algorithms used in a famous, unnamed spreadsheet

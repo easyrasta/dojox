@@ -201,6 +201,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
+				console.log("Serie::"+i, run);
 				if(!this.dirty && !run.dirty){
 					t.skip();
 					this._reconnectEvents(run.name);

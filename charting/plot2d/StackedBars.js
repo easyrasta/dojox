@@ -82,10 +82,16 @@ var bars = dojox.charting.plot2d.Bars;
 					var value = run.data[j];
 					if(value !== null){
 						var v = acc[j],
-							width = ht(v),
-							finalTheme = typeof value != "number" ?
-								t.addMixin(theme, "bar", value, true) :
-								t.post(theme, "bar");
+							width = ht(v);
+						if(this.opt.styleFunc || typeof value != "number"){
+								var tMixin = typeof value != "number" ? [value] : [];
+								if(this.opt.styleFunc){
+									tMixin.push(this.opt.styleFunc(value));
+								}
+								finalTheme = t.addMixin(theme, "bar", tMixin, true);
+							}else{
+								finalTheme = t.post(theme, "bar");
+							}
 						if(width >= 0 && height >= 1){
 							var rect = {
 								x: offsets.l,
