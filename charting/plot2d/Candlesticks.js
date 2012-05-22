@@ -137,7 +137,11 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 					continue;
 				}
 				run.cleanGroup();
-				var theme = t.next("candlestick", [this.opt, run]), s = run.group,
+				var theme = t.next("candlestick", [this.opt, run]);
+				if(run.hide){
+					continue;
+				}
+				s = run.group,
 					eventSeries = new Array(run.data.length);
 				for(var j = 0; j < run.data.length; ++j){
 					var v = run.data[j];

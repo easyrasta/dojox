@@ -54,6 +54,8 @@
             dojo.require("dojox.charting.plot2d.Columns");
             dojo.require("dojox.charting.plot2d.ClusteredColumns");
             dojo.require("dojox.charting.plot2d.StackedColumns");
+            dojo.require("dojox.charting.plot2d.Candlesticks");
+            
             dojo.require("dojox.charting.plot2d.Bubble");
             dojo.require("dojox.charting.plot2d.Pie");
 			dojo.require("dojox.charting.themes.MiamiNice");
@@ -66,6 +68,7 @@
 					addAxis("x",{natural: true, includeZero: true}).
 					addAxis("y",{natural: true, vertical:true}).
 					addSeries("A",[1,3,5,7,2,4,6]).
+					addSeries("B",[2,4,6,8,3,5,7]).
 					render();
 				var barsLegend = new dojox.charting.widget.SelectableLegend({chart: bars},"barsLegend");
 				
@@ -102,6 +105,32 @@
 					addSeries("C",[6,4,2,7,5,3,1]).
 					render();
 				var stackedAreaLegend = new dojox.charting.widget.SelectableLegend({chart: stackedArea},"stackedAreaLegend");
+				
+				var candleSticks = new dojox.charting.Chart("candleSticks").
+					setTheme(dojox.charting.themes.MiamiNice).
+					addPlot("default", {type:"Candlesticks", gap: 3}).
+					addAxis("y",{natural: true, includeZero: true, vertical:true}).
+					addAxis("x",{natural: true}).
+					addSeries("A",[
+						{ open: 20, close: 16, high: 22, low: 8 },
+						{ open: 16, close: 22, high: 26, low: 6, mid: 18 },
+						{ open: 22, close: 18, high: 22, low: 11, mid: 21 },
+						{ open: 18, close: 29, high: 32, low: 14, mid: 27 },
+						{ open: 29, close: 24, high: 29, low: 13, mid: 27 },
+						{ open: 24, close: 8, high: 24, low: 5 },
+						{ open: 8, close: 16, high: 22, low: 2 }
+					]).
+					addSeries("B",[
+						{ open: 24, close: 8, high: 24, low: 5 },
+						{ open: 8, close: 16, high: 22, low: 2 },
+						{ open: 16, close: 12, high: 19, low: 7 },
+						{ open: 12, close: 20, high: 22, low: 8 },
+						{ open: 20, close: 16, high: 22, low: 8 },
+						{ open: 16, close: 12, high: 19, low: 7 },
+						{ open: 12, close: 20, high: 22, low: 8 }
+					]).
+					render();
+				var candleSticksLegend = new dojox.charting.widget.SelectableLegend({chart: candleSticks},"candleSticksLegend");
 				
 				var columns = new dojox.charting.Chart("columns").
 					setTheme(dojox.charting.themes.MiamiNice).
@@ -174,7 +203,7 @@
 	                    text: "Japan"
 	                }]).
 					render();
-				var ainm = new dojox.charting.action2d.Highlight(pie,"default");
+				//var ainm = new dojox.charting.action2d.Highlight(pie,"default");
 				var pieLegend = new dojox.charting.widget.SelectableLegend({chart: pie,horizontal:false, outline: true},"pieLegend");
 				
 				var bubble = new dojox.charting.Chart("bubble").
@@ -195,67 +224,69 @@
 		<h1>Chart: Selectable Legend</h1>
 		<h3>Click the legends</h3>
 		<div style="clear:both;">
-		<div style="float:left;">
-		<h2>1.Bars</h2>
-		<div id="bars" class="bars"></div>
-		<div id="barsLegend"></div>
+			<div style="float:left;">
+				<h2>1.Bars</h2>
+				<div id="bars" class="bars"></div>
+				<div id="barsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>2.Clustered Bars</h2>
+				<div id="clusteredBars" class="bars"></div>
+				<div id="clusteredBarsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>3.Stacked Bars</h2>
+				<div id="stackedBars" class="bars"></div>
+				<div id="stackedBarsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>4.Stacked Area</h2>
+				<div id="stackedArea" class="bars"></div>
+				<div id="stackedAreaLegend"></div>
+			</div>
 		</div>
-		<div style="float:left;">
-		<h2>2.Clustered Bars</h2>
-		<div id="clusteredBars" class="bars"></div>
-		<div id="clusteredBarsLegend"></div>
-		</div>
-		<div style="float:left;">
-		<h2>3.Stacked Bars</h2>
-		<div id="stackedBars" class="bars"></div>
-		<div id="stackedBarsLegend"></div>
-		</div>
-		<div style="float:left;">
-		<h2>4.Stacked Area</h2>
-		<div id="stackedArea" class="bars"></div>
-		<div id="stackedAreaLegend"></div>
-		</div>
-		</div>
-		
-		
 		<div style="clear:both;">
-		<div style="float:left;">
-		<h2>5.Columns</h2>
-		<div id="columns" class="columns"></div>
-		<div id="columnsLegend"></div>
+			<div style="float:left;">
+				<h2>5.Columns</h2>
+				<div id="columns" class="columns"></div>
+				<div id="columnsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>6.Clustered Columns</h2>
+				<div id="clusteredColumns" class="columns"></div>
+				<div id="clusteredColumnsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>7.Stacked Columns</h2>
+				<div id="stackedColumns" class="columns"></div>
+				<div id="stackedColumnsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>8.Lines&Columns</h2>
+				<div id="linesColumns" class="columns"></div>
+				<div id="linesColumnsLegend"></div>
+			</div>
+			<div style="float:left;">
+				<h2>9.ClandeSticks</h2>
+				<div id="candleSticks" class="columns"></div>
+				<div id="candleSticksLegend"></div>
+			</div>
 		</div>
-		<div style="float:left;">
-		<h2>6.Clustered Columns</h2>
-		<div id="clusteredColumns" class="columns"></div>
-		<div id="clusteredColumnsLegend"></div>
-		</div>
-		<div style="float:left;">
-		<h2>7.Stacked Columns</h2>
-		<div id="stackedColumns" class="columns"></div>
-		<div id="stackedColumnsLegend"></div>
-		</div>
-		<div style="float:left;">
-		<h2>8.Lines&Columns</h2>
-		<div id="linesColumns" class="columns"></div>
-		<div id="linesColumnsLegend"></div>
-		</div>
-		</div>
-		
 		<div style="clear:both;">
-		<div style="float:left;">
-		<h2>9.Pie</h2>
-		<div id="pie" class="pie" style="float:left;"></div>
-		<div style="float:left;">
-		<div id="pieLegend"></div>
-		</div>
-		</div>
-		<div style="float:left;margin-left:40px">
-		<h2>10.Bubble</h2>
-		<div id="bubble" class="bubble" style="float:left;"></div>
-		<div style="float:left;">
-		<div id="bubbleLegend"></div>
-		</div>
-		</div>
+			<div style="float:left;">
+				<h2>10.Pie</h2>
+				<div id="pie" class="pie" style="float:left;"></div>
+				<div style="float:left;">
+					<div id="pieLegend"></div>
+				</div>
+			</div>
+			<div style="float:left;margin-left:40px">
+				<h2>11.Bubble</h2>
+				<div id="bubble" class="bubble" style="float:left;"></div>
+				<div style="float:left;">
+					<div id="bubbleLegend"></div>
+				</div>
+			</div>
 		</div>
 
     </body>

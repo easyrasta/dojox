@@ -79,7 +79,12 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 					continue;
 				}
 
-				var theme = t.next("marker", [this.opt, run]), s = run.group, lpoly,
+				var theme = t.next("marker", [this.opt, run]);
+				if(run.hide){
+					continue;
+				}
+				
+				var s = run.group, lpoly,
 					ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
 				if(typeof run.data[0] == "number"){

@@ -79,7 +79,11 @@ var Legend = dojox.charting.widget.Legend;
 			query("input", this.legend.legends[this.index])[0].focus();
 		}
 	});
-			
+	
+	var FakeHighlight = declare("FakeHighlight", Highlight, {
+		connect: function(){}
+	});
+	
 	declare("dojox.charting.widget.SelectableLegend", Legend, {
 		//	summary:
 		//		An enhanced chart legend supporting interactive events on data series
@@ -93,6 +97,7 @@ var Legend = dojox.charting.widget.Legend;
 			this.legends = [];
 			this.legendAnim = {};
 			this.inherited(arguments);
+			this.legendHighligthHandler = [];
 		},
 		refresh: function(){
 			this.legends = [];
@@ -140,23 +145,48 @@ var Legend = dojox.charting.widget.Legend;
 				//	toggle action
 				var legendCheckBox = query(".dijitCheckBox", legend)[0];
 				hub.connect(legendCheckBox, "onclick", this, function(e){
-					this._toggle(shapes, i, legend.vanished, originalDyn, seriesName, plotName);
+					console.log("check", legendCheckBox);
+					console.log("evt", e);
+					//this._toggle(i, legend.vanished, originalDyn, seriesName, plotName);
 					legend.vanished = !legend.vanished;
+					if(this._isPie()){
+						var plotPie = this.chart.getPlot(plotName);
+						if(plotPie.datasFilter.indexOf(i) != -1){
+							if(!legend.vanished){
+								plotPie.datasFilter = arrayUtil.filter(plotPie.datasFilter, function(item){
+									return item != i;
+								});
+							}
+						}else{
+							if(legend.vanished){
+								plotPie.datasFilter.push(i);
+							}
+						}
+						plotPie.dirty = true;
+						this.chart.render();
+					}else{ 
+						//if(this._getTransitionFill(plotName) != null){
+						targetData.hide = legend.vanished;
+						this.chart.getPlot(plotName).dirty = true;
+						this.chart.render();
+					}
 					e.stopPropagation();
 				});
-				
 				//	highlight action
 				var legendIcon = query(".dojoxLegendIcon", legend)[0],
 					iconShape = this._getFilledShape(this._surfaces[i].children);
 				arrayUtil.forEach(["onmouseenter", "onmouseleave"], function(event){
 					hub.connect(legendIcon, event, this, function(e){
-						this._highlight(e, iconShape, shapes, i, legend.vanished, originalDyn, seriesName, plotName);
+						this._highlight(e, iconShape, i, legend.vanished, originalDyn, seriesName, plotName);
 					});
 				}, this);
 			},this);
 		},
-		_toggle: function(shapes, index, isOff, dyn, seriesName, plotName){
-			arrayUtil.forEach(shapes, function(shape, i){
+		
+		
+		
+		_toggle: function(index, isOff, dyn, seriesName, plotName){
+			arrayUtil.forEach(this._getShapes(index, plotName), function(shape, i){
 				var startFill = dyn.fills[i],
 					endFill = this._getTransitionFill(plotName),
 					startStroke = dyn.strokes[i],
@@ -179,10 +209,11 @@ var Legend = dojox.charting.widget.Legend;
 				}
 			}, this);
 		},
-		_highlight: function(e, iconShape, shapes, index, isOff, dyn, seriesName, plotName){
+		_highlight: function(e, iconShape, index, isOff, dyn, seriesName, plotName){
 			if(!isOff){
 				var anim = this._getAnim(plotName),
 					isPie = this._isPie(),
+					isCandle = this._isCandleStick(plotName),
 					type = formatEventType(e.type);
 				//	highlight the label icon,
 				var label = {
@@ -191,13 +222,16 @@ var Legend = dojox.charting.widget.Legend;
 					run: {name: seriesName},
 					type: type
 				};
+				console.log("dyn", dyn);
 				anim.process(label);
 				//	highlight the data items
-				arrayUtil.forEach(shapes, function(shape, i){
-					shape.setFill(dyn.fills[i]);
+				arrayUtil.forEach(this._getShapes(index, plotName), function(shape, i){
+					console.log("dyn Fill", dyn.fills[isCandle? Math.ceil(i/2): i]);
+					console.log("shape Fill", shape.getFill());
+					shape.setFill(dyn.fills[isCandle? Math.ceil(i/2): i]);
 					var o = {
 						shape: shape,
-						index: isPie ? index : i,
+						index: isPie ? index : isCandle? Math.ceil(i/2): i,
 						run: {name: seriesName},
 						type: type
 					};
@@ -206,12 +240,37 @@ var Legend = dojox.charting.widget.Legend;
 				});
 			}
 		},
+		_getShapes: function(i, plotName){
+			var shapes = [];
+			if(this._isPie()){
+				var decrease = 0;
+				arrayUtil.forEach(this.chart.getPlot(plotName).datasFilter, function(item){
+					if( i> item){
+						decrease++;
+					}
+				});
+				shapes.push(this.chart.stack[0].group.children[i-decrease]);
+			}if(this._isCandleStick(plotName)){
+				console.log("candleSticks");
+				arrayUtil.forEach(this.chart.series[i].group.children, function(group){
+					arrayUtil.forEach(group.children, function(candle){
+						arrayUtil.forEach(candle.children, function(shape){
+							shapes.push(shape);
+						});
+					});
+				});
+			}else{
+				shapes = this.chart.series[i].group.children;
+			}
+			console.log("shapes", shapes);
+			return shapes;
+		},
 		_getAnim: function(plotName){
 			if(!this.legendAnim[plotName]){
-				this.legendAnim[plotName] = new Highlight(this.chart, plotName);
+				this.legendAnim[plotName] = new FakeHighlight(this.chart, plotName);
 				// calling this is marking the plot dirty however here this is a "fake" highlight action
 				// we don't want to re-render the chart, _highlight is the in charge of running the animation
-				this.chart.getPlot(plotName).dirty = false;
+				//this.chart.getPlot(plotName).dirty = false;
 			}
 			return this.legendAnim[plotName];
 		},
@@ -235,6 +294,9 @@ var Legend = dojox.charting.widget.Legend;
 		},
 		_isPie: function(){
 			return this.chart.stack[0].declaredClass == "dojox.charting.plot2d.Pie";
+		},
+		_isCandleStick: function(plotName){
+			return this.chart.stack[this.chart.plots[plotName]].declaredClass == "dojox.charting.plot2d.Candlesticks";
 		}
 	});
 	

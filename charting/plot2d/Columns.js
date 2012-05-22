@@ -107,6 +107,10 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 				events = this.events();
 			bar = this.getBarProperties();
 			
+			var length = this.series.length;
+			arr.forEach(this.series, function(serie){if(serie.hide){length--;}});
+			var z = length;
+			
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
 				if(!this.dirty && !run.dirty){
@@ -121,6 +125,10 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 				}
 				var theme = t.next("column", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
+				if(run.hide){
+					continue;
+				}
+				z--;
 				s = run.group;
 				var l = this.getDataLength(run);
 				for(var j = min; j < l; ++j){
@@ -144,7 +152,7 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 						
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
-								x: offsets.l + ht(val.x + 0.5) + bar.gap + bar.thickness * i,
+								x: offsets.l + ht(val.x + 0.5) + bar.gap + bar.thickness * z,
 								y: dim.height - offsets.b - (val.y > baseline ? vv : baselineHeight),
 								width: bar.width, 
 								height: h

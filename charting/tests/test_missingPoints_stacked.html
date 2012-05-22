@@ -77,10 +77,13 @@
 				"dojox/charting/plot2d/Columns",
 				"dojox/charting/plot2d/StackedColumns",
 				"dojox/charting/plot2d/ClusteredColumns",
+				"dojox/charting/plot2d/Bars",
+				"dojox/charting/plot2d/StackedBars",
+				"dojox/charting/plot2d/ClusteredBars",
 				"dojox/charting/themes/Adobebricks",
 				"dojox/dtl",
 				"dojox/dtl/Context"
-			], function(ready, dom, domStyle, Chart, Default, Lines, StackedLines, Columns, StackedColumns, ClusteredColumns, Adobebricks, dtl, Context){
+			], function(ready, dom, domStyle, Chart, Default, Lines, StackedLines, Columns, StackedColumns, ClusteredColumns, Bars, StackedBars, ClusteredBars, Adobebricks, dtl, Context){
 				charts = [
 				{
 					description: "Test missing points on Lines chart",
@@ -179,6 +182,49 @@
 							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
 							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 							addPlot("default", { type: "ClusteredColumns", gap: 3 }).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				
+				},
+				{
+					description: "Test missing points on StackedLines chart",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true }).
+							addPlot("default", { type: "Bars" }).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				},
+				{
+					description: "Test missing points on StackedLines chart",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true }).
+							addPlot("default", { type: "StackedBars" }).
+							addSeries("Series A", seriesA).
+							addSeries("Series C", seriesC ).
+							addSeries("Series D", seriesD).
+							render();
+					}
+				},
+				{
+					description: "Test missing points on StackedLines chart",
+					makeChart: function(node){
+						(new Chart(node)).
+							setTheme(Adobebricks).
+							addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true }).
+							addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true }).
+							addPlot("default", { type: "ClusteredBars", gap: 2 }).
 							addSeries("Series A", seriesA).
 							addSeries("Series C", seriesC ).
 							addSeries("Series D", seriesD).

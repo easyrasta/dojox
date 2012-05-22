@@ -172,31 +172,6 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			return path;
 		},
 
-		buildSegments: function(i, indexed){
-			var run = this.series[i],
-				min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0,
-				max = indexed?Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to)):run.data.length,
-				rseg = null, segments = [];
-
-			// split the run data into dense segments (each containing no nulls)
-			// except if interpolates is false in which case ignore null between valid data
-			for(var j = min; j < max; j++){
-				if(run.data[j] != null && (indexed || run.data[j].y != null)){
-					if(!rseg){
-						rseg = [];
-						segments.push({index: j, rseg: rseg});
-					}
-					rseg.push(run.data[j]);
-				}else{
-					if(!this.opt.interpolate || indexed){
-						// we break the line only if not interpolating or if we have indexed data
-						rseg = null;
-					}
-				}
-			}
-			return segments;
-		},
-
 		render: function(dim, offsets){
 			//	summary:
 			//		Render/draw everything on this plot.
@@ -214,12 +189,12 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			this.resetEvents();
 			this.dirty = this.isDirty();
-			var s = this.group;
 			if(this.dirty){
 				arr.forEach(this.series, purgeGroup);
 				this._eventSeries = {};
 				this.cleanGroup();
 				this.group.setTransform(null);
+				var s = this.group;
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
 			var t = this.chart.theme, events = this.events();
@@ -249,9 +224,13 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
 				this._eventSeries[run.name] = new Array(run.data.length);
 				
+				if(run.hide){
+					continue;
+				}
+				
 				// optim works only for index based case
 				var indexed = arr.some(run.data, function(item){
-					return typeof item == "number";
+					return typeof item == "number" || (item && item.y && !item.x);
 				});
 				
 				var segments = this.buildSegments(i, indexed);
@@ -267,10 +246,10 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					this.renderLines(theme, run, lpoly, lpath);
 					this.renderMarkers(theme, lpoly, events, run, segments[seg]);
 				}
+				
 				run.dirty = false;
 			}
-			
-			this.animateRenderer(dim.height - offsets.b);
+			this.animateRenderer(dim.height - offsets.b, this.group);
 			
 			this.dirty = false;
 			return this;	//	dojox.charting.plot2d.Default
@@ -473,19 +452,22 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			}
 		},
 		
-		animateRenderer: function(height){
+		animateRenderer: function(height, shape){
+			
 			if(this.animate){
 				// grow from the bottom
-				var plotGroup = this.group;
-				fx.animateTransform(lang.delegate({
+				var plotGroup = shape;
+				var animT = fx.animateTransform(lang.delegate({
 					shape: plotGroup,
-					duration: DEFAULT_ANIMATION_LENGTH,
+					duration: 1200,
 					transform:[
 						{name:"translate", start: [0, height], end: [0, 0]},
 						{name:"scale", start: [1, 0], end:[1, 1]},
 						{name:"original"}
 					]
-				}, this.animate)).play();
+				}, this.animate));
+				console.log("animT", animT);
+				animT.play();
 			}
 		}
 	});

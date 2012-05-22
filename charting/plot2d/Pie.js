@@ -112,6 +112,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			this.axes = [];
 			this.run = null;
 			this.dyn = [];
+			this.datasFilter = [];
 		},
 		clear: function(){
 			//	summary:
@@ -162,6 +163,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			if(!this.dirty){ return this; }
 			this.resetEvents();
 			this.dirty = false;
+			console.log("Pie::_eventSeries", this._eventSeries);
 			this._eventSeries = {};
 			this.cleanGroup();
 			var s = this.group, t = this.chart.theme;
@@ -179,9 +181,21 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 				taFontColor = "fontColor" in this.opt ? this.opt.fontColor : t.axis.fontColor,
 				startAngle = m._degToRad(this.opt.startAngle),
 				start = startAngle, step, filteredRun, slices, labels, shift, labelR,
-				run = this.run.data,
 				events = this.events();
-
+			var run = arr.map(this.run.data, function(item, i){
+				if(arr.some(this.datasFilter, function(filter){return filter == i;})){
+					if(typeof item == "number"){
+						return 0;
+					}else{
+						//TODO use mixin
+						return {y: 0, text: item.text};
+					}
+				}else{
+					return item;
+				}
+			}, this);
+			console.log("run", run);
+			
 			this.dyn = [];
 
 			if("radius" in this.opt){

@@ -92,7 +92,11 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 					continue;
 				}
 
-				var theme = t.next("circle", [this.opt, run]), s = run.group,
+				var theme = t.next("circle", [this.opt, run]);
+				if(run.hide){
+					continue;
+				}
+				s = run.group,
 					points = arr.map(run.data, function(v, i){
 						return v ? {
 							x: ht(v.x) + offsets.l,
