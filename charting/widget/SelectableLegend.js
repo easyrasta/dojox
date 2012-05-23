@@ -1,9 +1,9 @@
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query", 
 		"dojo/_base/connect", "dojo/_base/Color", "./Legend", "dijit/form/CheckBox", "../action2d/Highlight",
 		"dojox/lang/functional", "dojox/gfx/fx", "dojo/keys", "dojo/_base/event", "dojo/dom-construct",
-		"dojo/dom-prop"], 
+		"dojo/dom-prop", "dijit/registry"], 
 	function(lang, arrayUtil, declare, query, hub, Color, Legend, CheckBox,
-			 Highlight, df, fx, keys, event, dom, domProp){
+			 Highlight, df, fx, keys, event, dom, domProp, registry){
 /*=====
 var Legend = dojox.charting.widget.Legend;
 =====*/
@@ -129,27 +129,50 @@ var Legend = dojox.charting.widget.Legend;
 				var targetData, shapes = [], plotName, seriesName;
 				if(this._isPie()){
 					targetData = this.chart.stack[0];
-					shapes.push(targetData.group.children[i]);
+					//shapes.push(targetData.group.children[i]);
 					plotName = targetData.name;
 					seriesName = this.chart.series[0].name;
 				}else{
 					targetData = this.chart.series[i];
-					shapes = targetData.group.children;
+					
 					plotName = targetData.plot;
 					seriesName = targetData.name;
+					/*
+					if(this._isCandleStick(plotName)){
+						console.log("candleSticks");
+						arrayUtil.forEach(this.chart.series[i].group.children, function(group){
+							arrayUtil.forEach(group.children, function(candle){
+								arrayUtil.forEach(candle.children, function(shape){
+									if(shape.shape.type !="line"){
+									console.log("shape", shape);
+									shapes.push(shape);
+									}
+								});
+							});
+						});
+					}else{
+						shapes = targetData.group.children;
+					}
+					*/
 				}
+				
+				shapes = this._getShapes(i, plotName);
+				
 				var originalDyn = {
 					fills : df.map(shapes, "x.getFill()"),
 					strokes: df.map(shapes, "x.getStroke()")
 				};
 				//	toggle action
-				var legendCheckBox = query(".dijitCheckBox", legend)[0];
-				hub.connect(legendCheckBox, "onclick", this, function(e){
-					console.log("check", legendCheckBox);
+				var legendCheckBox = registry.byNode(query(".dijitCheckBox", legend)[0]);
+				console.log("checkbox", legendCheckBox);
+				hub.connect(legendCheckBox, "onClick", this, function(e){
 					console.log("evt", e);
+					
 					//this._toggle(i, legend.vanished, originalDyn, seriesName, plotName);
 					legend.vanished = !legend.vanished;
-					if(this._isPie()){
+					console.log("checked", legendCheckBox.get("checked"));
+					this.toogle(plotName, i, !legendCheckBox.get("checked"));
+					/*if(this._isPie()){
 						var plotPie = this.chart.getPlot(plotName);
 						if(plotPie.datasFilter.indexOf(i) != -1){
 							if(!legend.vanished){
@@ -166,10 +189,10 @@ var Legend = dojox.charting.widget.Legend;
 						this.chart.render();
 					}else{ 
 						//if(this._getTransitionFill(plotName) != null){
-						targetData.hide = legend.vanished;
+						targetData.hide = legendCheckBox.get("checked");
 						this.chart.getPlot(plotName).dirty = true;
 						this.chart.render();
-					}
+					}*/
 					e.stopPropagation();
 				});
 				//	highlight action
@@ -183,7 +206,27 @@ var Legend = dojox.charting.widget.Legend;
 			},this);
 		},
 		
-		
+		toogle: function(plotName, index, hide){
+			var plot =  this.chart.getPlot(plotName);
+			if(this._isPie()){
+				if(plot.datasFilter.indexOf(index) != -1){
+					if(!hide){
+						plot.datasFilter = arrayUtil.filter(plot.datasFilter, function(item){
+							return item != index;
+						});
+					}
+				}else{
+					if(hide){
+						plot.datasFilter.push(index);
+					}
+				}
+			}else{ 
+				//if(this._getTransitionFill(plotName) != null){
+				this.chart.series[index].hide = hide;
+			}
+			plot.dirty = true;
+			this.chart.render();
+		},
 		
 		_toggle: function(index, isOff, dyn, seriesName, plotName){
 			arrayUtil.forEach(this._getShapes(index, plotName), function(shape, i){
@@ -213,7 +256,6 @@ var Legend = dojox.charting.widget.Legend;
 			if(!isOff){
 				var anim = this._getAnim(plotName),
 					isPie = this._isPie(),
-					isCandle = this._isCandleStick(plotName),
 					type = formatEventType(e.type);
 				//	highlight the label icon,
 				var label = {
@@ -222,16 +264,16 @@ var Legend = dojox.charting.widget.Legend;
 					run: {name: seriesName},
 					type: type
 				};
-				console.log("dyn", dyn);
+				//console.log("dyn", dyn);
 				anim.process(label);
 				//	highlight the data items
 				arrayUtil.forEach(this._getShapes(index, plotName), function(shape, i){
-					console.log("dyn Fill", dyn.fills[isCandle? Math.ceil(i/2): i]);
-					console.log("shape Fill", shape.getFill());
-					shape.setFill(dyn.fills[isCandle? Math.ceil(i/2): i]);
+					//console.log("dyn Fill", dyn.fills[isCandle? Math.ceil(i/2): i]);
+					//console.log("shape Fill", shape.getFill());
+					shape.setFill(dyn.fills[i]);
 					var o = {
 						shape: shape,
-						index: isPie ? index : isCandle? Math.ceil(i/2): i,
+						index: isPie ? index : i,
 						run: {name: seriesName},
 						type: type
 					};
@@ -243,26 +285,30 @@ var Legend = dojox.charting.widget.Legend;
 		_getShapes: function(i, plotName){
 			var shapes = [];
 			if(this._isPie()){
+				console.log("_getShapes::Pie");
 				var decrease = 0;
 				arrayUtil.forEach(this.chart.getPlot(plotName).datasFilter, function(item){
-					if( i> item){
+					if(i > item){
 						decrease++;
 					}
 				});
 				shapes.push(this.chart.stack[0].group.children[i-decrease]);
-			}if(this._isCandleStick(plotName)){
-				console.log("candleSticks");
+			}else if(this._isCandleStick(plotName)){
+				console.log("_getShapes::candleSticks");
 				arrayUtil.forEach(this.chart.series[i].group.children, function(group){
 					arrayUtil.forEach(group.children, function(candle){
 						arrayUtil.forEach(candle.children, function(shape){
-							shapes.push(shape);
+							if(shape.shape.type !="line"){
+								shapes.push(shape);
+							}
 						});
 					});
 				});
 			}else{
+				console.log("_getShapes::other");
 				shapes = this.chart.series[i].group.children;
 			}
-			console.log("shapes", shapes);
+			//console.log("shapes", shapes);
 			return shapes;
 		},
 		_getAnim: function(plotName){
