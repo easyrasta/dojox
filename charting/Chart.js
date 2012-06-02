@@ -1150,6 +1150,7 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "dojo/dom-st
 		var plots = {}, axes = {};
 		arr.forEach(stack, function(plot){
 			var stats = plots[plot.name] = plot.getSeriesStats();
+			console.log("calculateAxes:stats", stats);
 			if(plot.hAxis){
 				axes[plot.hAxis] = combineStats(axes[plot.hAxis], hSection(stats));
 			}

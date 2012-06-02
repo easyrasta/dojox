@@ -56,7 +56,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 	
 		//	radius: Number?
 		//		The size of the radial gradient.  Default is 0.
-		radius:		0
+		radius:		0,
 
 		//	shadow: dojox.gfx.Stroke?
 		//		An optional stroke to use to draw any shadows for a series on a plot.
@@ -68,7 +68,7 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 
 		//	styleFunc: Function?
 		//		A function that returns a styling object for the a given data item.
-		styleFunc:	null,
+		styleFunc:	null
 	});
 	=====*/
 
@@ -163,7 +163,6 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 			if(!this.dirty){ return this; }
 			this.resetEvents();
 			this.dirty = false;
-			console.log("Pie::_eventSeries", this._eventSeries);
 			this._eventSeries = {};
 			this.cleanGroup();
 			var s = this.group, t = this.chart.theme;
@@ -182,7 +181,12 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 				startAngle = m._degToRad(this.opt.startAngle),
 				start = startAngle, step, filteredRun, slices, labels, shift, labelR,
 				events = this.events();
+			
 			var run = arr.map(this.run.data, function(item, i){
+				if(typeof item != "number" && item.hide){
+					this.datasFilter.push(i);
+					item.hide = false;
+				}
 				if(arr.some(this.datasFilter, function(filter){return filter == i;})){
 					if(typeof item == "number"){
 						return 0;
@@ -281,11 +285,11 @@ define(["dojo/_base/lang", "dojo/_base/array" ,"dojo/_base/declare",
 					// degenerated slice
 					return false;	// continue
 				}
+				var v = run[i], theme = themes[i], specialFill, o;
 				if(slice == 0){
-				  this.dyn.push({fill: null, stroke: null});
+				  this.dyn.push({fill: theme.series.fill, stroke: theme.series.stroke});
 				  return false;
 				}
-				var v = run[i], theme = themes[i], specialFill, o;
 				if(slice >= 1){
 					// whole pie
 					specialFill = this._plotFill(theme.series.fill, dim, offsets);

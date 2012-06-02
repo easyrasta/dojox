@@ -225,6 +225,17 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 				this._eventSeries[run.name] = new Array(run.data.length);
 				
 				if(run.hide){
+					if(this.opt.lines){
+						run.dyn.stroke = theme.series.stroke;
+					}
+					if(this.opt.markers){
+						run.dyn.markerFill = theme.marker.fill;
+						run.dyn.markerStroke = theme.marker.stroke;
+						run.dyn.marker = theme.symbol;
+					}
+					if(this.opt.areas){ 
+						run.dyn.fill = theme.series.fill;
+					}
 					continue;
 				}
 				

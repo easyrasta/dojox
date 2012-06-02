@@ -171,6 +171,8 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				var theme = t.next("bar", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
 				if(run.hide){
+					run.dyn.fill = theme.series.fill;
+					run.dyn.stroke = theme.series.stroke;
 					continue;
 				}
 				z--;

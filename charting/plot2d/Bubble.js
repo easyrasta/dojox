@@ -94,6 +94,9 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 
 				var theme = t.next("circle", [this.opt, run]);
 				if(run.hide){
+					run.dyn.fill = theme.series.fill;
+					run.dyn.stroke =  theme.series.stroke;
+				
 					continue;
 				}
 				s = run.group,

@@ -126,6 +126,7 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 				var theme = t.next("column", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
 				if(run.hide){
+					run.dyn.fill = theme.series.fill;
 					continue;
 				}
 				z--;

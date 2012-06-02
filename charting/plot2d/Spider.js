@@ -300,6 +300,15 @@ var PlotEvents = dojox.charting.plot2d._PlotEvents;
 			for (var i = this.series.length - 1; i >= 0; i--){
 				var serieEntry = this.series[i], run = serieEntry.data;
 				if(run !== null){
+					var theme = t.next("spider", [o, serieEntry]),
+						f = g.normalizeColor(theme.series.fill), 
+						sk = {color: theme.series.fill, width: seriesWidth};
+						f.a = o.seriesFillAlpha;
+						serieEntry.dyn = {fill: f, stroke: sk};
+					if(serieEntry.hide){
+						continue;
+					}
+					
 					//series polygon
 					var seriePoints = [], k = 0, tipData = [];
 					for(var key in run){
@@ -313,10 +322,7 @@ var PlotEvents = dojox.charting.plot2d._PlotEvents;
 					seriePoints[seriePoints.length] = seriePoints[0];
 					tipData[tipData.length] = tipData[0];
 					var polygonBoundRect = this._getBoundary(seriePoints),
-						theme = t.next("spider", [o, serieEntry]), ts = serieEntry.group,
-						f = g.normalizeColor(theme.series.fill), sk = {color: theme.series.fill, width: seriesWidth};
-					f.a = o.seriesFillAlpha;
-					serieEntry.dyn = {fill: f, stroke: sk};
+						 ts = serieEntry.group;
 					
 					var osps = this.oldSeriePoints[serieEntry.name];
 					var cs = this._createSeriesEntry(ts, (osps || innerPoints), seriePoints, f, sk, r, ro, ms, at);

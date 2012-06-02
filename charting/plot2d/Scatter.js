@@ -81,6 +81,9 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 
 				var theme = t.next("marker", [this.opt, run]);
 				if(run.hide){
+					run.dyn.marker = theme.symbol;
+					run.dyn.markerFill = theme.marker.fill;
+					run.dyn.markerStroke = theme.marker.stroke;
 					continue;
 				}
 				
@@ -151,8 +154,9 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 					}
 				}, this);
 				if(frontMarkers.length){
-					run.dyn.stroke = frontMarkers[frontMarkers.length - 1].getStroke();
-					run.dyn.fill   = frontMarkers[frontMarkers.length - 1].getFill();
+					run.dyn.marker = theme.symbol;
+					run.dyn.markerFill = frontMarkers[frontMarkers.length - 1].getFill();
+					run.dyn.markerStroke = frontMarkers[frontMarkers.length - 1].getStroke();
 				}
 
 				if(events){
