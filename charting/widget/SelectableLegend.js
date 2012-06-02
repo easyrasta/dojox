@@ -4,11 +4,8 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 		"dojo/dom-prop", "dijit/registry"], 
 	function(lang, arrayUtil, declare, query, hub, Color, Legend, CheckBox,
 			 Highlight, df, fx, keys, event, dom, domProp, registry){
-/*=====
-var Legend = dojox.charting.widget.Legend;
-=====*/
 	var FocusManager = declare(null, {
-		//	summary:
+		// summary:
 		//		It will take legend as a tab stop, and using
 		//		cursor keys to navigate labels within the legend.
 		constructor: function(legend){
@@ -85,7 +82,7 @@ var Legend = dojox.charting.widget.Legend;
 	});
 	
 	declare("dojox.charting.widget.SelectableLegend", Legend, {
-		//	summary:
+		// summary:
 		//		An enhanced chart legend supporting interactive events on data series
 		
 		//	theme component
@@ -123,6 +120,7 @@ var Legend = dojox.charting.widget.Legend;
 			// summary:
 			//		Apply click-event on checkbox and hover-event on legend icon,
 			//		highlight data series or toggle it.
+			
 			// if the chart has not yet been refreshed it will crash here (targetData.group == null)
 			if(this.chart.dirty){
 				return;
@@ -253,7 +251,7 @@ var Legend = dojox.charting.widget.Legend;
 			return null;
 		},
 		_getFilledShape: function(shapes){
-			//	summary:
+			// summary:
 			//		Get filled shape in legend icon which would be highlighted when hovered
 			var i = 0;
 			while(shapes[i]){

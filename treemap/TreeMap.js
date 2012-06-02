@@ -5,12 +5,6 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 	function(arr, lang, declare, event, Color, touch, when, on, query, domConstruct, domGeom, domClass, domStyle,
 		utils, _WidgetBase, _Invalidating, Selection, has){
 
-	/*=====
-	var _WidgetBase = dijit._WidgetBase;
-	var Selection = dojox.widget.Selection;
-	var _Invalidating = dojox.widget._Invalidating;
-	=====*/ 	
-	
 	return declare("dojox.treemap.TreeMap", [_WidgetBase, _Invalidating, Selection], {
 		//	summary:
 		//		A treemap widget.
@@ -25,10 +19,8 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 		//		A query that can be passed to when querying the store.
 		query: {},
 		
-		//	itemToRenderer: Object
+		//	itemToRenderer: [protected] Object
 		//		The associated array item to renderer list.
-		//	tags
-		//		protected
 		itemToRenderer: null,
 
 		// Data
@@ -331,7 +323,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The specified kind. This can either be "leaf", "group", "header" or "content". 
 			//	returns: DomNode
 			//		The renderer use for the specified kind.
-			//	tags
+			//	tags:
 			//		protected					
 			var div = domConstruct.create("div");
 			if(kind != "header"){
@@ -354,7 +346,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The item depth level.
 			//	kind: String
 			//		The specified kind. This can either be "leaf", "group", "header" or "content". 
-			//	tags
+			//	tags:
 			//		protected
 			switch(kind){
 				case "leaf":
@@ -432,7 +424,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		or just the result of the colorFunc.
 			//	item: Object
 			//		The data item.
-			//	tags
+			//	tags:
 			//		protected	
 			var value = this.colorFunc(item, this.store);
 			if(this.colorModel != null){
@@ -447,7 +439,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		Returns the label for a given item.
 			//	item: Object
 			//		The data item.
-			//	tags
+			//	tags:
 			//		protected	
 			return item.__treeName?item.__treeName:this.labelFunc(item, this.store);
 		},
@@ -576,7 +568,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The data item.
 			//	level: Number
 			//		The item depth level.
-			//	tags
+			//	tags:
 			//		private				
 			var forceCreate = renderer == null;
 			if(renderer == null){
@@ -607,7 +599,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The data item.
 			//	level: Number
 			//		The item depth level.
-			//	tags
+			//	tags:
 			//		private			
 			if(renderer == null){
 				renderer = this.createRenderer(item, level, "header");
@@ -628,7 +620,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The data item.
 			//	level: Number
 			//		The item depth level.
-			//	tags
+			//	tags:
 			//		private				
 			if(renderer == null){
 				renderer = this.createRenderer(item, level, "leaf");
@@ -653,7 +645,7 @@ define(["dojo/_base/array", "dojo/_base/lang", "dojo/_base/declare", "dojo/_base
 			//		The data item.
 			//	level: Number
 			//		The item depth level.
-			//	tags
+			//	tags:
 			//		private				
 			if(renderer == null){
 				renderer = this.createRenderer(item, level, "content");

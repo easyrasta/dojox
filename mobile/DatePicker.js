@@ -1,6 +1,7 @@
 define([
+	"dojo/_base/lang",
 	"./_PickerChooser!DatePicker"
-], function(DatePicker){
+], function(lang, DatePicker){
 
 	// module:
 	//		dojox/mobile/DatePicker
@@ -9,5 +10,5 @@ define([
 	//		Returns ValuePickerDatePicker when the current theme is "android".
 	//		Returns SpinWheelDatePicker otherwise.
 
-	return DatePicker;
+	return lang.setObject("dojox.mobile.DatePicker", DatePicker);
 });

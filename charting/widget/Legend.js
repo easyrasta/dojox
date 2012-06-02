@@ -3,25 +3,23 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dijit/_WidgetBase", "dojox/gfx
 		"dojo/dom", "dojo/dom-construct", "dojo/dom-class","dijit/registry"],
 		function(lang, declare, _WidgetBase, gfx, arrayUtil, df, dfa, dff,
 				dom, domFactory, domClass, registry){
-/*=====
-var _WidgetBase = dijit._WidgetBase;
-=====*/
 
 	var REVERSED_SERIES = /\.(StackedColumns|StackedAreas|ClusteredBars)$/;
 
 	return declare("dojox.charting.widget.Legend", _WidgetBase, {
-		// summary: A legend for a chart. A legend contains summary labels for
-		// each series of data contained in the chart.
-		//
-		// Set the horizontal attribute to boolean false to layout legend labels vertically.
-		// Set the horizontal attribute to a number to layout legend labels in horizontal
-		// rows each containing that number of labels (except possibly the last row).
-		//
-		// (Line or Scatter charts (colored lines with shape symbols) )
-		// -o- Series1		-X- Series2		-v- Series3
-		//
-		// (Area/Bar/Pie charts (letters represent colors))
-		// [a] Series1		[b] Series2		[c] Series3
+		// summary:
+		//		A legend for a chart. A legend contains summary labels for
+		//		each series of data contained in the chart.
+		//		
+		//		Set the horizontal attribute to boolean false to layout legend labels vertically.
+		//		Set the horizontal attribute to a number to layout legend labels in horizontal
+		//		rows each containing that number of labels (except possibly the last row).
+		//		
+		//		(Line or Scatter charts (colored lines with shape symbols) )
+		//		-o- Series1		-X- Series2		-v- Series3
+		//		
+		//		(Area/Bar/Pie charts (letters represent colors))
+		//		[a] Series1		[b] Series2		[c] Series3
 
 		chartRef:   "",
 		horizontal: true,
@@ -47,7 +45,8 @@ var _WidgetBase = dijit._WidgetBase;
 			this.inherited(arguments);
 		},
 		refresh: function(){
-			// summary: regenerates the legend to reflect changes to the chart
+			// summary:
+			//		regenerates the legend to reflect changes to the chart
 
 			// cleanup
 			if(this._surfaces){

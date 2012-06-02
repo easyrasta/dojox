@@ -1,11 +1,4 @@
-var _define;
-if(typeof define === "undefined"){ // assumes dojo.js is not loaded
-	define = _define = function(module, deps, def){
-		((arguments.length === 2) ? arguments[1] : arguments[2])();
-	};
-}
-
-define([
+(typeof define === "undefined" ? function(deps, def) { def(); } : define)([
 	"dojo/_base/config",
 	"dojo/_base/lang",
 	"dojo/_base/window",
@@ -234,7 +227,7 @@ define([
 					win.doc.documentElement.className = cls;
 					dm.currentTheme = theme;
 					var files = [].concat(m[i][2]);
-					for(j = t.length - 1; j >= 0; j--){
+					for(j = 0; j < t.length; j++){ 
 						var isArray = (t[j] instanceof Array || typeof t[j] == "array");
 						var path;
 						if(!isArray && t[j].indexOf('/') !== -1){
@@ -268,8 +261,5 @@ define([
 	}();
 	deviceTheme.loadDeviceTheme();
 	window.deviceTheme = dm.deviceTheme = deviceTheme;
-	if(typeof _define !== "undefined"){
-		define = _define = undefined;
-	}
 	return deviceTheme;
 });

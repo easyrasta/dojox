@@ -1,14 +1,11 @@
 define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./CartesianBase", "./_PlotEvents", "./common",
 	"dojox/lang/functional", "dojox/lang/functional/reversed", "dojox/lang/utils", "dojox/gfx/fx", "dojox/gfx/gradutils"],
 	function(lang, arr, declare, CartesianBase, _PlotEvents, dc, df, dfr, du, fx, gradutils){
-/*=====
-var CartesianBase = dojox.charting.plot2d.CartesianBase;
-var _PlotEvents = dojox.charting.plot2d._PlotEvents;
-=====*/
+
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
 
 	return declare("dojox.charting.plot2d.Scatter", [CartesianBase, _PlotEvents], {
-		//	summary:
+		// summary:
 		//		A plot object representing a typical scatter chart.
 		defaultParams: {
 			hAxis: "x",		// use a horizontal axis named "x"
@@ -28,11 +25,11 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 		},
 
 		constructor: function(chart, kwArgs){
-			//	summary:
+			// summary:
 			//		Create the scatter plot.
-			//	chart: dojox.charting.Chart
+			// chart: dojox.charting.Chart
 			//		The chart this plot belongs to.
-			//	kwArgs: dojox.charting.plot2d.__DefaultCtorArgs?
+			// kwArgs: dojox.charting.plot2d.__DefaultCtorArgs?
 			//		An optional keyword arguments object to help define this plot's parameters.
 			this.opt = lang.clone(this.defaultParams);
             du.updateWithObject(this.opt, kwArgs);
@@ -44,13 +41,13 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 		},
 
 		render: function(dim, offsets){
-			//	summary:
+			// summary:
 			//		Run the calculations for any axes for this plot.
-			//	dim: Object
+			// dim: Object
 			//		An object in the form of { width, height }
-			//	offsets: Object
+			// offsets: Object
 			//		An object of the form { l, r, t, b}.
-			//	returns: dojox.charting.plot2d.Scatter
+			// returns: dojox.charting.plot2d.Scatter
 			//		A reference to this plot for functional chaining.
 			if(this.zoom && !this.isDataDirty()){
 				return this.performZoom(dim, offsets);

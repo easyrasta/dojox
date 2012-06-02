@@ -1,4 +1,5 @@
 define([
+	"dojo/_base/kernel",
 	"dojo/_base/array",
 	"dojo/_base/declare",
 	"dojo/_base/lang",
@@ -8,17 +9,14 @@ define([
 	"dijit/_Contained",
 	"dijit/_WidgetBase",
 	"./scrollable"
-], function(array, declare, lang, win, domClass, domConstruct, Contained, WidgetBase, Scrollable){
+], function(dojo, array, declare, lang, win, domClass, domConstruct, Contained, WidgetBase, Scrollable){
 
 	// module:
 	//		dojox/mobile/SpinWheelSlot
 	// summary:
 	//		A slot of a SpinWheel.
 
-	var cls = declare("", null, {});
-	lang.extend(cls, new Scrollable());
-
-	return declare("dojox.mobile.SpinWheelSlot", [WidgetBase, Contained, cls], {
+	return declare("dojox.mobile.SpinWheelSlot", [WidgetBase, Contained, Scrollable], {
 		// summary:
 		//		A slot of a SpinWheel.
 		// description:

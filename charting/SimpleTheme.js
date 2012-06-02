@@ -2,11 +2,11 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	function(lang, arr, declare, Color, dlu, dgg){
 	
 	var SimpleTheme = declare("dojox.charting.SimpleTheme", null, {
-	//	summary:
+	// summary:
 	//		A SimpleTheme or Theme is a pre-defined object, primarily JSON-based, that makes up the definitions to
 	//		style a chart.
 	//
-	//	description:
+	// description:
 	//		While you can set up style definitions on a chart directly (usually through the various add methods
 	//		on a dojox.charting.Chart object), a Theme simplifies this manual setup by allowing you to
 	//		pre-define all of the various visual parameters of each element in a chart.
@@ -34,8 +34,7 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	//		to be rendered.
 	//
 	//		A note on colors:
-	//		The Theme constructor was on the use of dojox.color.Palette (in general) for creating a visually distinct
-	//		set of colors for usage in a chart.  A palette is usually comprised of 5 different color definitions, and
+	//		A theme palette is usually comprised of 5 different color definitions, and
 	//		no more.  If you have a need to render a chart with more than 5 data elements, you can simply "push"
 	//		new color definitions into the theme's .color array.  Make sure that you do that with the actual
 	//		theme object from a Chart, and not in the theme itself (i.e. either do that before using .setTheme
@@ -132,7 +131,7 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	//	|		markerShadow: null,								// no marker shadow
 	//	|	}
 	//
-	//	example:
+	// example:
 	//		Defining a new theme is pretty simple:
 	//	|	dojox.charting.themes.Grasslands = new dojox.charting.SimpleTheme({
 	//	|		colors: [ "#70803a", "#dde574", "#788062", "#b1cc5d", "#eff2c2" ]
@@ -143,7 +142,7 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	shapeSpaces: {shape: 1, shapeX: 1, shapeY: 1},
 
 	constructor: function(kwArgs){
-		//	summary:
+		// summary:
 		//		Initialize a theme using the keyword arguments.  Note that the arguments
 		//		look like the example (above), and may include a few more parameters.
 		kwArgs = kwArgs || {};
@@ -181,9 +180,9 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	clone: function(){
-		//	summary:
+		// summary:
 		//		Clone the current theme.
-		//	returns: dojox.charting.SimpleTheme
+		// returns: dojox.charting.SimpleTheme
 		//		The cloned theme; any alterations made will not affect the original.
 		var theme = new this.constructor({
 			// theme components
@@ -217,21 +216,21 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	clear: function(){
-		//	summary:
+		// summary:
 		//		Clear and reset the internal pointer to start fresh.
 		this._current = 0;
 	},
 
 	next: function(elementType, mixin, doPost){
-		//	summary:
+		// summary:
 		//		Get the next color or series theme.
-		//	elementType: String?
+		// elementType: String?
 		//		An optional element type (for use with series themes)
-		//	mixin: Object?
+		// mixin: Object?
 		//		An optional object to mix into the theme.
-		//	doPost: Boolean?
+		// doPost: Boolean?
 		//		A flag to post-process the results.
-		//	returns: Object
+		// returns: Object
 		//		An object of the structure { series, marker, symbol }
 		var merge = dlu.merge, series, marker;
 		if(this.colors){
@@ -297,23 +296,23 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	skip: function(){
-		//	summary:
+		// summary:
 		//		Skip the next internal color.
 		++this._current;
 	},
 
 	addMixin: function(theme, elementType, mixin, doPost){
-		//	summary:
+		// summary:
 		//		Add a mixin object to the passed theme and process.
-		//	theme: dojox.charting.SimpleTheme
+		// theme: dojox.charting.SimpleTheme
 		//		The theme to mixin to.
-		//	elementType: String
+		// elementType: String
 		//		The type of element in question. Can be "line", "bar" or "circle"
-		//	mixin: Object|Array
+		// mixin: Object|Array
 		//		The object or objects to mix into the theme.
-		//	doPost: Boolean
+		// doPost: Boolean
 		//		If true, run the new theme through the post-processor.
-		//	returns: dojox.charting.SimpleTheme
+		// returns: dojox.charting.SimpleTheme
 		//		The new theme.
 		if(lang.isArray(mixin)){
 			arr.forEach(mixin, function(m){
@@ -355,13 +354,13 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	post: function(theme, elementType){
-		//	summary:
+		// summary:
 		//		Process any post-shape fills.
-		//	theme: dojox.charting.SimpleTheme
+		// theme: dojox.charting.SimpleTheme
 		//		The theme to post process with.
-		//	elementType: String
+		// elementType: String
 		//		The type of element being filled.  Can be "bar" or "circle".
-		//	returns: dojox.charting.SimpleTheme
+		// returns: dojox.charting.SimpleTheme
 		//		The post-processed theme.
 		var fill = theme.series.fill, t;
 		if(!this.noGradConv && this.shapeSpaces[fill.space] && fill.type == "linear"){
@@ -390,11 +389,11 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	getTick: function(name, mixin){
-		//	summary:
+		// summary:
 		//		Calculates and merges tick parameters.
-		//	name: String
+		// name: String
 		//		Tick name, can be "major", "minor", or "micro".
-		//	mixin: Object?
+		// mixin: Object?
 		//		Optional object to mix in to the tick.
 		var tick = this.axis.tick, tickName = name + "Tick",
 			merge = dlu.merge;
@@ -438,20 +437,20 @@ define(["dojo/_base/lang", "dojo/_base/array","dojo/_base/declare","dojo/_base/C
 	},
 
 	addMarker:function(/*String*/ name, /*String*/ segment){
-		//	summary:
+		// summary:
 		//		Add a custom marker to this theme.
-		//	example:
+		// example:
 		//	|	myTheme.addMarker("Ellipse", foo);
 		this.markers[name] = segment;
 		this._buildMarkerArray();
 	},
 
 	setMarkers:function(/*Object*/ obj){
-		//	summary:
+		// summary:
 		//		Set all the markers of this theme at once.  obj should be a
 		//		dictionary of keys and path segments.
 		//
-		//	example:
+		// example:
 		//	|	myTheme.setMarkers({ "CIRCLE": foo });
 		this.markers = obj;
 		this._buildMarkerArray();
@@ -506,7 +505,8 @@ lang.mixin(SimpleTheme, {
 				color:     "#666",
 				position:  "center",
 				font:      "normal normal normal 7pt Tahoma",	// labels on axis
-				fontColor: "#333"								// color of labels
+				fontColor: "#333",								// color of labels
+				labelGap:  4                                    // gap between a tick and its label in pixels
 			},
 			majorTick:	{ // major ticks on axis, and used for major gridlines
 				width:  1,

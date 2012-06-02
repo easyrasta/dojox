@@ -1,9 +1,7 @@
 define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array","dojo/dom-attr","dojo/_base/declare", "dojo/query",
 	"dijit/_WidgetBase", "../Chart", "dojox/lang/utils", "dojox/lang/functional","dojox/lang/functional/lambda"],
 	function(kernel, lang, arr, domAttr, declare, query, _WidgetBase, Chart, du, df, dfl){
-/*=====
-var _WidgetBase = dijit._WidgetBase;
-=====*/
+
 	var collectParams, collectAxisParams, collectPlotParams,
 		collectActionParams, collectDataParams,
 		notNull = function(o){ return o; },
@@ -250,18 +248,19 @@ var _WidgetBase = dijit._WidgetBase;
 			if(render){ c.render(); }
 		},
 		destroy: function(){
-			// summary: properly destroy the widget
+			// summary:
+			//		properly destroy the widget
 			this.chart.destroy();
 			this.inherited(arguments);
 		},
 		resize: function(box){
-			//	summary:
+			// summary:
 			//		Resize the widget.
-			//	description:
+			// description:
 			//		Resize the domNode and the widget surface to the dimensions of a box of the following form:
 			//			`{ l: 50, t: 200, w: 300: h: 150 }`
 			//		If no box is provided, resize the surface to the marginBox of the domNode.
-			//	box:
+			// box:
 			//		If passed, denotes the new size of the widget.
 			this.chart.resize(box);
 		}

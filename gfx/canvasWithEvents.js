@@ -1,25 +1,23 @@
 define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_base/Color", "dojo/dom", 
 		"dojo/dom-geometry", "./_base","./canvas", "./shape", "./matrix"], 
   function(lang, declare, hub, Color, dom, domGeom, g, canvas, shapeLib, m){
-/*===== 
-	dojox.gfx.canvasWithEvents = {
-	// module:
-	//		dojox/gfx/canvasWithEvents
-	// summary:
-	//		This the graphics rendering bridge for W3C Canvas compliant browsers which extends
-	//		the basic canvas drawing renderer bridge to add additional support for graphics events
-	//		on Shapes.
-	//		Since Canvas is an immediate mode graphics api, with no object graph or
-	//		eventing capabilities, use of the canvas module alone will only add in drawing support.
-	//		This additional module, canvasWithEvents extends this module with additional support
-	//		for handling events on Canvas.  By default, the support for events is now included 
-	//		however, if only drawing capabilities are needed, canvas event module can be disabled
-	//		using the dojoConfig option, canvasEvents:true|false.
-	//		The id of the Canvas renderer is 'canvasWithEvents'.  This id can be used when switch Dojo's
-	//		graphics context between renderer implementations.  See dojox.gfx._base switchRenderer
-	//		API.	
+	var canvasEvent = g.canvasWithEvents = {
+		// summary:
+		//		This the graphics rendering bridge for W3C Canvas compliant browsers which extends
+		//		the basic canvas drawing renderer bridge to add additional support for graphics events
+		//		on Shapes.
+		//		Since Canvas is an immediate mode graphics api, with no object graph or
+		//		eventing capabilities, use of the canvas module alone will only add in drawing support.
+		//		This additional module, canvasWithEvents extends this module with additional support
+		//		for handling events on Canvas.  By default, the support for events is now included
+		//		however, if only drawing capabilities are needed, canvas event module can be disabled
+		//		using the dojoConfig option, canvasEvents:true|false.
+		//		The id of the Canvas renderer is 'canvasWithEvents'.  This id can be used when switch Dojo's
+		//		graphics context between renderer implementations.  See dojox.gfx._base switchRenderer
+		//		API.
 	};
-	g = dojox.gfx;
+
+	/*=====
 	canvas.Shape = dojox.gfx.canvas.Shape;
 	canvas.Group = dojox.gfx.canvas.Group;
 	canvas.Image = dojox.gfx.canvas.Image;
@@ -33,9 +31,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 	canvas.Path = dojox.gfx.canvas.Path;
 	canvas.Surface = dojox.gfx.canvas.Surface;
 	canvasEvent.Shape = dojox.gfx.canvasWithEvents.Shape;
-	
-  =====*/
-	var canvasEvent = g.canvasWithEvents = {};
+	=====*/
 
 	declare("dojox.gfx.canvasWithEvents.Shape", canvas.Shape, {
 		
@@ -280,7 +276,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		
 		connect: function(/*String*/name, /*Object*/object, /*Function|String*/method){
 			// summary: connects a handler to an event on this surface
-			// name : String
+			// name: String
 			//		The event name
 			// object: Object
 			//		The object that method will receive as "this".
@@ -397,6 +393,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_oncontextmenu: function(e){
 			// summary: triggers onclick
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pick.curr){
 				this._invokeHandler(this._pick.curr, 'oncontextmenu', e);
@@ -404,6 +401,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_ondblclick: function(e){
 			// summary: triggers onclick
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pickOfMouseUp){
 				this._invokeHandler(this._pickOfMouseUp, 'ondblclick', e);
@@ -411,6 +409,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_onclick: function(e){
 			// summary: triggers onclick
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pickOfMouseUp && this._pickOfMouseUp == this._pickOfMouseDown){
 				this._invokeHandler(this._pickOfMouseUp, 'onclick', e);
@@ -426,6 +425,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_ontouchstart: function(e){
 			// summary: triggers ontouchstart			
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pick.curr) {
 				this._fireTouchEvent(e);
@@ -433,6 +433,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_onmouseup: function(e){
 			// summary: triggers onmouseup
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			this._pickOfMouseUp = this._pick.curr;
 			if(this._pick.curr){
@@ -441,6 +442,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_ontouchend: function(e){
 			// summary: triggers ontouchend
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pick.curr){
 				for(var i = 0; i < this._pick.curr.length; ++i){
@@ -453,6 +455,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 		},
 		_onmousemove: function(e){
 			// summary: triggers onmousemove, onmouseenter, onmouseleave
+			
 			// this._pick.curr = an array of target for touch event, one target instance for mouse events
 			if(this._pick.last && this._pick.last != this._pick.curr){
 				this._invokeHandler(this._pick.last, 'onmouseleave', e);

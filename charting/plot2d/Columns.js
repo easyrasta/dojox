@@ -3,13 +3,9 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 	function(lang, arr, declare, CartesianBase, _PlotEvents, dc, df, dfr, du, fx){
 
 	var purgeGroup = dfr.lambda("item.purgeGroup()");
-/*=====
-var CartesianBase = dojox.charting.plot2d.CartesianBase;
-var _PlotEvents = dojox.charting.plot2d._PlotEvents;
-=====*/
 
 	return declare("dojox.charting.plot2d.Columns", [CartesianBase, _PlotEvents], {
-		//	summary:
+		// summary:
 		//		The plot object representing a column chart (vertical bars).
 		defaultParams: {
 			hAxis: "x",		// use a horizontal axis named "x"
@@ -32,11 +28,11 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 		},
 
 		constructor: function(chart, kwArgs){
-			//	summary:
+			// summary:
 			//		The constructor for a columns chart.
-			//	chart: dojox.charting.Chart
+			// chart: dojox.charting.Chart
 			//		The chart this plot belongs to.
-			//	kwArgs: dojox.charting.plot2d.__BarCtorArgs?
+			// kwArgs: dojox.charting.plot2d.__BarCtorArgs?
 			//		An optional keyword arguments object to help define the plot.
 			this.opt = lang.clone(this.defaultParams);
 			du.updateWithObject(this.opt, kwArgs);
@@ -48,9 +44,9 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 		},
 
 		getSeriesStats: function(){
-			//	summary:
+			// summary:
 			//		Calculate the min/max on all attached series in both directions.
-			//	returns: Object
+			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = dc.collectSimpleStats(this.series);
 			stats.hmin -= 0.5;
@@ -75,13 +71,13 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 		},
 
 		render: function(dim, offsets){
-			//	summary:
+			// summary:
 			//		Run the calculations for any axes for this plot.
-			//	dim: Object
+			// dim: Object
 			//		An object in the form of { width, height }
-			//	offsets: Object
+			// offsets: Object
 			//		An object of the form { l, r, t, b}.
-			//	returns: dojox.charting.plot2d.Columns
+			// returns: dojox.charting.plot2d.Columns
 			//		A reference to this plot for functional chaining.
 			if(this.zoom && !this.isDataDirty()){
 				return this.performZoom(dim, offsets);
@@ -132,6 +128,10 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 				z--;
 				s = run.group;
 				var l = this.getDataLength(run);
+				/*var indexed = arr.some(run.data, function(item){
+					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
+				});
+				*/
 				for(var j = min; j < l; ++j){
 					var value = run.data[j];
 					if(value != null){
@@ -210,6 +210,20 @@ var _PlotEvents = dojox.charting.plot2d._PlotEvents;
 			}else{
 				y = value.y;
 				x = value.x ? value.x - 1: j;
+/*
+		getValue: function(value, j, seriesIndex, indexed){
+			var y,x;
+			if(indexed){
+				if(typeof value == "number"){
+					y = value;
+				}else{
+					y = value.y;
+				}
+				x = j;
+			}else{
+				y = value.y;
+				x = value.x - 1;
+*/
 			}
 			return {y:y, x:x};
 		},

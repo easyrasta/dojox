@@ -3,16 +3,15 @@ define(["dojo/_base/kernel", "dijit/Tooltip","dojo/_base/lang", "dojo/_base/decl
 	function(dojo, Tooltip, lang, declare, domStyle, PlotAction, m, df, dfs, dff){
 	
 	/*=====
-	dojo.declare("dojox.charting.action2d.__TooltipCtorArgs", dojox.charting.action2d.__PlotActionCtorArgs, {
-		//	summary:
+	declare("dojox.charting.action2d.__TooltipCtorArgs", dojox.charting.action2d.__PlotActionCtorArgs, {
+		// summary:
 		//		Additional arguments for tooltip actions.
 	
-		//	text: Function?
+		// text: Function?
 		//		The function that produces the text to be shown within a tooltip.  By default this will be
 		//		set by the plot in question, by returning the value of the element.
 		text: null
 	});
-	var PlotAction = dojox.charting.action2d.PlotAction;
 	=====*/
 
 	var DEFAULT_TEXT = function(o){
@@ -35,7 +34,7 @@ define(["dojo/_base/kernel", "dijit/Tooltip","dojo/_base/lang", "dojo/_base/decl
 	var pi4 = Math.PI / 4, pi2 = Math.PI / 2;
 	
 	return declare("dojox.charting.action2d.Tooltip", PlotAction, {
-		//	summary:
+		// summary:
 		//		Create an action on a plot where a tooltip is shown when hovering over an element.
 
 		// the data description block for the widget parser
@@ -45,13 +44,13 @@ define(["dojo/_base/kernel", "dijit/Tooltip","dojo/_base/lang", "dojo/_base/decl
 		optionalParams: {},	// no optional parameters
 
 		constructor: function(chart, plot, kwArgs){
-			//	summary:
+			// summary:
 			//		Create the tooltip action and connect it to the plot.
-			//	chart: dojox.charting.Chart
+			// chart: dojox.charting.Chart
 			//		The chart this action belongs to.
-			//	plot: String?
+			// plot: String?
 			//		The plot this action is attached to.  If not passed, "default" is assumed.
-			//	kwArgs: dojox.charting.action2d.__TooltipCtorArgs?
+			// kwArgs: dojox.charting.action2d.__TooltipCtorArgs?
 			//		Optional keyword arguments object for setting parameters.
 			this.text = kwArgs && kwArgs.text ? kwArgs.text : DEFAULT_TEXT;
 			
@@ -59,9 +58,9 @@ define(["dojo/_base/kernel", "dijit/Tooltip","dojo/_base/lang", "dojo/_base/decl
 		},
 		
 		process: function(o){
-			//	summary:
+			// summary:
 			//		Process the action on the given object.
-			//	o: dojox.gfx.Shape
+			// o: dojox.gfx.Shape
 			//		The object on which to process the highlighting action.
 			if(o.type === "onplotreset" || o.type === "onmouseout"){
                 Tooltip.hide(this.aroundRect);

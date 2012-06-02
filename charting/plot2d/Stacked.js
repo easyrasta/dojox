@@ -1,17 +1,15 @@
 define(["dojo/_base/declare", "./Default", "./commonStacked"], 
 	function(declare, Default, commonStacked){
-/*=====
-var Default = dojox.charting.plot2d.Default;
-=====*/
+
 	return declare("dojox.charting.plot2d.Stacked", Default, {
-		//	summary:
+		// summary:
 		//		Like the default plot, Stacked sets up lines, areas and markers
 		//		in a stacked fashion (values on the y axis added to each other)
 		//		as opposed to a direct one.
 		getSeriesStats: function(){
-			//	summary:
+			// summary:
 			//		Calculate the min/max on all attached series in both directions.
-			//	returns: Object
+			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = commonStacked.collectStats(this.series);
 			this._maxRunLength = stats.hmax;
