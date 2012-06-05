@@ -135,7 +135,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				for(var j = min; j < l; ++j){
 					var value = run.data[j];
 					if(value != null){
-						var val = this.getValue(value, j, i),
+						var val = this.getValue(value, j, i, indexed),
 							vv = vt(val.y),
 							h = Math.abs(vv - baselineHeight), 
 							finalTheme,
@@ -228,7 +228,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			return {y:y, x:x};
 		},
 		getBarProperties: function(){
-			var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
+			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
 			return {gap: f.gap, width: f.size, thickness: 0};
 		},
 		
