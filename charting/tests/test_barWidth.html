@@ -1,0 +1,71 @@
+<!--[if IE 7]>
+<!DOCTYPE>
+<html lang="en">
+	<head>
+<![endif]-->
+<!--[if IE 8]>
+<!DOCTYPE>
+<html lang="en">
+    <head>
+           <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+<![endif]-->
+<![if gte IE 9]>
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+<![endif]>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Test Missing point interpolation</title>
+		<style type="text/css">
+			@import "../../../dojo/resources/dojo.css";
+			@import "../../../dijit/tests/css/dijitTests.css";
+
+			.bars{
+				width:300px;
+				height:200px;
+			}
+		</style>
+		<!-- required for Tooltip: a default dijit theme: -->
+		<link rel="stylesheet" href="../../../dijit/themes/claro/claro.css">
+		<script type="text/javascript" src="../../../dojo/dojo.js" data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
+
+		<script type="text/javascript">
+			var seriesA = [
+				{ x: 5, y : 2 },
+				{ x: 10, y : 3 },
+				{ x: 15, y : 5 },
+				{ x: 20, y : 4 },
+				{ x: 25, y : 5 }
+			];
+			
+			require([
+			  "dojox/charting/Chart",
+			  "dojox/charting/axis2d/Default",
+			  "dojox/charting/plot2d/Columns",
+			  "dojox/charting/plot2d/Bars",
+			  "dojox/charting/themes/MiamiNice",
+			  "dojo/ready"],
+			function(Chart, Default, Columns, Bars, MiamiNice){
+			  new Chart("bars").
+				  setTheme(MiamiNice).
+				  addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+				  addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+				  addPlot("default", { type: "Columns", gap: 5 }).
+				  addSeries("Series A", seriesA).
+				  render();
+
+			});
+		</script>
+	</head>
+	<body class="claro">
+		<h1>Chart: Bar width</h1>
+		
+		<div style="float:left;">
+		  <h2>1.Bars</h2>
+		  <div id="bars" class="bars"></div>
+		
+		  
+		</div>
+		
+	</body>
+</html>

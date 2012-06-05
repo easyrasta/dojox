@@ -49,8 +49,17 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = dc.collectSimpleStats(this.series);
-			stats.hmin -= 0.5;
-			stats.hmax += 0.5;
+			
+			if(this._hScaler){
+			  var bar = this.getBarProperties();
+			  var width = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(bar.width)
+			  stats.hmin -= width/2;
+			  stats.hmax += width/2;
+			}else{
+			  stats.hmin -= 0.5;
+			  stats.hmax += 0.5;
+			}
+			
 			return stats;
 		},
 		
@@ -94,18 +103,14 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				s = this.group;
 				df.forEachRev(this.series, function(item){ item.cleanGroup(s); });
 			}
-			var t = this.chart.theme, bar,
+			var t = this.chart.theme,
 				ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 				vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler),
 				baseline = Math.max(0, this._vScaler.bounds.lower),
 				baselineHeight = vt(baseline),
 				min = Math.max(0, Math.floor(this._hScaler.bounds.from - 1)),
 				events = this.events();
-			bar = this.getBarProperties();
-			
-			var length = this.series.length;
-			arr.forEach(this.series, function(serie){if(serie.hide){length--;}});
-			var z = length;
+			var bar = this.getBarProperties();
 			
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
@@ -121,18 +126,14 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				}
 				var theme = t.next("column", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
-				if(run.hide){
-					run.dyn.fill = theme.series.fill;
-					continue;
-				}
-				z--;
 				s = run.group;
 				var l = this.getDataLength(run);
-				/*var indexed = arr.some(run.data, function(item){
+				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
-				*/
-				for(var j = min; j < l; ++j){
+				console.log("width", bar.width);
+				console.log("offsets.l", offsets.l);
+				for(var j = 0; j < run.data.length; ++j){
 					var value = run.data[j];
 					if(value != null){
 						var val = this.getValue(value, j, i, indexed),
@@ -153,11 +154,18 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 						
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
-								x: offsets.l + ht(val.x + 0.5) + bar.gap + bar.thickness * z,
+								//x: offsets.l - (bar.width - bar.gap - ht(0.5))/2 + ht(val.x + 0.5)  + bar.gap/2 + bar.thickness * i ,
+								x: offsets.l-1.5 + ht(val.x+1) - (bar.width/2) + (bar.gap/2) + bar.thickness * i,
 								y: dim.height - offsets.b - (val.y > baseline ? vv : baselineHeight),
-								width: bar.width, 
+								width: bar.width - bar.gap/2, 
 								height: h
 							};
+							
+							console.log(" ht(val.x + 0.5)", ht(val.x + 0.5));
+							console.log(" ht(val.x+1)", ht(val.x +1));
+							console.log("bar.gap", bar.gap);
+							console.log("rect", rect);
+							
 							if(finalTheme.series.shadow){
 								var srect = lang.clone(rect);
 								srect.x += finalTheme.series.shadow.dx;
@@ -202,15 +210,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 		getDataLength: function(run){
 			return Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to));
 		},
-		getValue: function(value, j, indexSerie){
-			var y,x;
-			if(typeof value == "number"){
-				y = value;
-				x = j;
-			}else{
-				y = value.y;
-				x = value.x ? value.x - 1: j;
-/*
 		getValue: function(value, j, seriesIndex, indexed){
 			var y,x;
 			if(indexed){
@@ -223,11 +222,11 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			}else{
 				y = value.y;
 				x = value.x - 1;
-*/
 			}
 			return {y:y, x:x};
 		},
 		getBarProperties: function(){
+			//var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
 			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
 			return {gap: f.gap, width: f.size, thickness: 0};
 		},
