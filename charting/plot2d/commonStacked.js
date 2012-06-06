@@ -12,7 +12,7 @@ define([
 				for(var j = 0; j < run.data.length; j++){
 					var x, y;
 					if(run.data[j] !== null){
-						if(typeof run.data[j] == "number" || run.data[j].hasOwnProperty("x")){
+						if(typeof run.data[j] == "number" || !run.data[j].hasOwnProperty("x")){
 							y = commonStacked.getIndexValue(series, i, j);
 							x = j+1;
 						}else{

@@ -18,7 +18,8 @@ define(["dojo/_base/declare", "./Default", "./commonStacked"],
 		
 		buildSegments: function(i, indexed){
 			var run = this.series[i],
-				max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to-this._hScaler.bounds.from)):run.data.length-1,
+				//max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to-this._hScaler.bounds.from)):run.data.length-1,
+			max = run.data.length-1;
 				rseg = null, segments = [];
 			// split the run data into dense segments (each containing no nulls)
 			// except if interpolates is false in which case ignore null between valid data
