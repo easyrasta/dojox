@@ -10,9 +10,7 @@ define(["dojo/_base/declare", "./Columns", "./commonStacked"],
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = commonStacked.collectStats(this.series);
 			this._maxRunLength = stats.hmax;
-			stats.hmin -= 0.5;
-			stats.hmax += 0.5;
-			return stats;
+			return this._adjustStats(stats);
 		},
 		getDataLength: function(run){
 			return this._maxRunLength;

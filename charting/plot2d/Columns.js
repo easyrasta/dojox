@@ -49,17 +49,22 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = dc.collectSimpleStats(this.series);
-			
+			return this._adjustStats(stats);
+		},
+		
+		_adjustStats: function(stats){
 			if(this._hScaler){
-			  var bar = this.getBarProperties();
-			  var width = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(bar.width)
-			  stats.hmin -= width/2;
-			  stats.hmax += width/2;
-			}else{
-			  stats.hmin -= 0.5;
-			  stats.hmax += 0.5;
+				var bar = this.getBarProperties();
+				console.log("getSeriesStats::width", bar.width);
+				var width = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(bar.width*bar.clusterSize)
+				if(width < stats.hmax){
+					stats.hmin -= width/2;
+					stats.hmax += width/2;
+					return stats;
+				}
 			}
-			
+			stats.hmin -= 0.5;
+			stats.hmax += 0.5;
 			return stats;
 		},
 		
@@ -160,11 +165,11 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 						}else{
 							finalTheme = t.post(theme, "column");
 						}
-						
+						console.log("bar.thickness", bar.thickness);
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
 								//x: offsets.l - (bar.width - bar.gap - ht(0.5))/2 + ht(val.x + 0.5)  + bar.gap/2 + bar.thickness * i ,
-								x: offsets.l-1.5 + ht(val.x+1) - (bar.width/2) + (bar.gap/2) + bar.thickness * z,
+								x: offsets.l-1.5 + ht(val.x+1) - (bar.width/2) + (bar.gap/2) - bar.thickness*(length-1)/2  + bar.thickness * z,
 								y: dim.height - offsets.b - (val.y > baseline ? vv : baselineHeight),
 								width: bar.width - bar.gap/2, 
 								height: h
@@ -234,10 +239,65 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			}
 			return {y:y, x:x};
 		},
+		
+		_getDelta: function(){
+			var delta = Number.MAX_VALUE;
+			
+			for(var i = 0; i < this.series.length; ++i){
+				var serie = this.series[i];
+				if(serie.hide){
+					continue;
+				}
+				var previousData = null;
+				for(var j = 0; j < serie.data.length; ++j){
+					var data = serie.data[j];
+					if(typeof data == "number"){
+						delta = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(this._hScaler.bounds.scale);
+						break;
+					}
+					if(!previousData){
+						previousData = data;
+					}else{
+						if(data){
+							var tdelta = data.x - previousData.x;
+							console.log("tdelta", tdelta);
+							delta = Math.min(delta, tdelta);
+							previousData = data;
+						}
+					}
+				}
+			}
+			return delta;
+		},
+		
 		getBarProperties: function(){
+			console.log("scale", this._hScaler.bounds.scale);
+			
+			/*
+			arr.forEach(this.series, function(serie){
+				if(!serie.hide){
+					
+					arr.forEach(serie.data, function(data){
+						if(!previousData){
+							previousData = data;
+						}else{
+							if(data){
+								var tdelta = data.x - previousData.x;
+								console.log("tdelta", tdelta);
+								delta = Math.min(delta, tdelta);
+								previousData = data;
+							}
+						}
+					});
+				}
+			});
+			*/
+			var delta = this._getDelta();
+			console.log("delta", delta);
 			//var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
-			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
-			return {gap: f.gap, width: f.size, thickness: 0};
+			//var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
+			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(delta), this.opt);
+			return {gap: f.gap, width: f.size, thickness: 0, clusterSize: 1};
 		},
 		
 		_animateColumn: function(shape, voffset, vsize){

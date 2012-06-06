@@ -12,24 +12,24 @@
 <![if gte IE 9]>
 <!DOCTYPE HTML>
 <html lang="en">
-	<head>
+<head>
 <![endif]>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Test Missing point interpolation</title>
-		<style type="text/css">
-			@import "../../../dojo/resources/dojo.css";
-			@import "../../../dijit/tests/css/dijitTests.css";
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Test Bars/Columns width</title>
+<style type="text/css">
+@import "../../../dojo/resources/dojo.css";
 
-			.bars{
-				width:300px;
-				height:200px;
-			}
-		</style>
-		<!-- required for Tooltip: a default dijit theme: -->
-		<link rel="stylesheet" href="../../../dijit/themes/claro/claro.css">
-		<script type="text/javascript" src="../../../dojo/dojo.js" data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
+@import "../../../dijit/tests/css/dijitTests.css";
 
-		<script type="text/javascript">
+.bars {
+	width: 300px;
+	height: 200px;
+}
+</style>
+<!-- required for Tooltip: a default dijit theme: -->
+<link rel="stylesheet" href="../../../dijit/themes/claro/claro.css">
+<script type="text/javascript" src="../../../dojo/dojo.js" data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
+<script type="text/javascript">
 			var seriesA = [
 				{ x: 5, y : 2 },
 				{ x: 10, y : 3 },
@@ -37,35 +37,166 @@
 				{ x: 20, y : 4 },
 				{ x: 25, y : 5 }
 			];
+			var seriesAA = [
+				{ x: 5, y : 3 },
+				{ x: 10, y : 4 },
+				{ x: 15, y : 6 },
+				{ x: 20, y : 5 },
+				{ x: 25, y : 6 }
+			];
+			var seriesAAA = [
+				{ x: 5, y : 4 },
+				{ x: 10, y : 5 },
+				{ x: 15, y : 7 },
+				{ x: 20, y : 6 },
+				{ x: 25, y : 7 }
+			];
+			
+			var seriesB = [
+				{ x: 5, y : 2 },
+				{ x: 8, y : 3 },
+				{ x: 15, y : 5 },
+				{ x: 18, y : 4 },
+				{ x: 25, y : 5 }
+			];
+			var seriesBB = [
+							{ x: 5, y : 3 },
+							{ x: 8, y : 4 },
+							{ x: 15, y : 6 },
+							{ x: 18, y : 5 },
+							{ x: 25, y : 7 }
+						];
+			var seriesBBB = [
+							{ x: 5, y : 4 },
+							{ x: 8, y : 5 },
+							{ x: 15, y : 7 },
+							{ x: 18, y : 6 },
+							{ x: 25, y : 7 }
+						];
+			var seriesI = [2,3,5,4,5];
+			var seriesII = [3,4,6,5,6];
+			var seriesIII = [4,5,7,6,7];
 			
 			require([
 			  "dojox/charting/Chart",
 			  "dojox/charting/axis2d/Default",
 			  "dojox/charting/plot2d/Columns",
+			  "dojox/charting/plot2d/ClusteredColumns",
+			  "dojox/charting/plot2d/StackedColumns",
 			  "dojox/charting/plot2d/Bars",
 			  "dojox/charting/themes/MiamiNice",
 			  "dojo/ready"],
-			function(Chart, Default, Columns, Bars, MiamiNice){
-			  new Chart("bars").
-				  setTheme(MiamiNice).
-				  addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
-				  addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
-				  addPlot("default", { type: "Columns", gap: 5 }).
-				  addSeries("Series A", seriesA).
-				  render();
+			function(Chart, Default, Columns, ClusteredColumns, StackedColumns, Bars, MiamiNice){
+				
+				new Chart("columns").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "Columns", gap: 2 }).
+					addSeries("Series A", seriesA).
+					render();
+				
+				new Chart("columns2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "Columns", gap: 2 }).
+					addSeries("Series A", seriesB).
+					render();
+				
+				new Chart("columnsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "Columns", gap: 2 }).
+					addSeries("Series A", seriesI).
+					render();
 
+				new Chart("clusteredColumns").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
+					addSeries("Series A", seriesA).
+					addSeries("Series AA", seriesAA).
+					addSeries("Series AAA", seriesAAA).
+					render();
+				
+				new Chart("clusteredColumns2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
+					addSeries("Series A", seriesB).
+					addSeries("Series AA", seriesBB).
+					addSeries("Series AAA", seriesBBB).
+					render();
+				
+				new Chart("clusteredColumnsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
+					addSeries("Series A", seriesI).
+					addSeries("Series AA", seriesII).
+					addSeries("Series AAA", seriesIII).
+					render();
+				
+				new Chart("stackedColumns").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "StackedColumns", gap: 2 }).
+					addSeries("Series A", seriesA).
+					addSeries("Series AA", seriesAA).
+					addSeries("Series AAA", seriesAAA).
+					render();
 			});
 		</script>
-	</head>
-	<body class="claro">
-		<h1>Chart: Bar width</h1>
-		
-		<div style="float:left;">
-		  <h2>1.Bars</h2>
-		  <div id="bars" class="bars"></div>
-		
-		  
+</head>
+<body class="claro">
+	<h1>Chart: Bars/Columns width</h1>
+	<div>
+		<div style="float: left;">
+			<h2>1.Columns equidistant</h2>
+			<div id="columns" class="bars" ></div>
 		</div>
-		
-	</body>
+		<div style="float: left;">
+			<h2>2.Columns</h2>
+			<div id="columns2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Columns Indexed</h2>
+			<div id="columnsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+	<div style="clear: both;">
+		<div style="float: left;">
+			<h2>1.Clustered Columns equidistant</h2>
+			<div id="clusteredColumns" class="bars" ></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Clustered Columns</h2>
+			<div id="clusteredColumns2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Clustered Columns Indexed</h2>
+			<div id="clusteredColumnsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+	<div style="clear: both;">
+		<div style="float: left;">
+			<h2>1.Stacked Columns equidistant</h2>
+			<div id="stackedColumns" class="bars" ></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Columns</h2>
+			<div id="stackedColumns2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Columns Indexed</h2>
+			<div id="stackedColumnsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+</body>
 </html>
