@@ -60,97 +60,221 @@
 				{ x: 25, y : 5 }
 			];
 			var seriesBB = [
-							{ x: 5, y : 3 },
-							{ x: 8, y : 4 },
-							{ x: 15, y : 6 },
-							{ x: 18, y : 5 },
-							{ x: 25, y : 7 }
-						];
+				{ x: 5, y : 3 },
+				{ x: 8, y : 4 },
+				{ x: 15, y : 6 },
+				{ x: 18, y : 5 },
+				{ x: 25, y : 7 }
+			];
 			var seriesBBB = [
-							{ x: 5, y : 4 },
-							{ x: 8, y : 5 },
-							{ x: 15, y : 7 },
-							{ x: 18, y : 6 },
-							{ x: 25, y : 7 }
-						];
+				{ x: 5, y : 4 },
+				{ x: 8, y : 5 },
+				{ x: 15, y : 7 },
+				{ x: 18, y : 6 },
+				{ x: 25, y : 7 }
+			];
+			
+			
 			var seriesI = [2,3,5,4,5];
 			var seriesII = [3,4,6,5,6];
 			var seriesIII = [4,5,7,6,7];
 			
+			var barSeriesA = [
+				{ y: 5, x : 2 },
+				{ y: 10, x : 3 },
+				{ y: 15, x : 5 },
+				{ y: 20, x : 4 },
+				{ y: 25, x : 5 }
+			];
+			var barSeriesAA = [
+				{ y: 5, x : 3 },
+				{ y: 10, x : 4 },
+				{ y: 15, x : 6 },
+				{ y: 20, x : 5 },
+				{ y: 25, x : 6 }
+			];
+			var barSeriesAAA = [
+				{ y: 5, x : 4 },
+				{ y: 10, x : 5 },
+				{ y: 15, x : 7 },
+				{ y: 20, x : 6 },
+				{ y: 25, x : 7 }
+			];
+			
 			require([
-			  "dojox/charting/Chart",
-			  "dojox/charting/axis2d/Default",
-			  "dojox/charting/plot2d/Columns",
-			  "dojox/charting/plot2d/ClusteredColumns",
-			  "dojox/charting/plot2d/StackedColumns",
-			  "dojox/charting/plot2d/Bars",
-			  "dojox/charting/themes/MiamiNice",
-			  "dojo/ready"],
-			function(Chart, Default, Columns, ClusteredColumns, StackedColumns, Bars, MiamiNice){
+				"dojo/_base/array",
+				"dojox/charting/Chart",
+				"dojox/charting/axis2d/Default",
+				"dojox/charting/plot2d/Columns",
+				"dojox/charting/plot2d/ClusteredColumns",
+				"dojox/charting/plot2d/StackedColumns",
+				"dojox/charting/plot2d/Bars",
+				"dojox/charting/plot2d/ClusteredBars",
+				"dojox/charting/plot2d/StackedBars",
+				"dojox/charting/themes/MiamiNice",
+				"dojox/charting/action2d/Tooltip",
+				"dojox/charting/action2d/Highlight",
+				"dojo/ready"],
+			function(array, Chart, Default, Columns, ClusteredColumns, StackedColumns, Bars, ClusteredBars, StackedBars, MiamiNice, Tooltip, Highlight){
 				
-				new Chart("columns").
+				var charts = [];
+				
+				charts.push(new Chart("columns").
 					setTheme(MiamiNice).
 					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
 					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 					addPlot("default", { type: "Columns", gap: 2 }).
-					addSeries("Series A", seriesA).
-					render();
-				
-				new Chart("columns2").
-					setTheme(MiamiNice).
-					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
-					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
-					addPlot("default", { type: "Columns", gap: 2 }).
-					addSeries("Series A", seriesB).
-					render();
-				
-				new Chart("columnsI").
-					setTheme(MiamiNice).
-					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
-					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
-					addPlot("default", { type: "Columns", gap: 2 }).
-					addSeries("Series A", seriesI).
-					render();
+					addSeries("Series A", seriesA));
 
-				new Chart("clusteredColumns").
+				
+				charts.push(new Chart("columns2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "Columns", gap: 2 }).
+					addSeries("Series A", seriesB));
+				
+				charts.push(new Chart("columnsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "Columns", gap: 2 }).
+					addSeries("Series A", seriesI));
+
+				charts.push(new Chart("clusteredColumns").
 					setTheme(MiamiNice).
 					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
 					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
 					addSeries("Series A", seriesA).
 					addSeries("Series AA", seriesAA).
-					addSeries("Series AAA", seriesAAA).
-					render();
+					addSeries("Series AAA", seriesAAA));
 				
-				new Chart("clusteredColumns2").
+				charts.push(new Chart("clusteredColumns2").
 					setTheme(MiamiNice).
 					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
 					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
 					addSeries("Series A", seriesB).
 					addSeries("Series AA", seriesBB).
-					addSeries("Series AAA", seriesBBB).
-					render();
+					addSeries("Series AAA", seriesBBB));
 				
-				new Chart("clusteredColumnsI").
+				charts.push(new Chart("clusteredColumnsI").
 					setTheme(MiamiNice).
 					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
 					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 					addPlot("default", { type: "ClusteredColumns", gap: 2 }).
 					addSeries("Series A", seriesI).
 					addSeries("Series AA", seriesII).
-					addSeries("Series AAA", seriesIII).
-					render();
+					addSeries("Series AAA", seriesIII));
 				
-				new Chart("stackedColumns").
+				charts.push(new Chart("stackedColumns").
 					setTheme(MiamiNice).
 					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
 					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
 					addPlot("default", { type: "StackedColumns", gap: 2 }).
 					addSeries("Series A", seriesA).
 					addSeries("Series AA", seriesAA).
-					addSeries("Series AAA", seriesAAA).
-					render();
+					addSeries("Series AAA", seriesAAA));
+				
+				charts.push(new Chart("stackedColumns2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "StackedColumns", gap: 2 }).
+					addSeries("Series A", seriesB).
+					addSeries("Series AA", seriesBB).
+					addSeries("Series AAA", seriesBBB));
+				
+				charts.push(new Chart("stackedColumnsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true, majorTickStep: 5}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true }).
+					addPlot("default", { type: "StackedColumns", gap: 2 }).
+					addSeries("Series A", seriesI).
+					addSeries("Series AA", seriesII).
+					addSeries("Series AAA", seriesIII));
+				
+				charts.push(new Chart("bars").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true , majorTickStep: 5}).
+					addPlot("default", { type: "Bars", gap: 2 }).
+					addSeries("Series A", seriesA));
+				
+				charts.push(new Chart("bars2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", includeZero: true , majorTickStep: 5}).
+					addPlot("default", { type: "Bars", gap: 2 }).
+					addSeries("Series A", seriesB));
+				
+				charts.push(new Chart("barsI").
+					setTheme(MiamiNice).
+					addAxis("x", { vertical: true, fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { fixLower: "major", fixUpper: "minor", includeZero: true , majorTickStep: 5}).
+					addPlot("default", { type: "Bars", gap: 2 }).
+					addSeries("Series A", seriesI));
+				
+				charts.push(new Chart("stackedBars").
+						setTheme(MiamiNice).
+						addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+						addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+						addPlot("default", { type: "StackedBars", gap: 2 }).
+						addSeries("Series A", seriesA).
+						addSeries("Series AA", seriesAA).
+						addSeries("Series AAA", seriesAAA));
+					
+				charts.push(new Chart("stackedBars2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+					addPlot("default", { type: "StackedBars", gap: 2 }).
+					addSeries("Series A", seriesB).
+					addSeries("Series AA", seriesBB).
+					addSeries("Series AAA", seriesBBB));
+				
+				charts.push(new Chart("stackedBarsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+					addPlot("default", { type: "StackedBars", gap: 2 }).
+					addSeries("Series A", seriesI).
+					addSeries("Series AA", seriesII).
+					addSeries("Series AAA", seriesIII));
+				
+				charts.push(new Chart("clusteredBars").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+					addPlot("default", { type: "ClusteredBars", gap: 2 }).
+					addSeries("Series A", seriesA).
+					addSeries("Series AA", seriesAA).
+					addSeries("Series AAA", seriesAAA));
+				
+				charts.push(new Chart("clusteredBars2").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+					addPlot("default", { type: "ClusteredBars", gap: 2 }).
+					addSeries("Series A", seriesB).
+					addSeries("Series AA", seriesBB).
+					addSeries("Series AAA", seriesBBB));
+				
+				charts.push(new Chart("clusteredBarsI").
+					setTheme(MiamiNice).
+					addAxis("x", { fixLower: "minor", fixUpper: "minor", natural: true , includeZero: true}).
+					addAxis("y", { vertical: true, fixLower: "major", fixUpper: "minor", includeZero: true, majorTickStep: 5 }).
+					addPlot("default", { type: "ClusteredBars", gap: 2 }).
+					addSeries("Series A", seriesI).
+					addSeries("Series AA", seriesII).
+					addSeries("Series AAA", seriesIII));
+				
+				array.forEach(charts, function(chart){
+					new Highlight(chart, "default");
+					new Tooltip(chart, "default");
+					chart.render();
+				});
 			});
 		</script>
 </head>
@@ -172,6 +296,20 @@
 	</div>
 	<div style="clear: both;">
 		<div style="float: left;">
+			<h2>1.Stacked Columns equidistant</h2>
+			<div id="stackedColumns" class="bars" ></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Columns</h2>
+			<div id="stackedColumns2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Columns Indexed</h2>
+			<div id="stackedColumnsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+	<div style="clear: both;">
+		<div style="float: left;">
 			<h2>1.Clustered Columns equidistant</h2>
 			<div id="clusteredColumns" class="bars" ></div>
 		</div>
@@ -186,16 +324,44 @@
 	</div>
 	<div style="clear: both;">
 		<div style="float: left;">
-			<h2>1.Stacked Columns equidistant</h2>
-			<div id="stackedColumns" class="bars" ></div>
+			<h2>1.Bars equidistant</h2>
+			<div id="bars" class="bars" ></div>
 		</div>
 		<div style="float: left;">
-			<h2>2.Stacked Columns</h2>
-			<div id="stackedColumns2" class="bars" style="float: left;"></div>
+			<h2>2.Bars</h2>
+			<div id="bars2" class="bars" style="float: left;"></div>
 		</div>
 		<div style="float: left;">
-			<h2>2.Stacked Columns Indexed</h2>
-			<div id="stackedColumnsI" class="bars" style="float: left;"></div>
+			<h2>2.Bars Indexed</h2>
+			<div id="barsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+	<div style="clear: both;">
+		<div style="float: left;">
+			<h2>1.Clustered Bars equidistant</h2>
+			<div id="clusteredBars" class="bars" ></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Clustered Bars</h2>
+			<div id="clusteredBars2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Clustered Bars Indexed</h2>
+			<div id="clusteredBarsI" class="bars" style="float: left;"></div>
+		</div>
+	</div>
+	<div style="clear: both;">
+		<div style="float: left;">
+			<h2>1.Stacked Bars equidistant</h2>
+			<div id="stackedBars" class="bars" ></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Bars</h2>
+			<div id="stackedBars2" class="bars" style="float: left;"></div>
+		</div>
+		<div style="float: left;">
+			<h2>2.Stacked Bars Indexed</h2>
+			<div id="stackedBarsI" class="bars" style="float: left;"></div>
 		</div>
 	</div>
 </body>
