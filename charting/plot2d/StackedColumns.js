@@ -21,7 +21,7 @@ define(["dojo/_base/declare", "./Columns", "./commonStacked"],
 				x = index;
 				y = commonStacked.getIndexValue(this.series, indexSerie, x);
 			}else{
-				x = value.x ? value.x - 1: index;
+				x = value.x !==null ? value.x - 1: index;
 				y = commonStacked.getValue(this.series, indexSerie, value.x);
 /*
 		getValue: function(value, index, seriesIndex, indexed){

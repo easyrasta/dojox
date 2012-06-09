@@ -729,6 +729,7 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 				lower = range[0] < bounds.lower ? bounds.lower : lower;
 				upper = range[1] > bounds.upper ? bounds.upper : upper;
 				scale = (bounds.upper - bounds.lower) / (upper - lower);
+				console.log("zoomIn:scale", scale);
 				offset = lower - bounds.lower;
 				this.setAxisWindow(name, scale, offset);
 				if(delayed){

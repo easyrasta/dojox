@@ -93,6 +93,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/Color",
 		},
 
 		calculateBarSize: function(/* Number */ availableSize, /* Object */ opt, /* Number? */ clusterSize){
+			console.log("availableSize", availableSize);
 			if(!clusterSize){
 				clusterSize = 1;
 			}

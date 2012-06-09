@@ -17,7 +17,7 @@ define([
 							x = j+1;
 						}else{
 							x = run.data[j].x;
-							if(x){
+							if(x !== null){
 								y = commonStacked.getValue(series, i, x);
 								y = y != null && y.y ? y.y:null; 
 							}
@@ -32,6 +32,7 @@ define([
 			}
 			return stats;
 		},
+		
 		getIndexValue: function(series, i, index){
 			var value = 0, v, j;
 			for(j = 0; j <= i; ++j){

@@ -8,8 +8,7 @@ define(["dojo/_base/declare", "dojo/_base/array", "./Columns", "./common"],
 			
 			//var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt, length);
 			var delta = this._getDelta();
-			console.log("delta", delta);
-			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(delta), this.opt, length);
+			var f = dc.calculateBarSize(delta*this._hScaler.bounds.scale, this.opt, length);
 
 			return {gap: f.gap, width: f.size, thickness: f.size, clusterSize: length};
 		}

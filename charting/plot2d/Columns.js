@@ -53,15 +53,32 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 		},
 		
 		_adjustStats: function(stats){
+			console.log("_adjustStats::_this._hScaler", this._hScaler);
 			if(this._hScaler){
 				var bar = this.getBarProperties();
 				console.log("getSeriesStats::width", bar.width);
 				var width = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(bar.width*bar.clusterSize)
-				if(width < stats.hmax){
+				
+				/*
+				var t = {min: (stats.hmin - width/2), max:  (stats.max + width/2)};
+				if(t.min < this._hScaler.bounds.lower){
+					stats.hmin = this._hScaler.bounds.lower;
+				}else{
+					stats.hmin = t.min;
+				}
+				if(t.max > this._hScaler.bounds.lower){
+					stats.hmax = this._hScaler.bounds.upper;
+				}else{
+					stats.hmax = t.max;
+				}
+				return stats;
+				*/
+				/*if(width < stats.hmax){
 					stats.hmin -= width/2;
 					stats.hmax += width/2;
 					return stats;
 				}
+				*/
 			}
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
@@ -97,7 +114,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				return this.performZoom(dim, offsets);
 			}
 			// TODO do we need to call this? This is not done in Bars.js
-			this.getSeriesStats();
+			//this.getSeriesStats();
 			this.resetEvents();
 			this.dirty = this.isDirty();
 			var s;
@@ -146,7 +163,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
 				console.log("width", bar.width);
-				console.log("offsets.l", offsets.l);
 				for(var j = 0; j < run.data.length; ++j){
 					var value = run.data[j];
 					if(value != null){
@@ -165,7 +181,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 						}else{
 							finalTheme = t.post(theme, "column");
 						}
-						console.log("bar.thickness", bar.thickness);
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
 								//x: offsets.l - (bar.width - bar.gap - ht(0.5))/2 + ht(val.x + 0.5)  + bar.gap/2 + bar.thickness * i ,
@@ -174,11 +189,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 								width: bar.width - bar.gap/2, 
 								height: h
 							};
-							
-							console.log(" ht(val.x + 0.5)", ht(val.x + 0.5));
-							console.log(" ht(val.x+1)", ht(val.x +1));
-							console.log("bar.gap", bar.gap);
-							console.log("rect", rect);
 							
 							if(finalTheme.series.shadow){
 								var srect = lang.clone(rect);
@@ -260,7 +270,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 					}else{
 						if(data){
 							var tdelta = data.x - previousData.x;
-							console.log("tdelta", tdelta);
 							delta = Math.min(delta, tdelta);
 							previousData = data;
 						}
@@ -296,8 +305,9 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			console.log("delta", delta);
 			//var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
 			//var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
-			var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(delta), this.opt);
-			return {gap: f.gap, width: f.size, thickness: 0, clusterSize: 1};
+			var bar = dc.calculateBarSize(delta*this._hScaler.bounds.scale, this.opt);
+			console.log("bar", bar);
+			return {gap: bar.gap, width: bar.size, thickness: 0, clusterSize: 1};
 		},
 		
 		_animateColumn: function(shape, voffset, vsize){
