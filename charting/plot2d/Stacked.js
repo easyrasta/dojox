@@ -13,12 +13,12 @@ define(["dojo/_base/declare", "./Default", "./commonStacked"],
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = commonStacked.collectStats(this.series);
 			this._maxRunLength = stats.hmax;
-			return stats;
+			return stats; // Object
 		},
 		
 		buildSegments: function(i, indexed){
 			var run = this.series[i],
-				//max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to-this._hScaler.bounds.from)):run.data.length-1,
+			//max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to-this._hScaler.bounds.from)):run.data.length-1,
 			max = run.data.length-1;
 				rseg = null, segments = [];
 			// split the run data into dense segments (each containing no nulls)

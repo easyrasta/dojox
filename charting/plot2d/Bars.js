@@ -77,7 +77,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 		constructor: function(chart, kwArgs){
 			// summary:
 			//		The constructor for a bar chart.
-			// chart: dojox.charting.Chart
+			// chart: dojox/charting/Chart
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__BarCtorArgs?
 			//		An optional keyword arguments object to help define the plot.
@@ -115,7 +115,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			}
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
-			return stats;
+			return stats; // Object
 		},
 		/*
 		getSeriesStats: function(){
@@ -128,8 +128,6 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			stats.hmax += 0.5;
 			t = stats.hmin, stats.hmin = stats.vmin, stats.vmin = t;
 			t = stats.hmax, stats.hmax = stats.vmax, stats.vmax = t;
-			console.log("stats", stats);
-			return stats;
 		},
 		*/
 		createRect: function(run, creator, params){
@@ -155,10 +153,10 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			//		An object in the form of { width, height }
 			// offsets: Object
 			//		An object of the form { l, r, t, b}.
-			// returns: dojox.charting.plot2d.Bars
+			// returns: dojox/charting/plot2d/Bars
 			//		A reference to this plot for functional chaining.
 			if(this.zoom && !this.isDataDirty()){
-				return this.performZoom(dim, offsets);
+				return this.performZoom(dim, offsets); // dojox/charting/plot2d/Bars
 			}
 			this.dirty = this.isDirty();
 			this.resetEvents();
@@ -278,7 +276,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				run.dirty = false;
 			}
 			this.dirty = false;
-			return this;	//	dojox.charting.plot2d.Bars
+			return this;	//	dojox/charting/plot2d/Bars
 		},
 		getDataLength: function(run){
 			return Math.min(run.data.length, Math.ceil(this._vScaler.bounds.to));

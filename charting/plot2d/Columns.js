@@ -30,7 +30,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 		constructor: function(chart, kwArgs){
 			// summary:
 			//		The constructor for a columns chart.
-			// chart: dojox.charting.Chart
+			// chart: dojox/charting/Chart
 			//		The chart this plot belongs to.
 			// kwArgs: dojox.charting.plot2d.__BarCtorArgs?
 			//		An optional keyword arguments object to help define the plot.
@@ -82,7 +82,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			}
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
-			return stats;
+			return stats; // Object
 		},
 		
 		createRect: function(run, creator, params){
@@ -108,7 +108,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 			//		An object in the form of { width, height }
 			// offsets: Object
 			//		An object of the form { l, r, t, b}.
-			// returns: dojox.charting.plot2d.Columns
+			// returns: dojox/charting/plot2d/Columns
 			//		A reference to this plot for functional chaining.
 			if(this.zoom && !this.isDataDirty()){
 				return this.performZoom(dim, offsets);
@@ -228,7 +228,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				run.dirty = false;
 			}
 			this.dirty = false;
-			return this;	//	dojox.charting.plot2d.Columns
+			return this;	//	dojox/charting/plot2d/Columns
 		},
 		
 		getDataLength: function(run){
