@@ -262,7 +262,8 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				for(var j = 0; j < serie.data.length; ++j){
 					var data = serie.data[j];
 					if(typeof data == "number"){
-						delta = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(this._hScaler.bounds.scale);
+						//delta = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(this._hScaler.bounds.scale);
+						delta = 1;
 						break;
 					}
 					if(!previousData){
