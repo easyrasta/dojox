@@ -4,14 +4,18 @@ define("dojox/widget/MultiSelectCalendar", [
     "dojo/cldr/supplemental", 
     "dojo/date", 
     "dojo/date/locale", 
-    "dijit/Calendar", "dijit/_Templated", "dijit/_CssStateMixin", "dijit/form/DropDownButton", "dijit/typematic"],
-    function(dojo, dijit, template) {
+    "dijit/_Widget", "dijit/_TemplatedMixin", "dijit/_WidgetsInTemplateMixin",
+	"dijit/_CssStateMixin", "dijit/form/DropDownButton", "dijit/typematic"
+],
+    function(dojo, dijit, template, supplemental, date, locale,
+		_Widget, _TemplatedMixin, _WidgetsInTemplateMixin,
+		_CssStateMixin, DropDownButton, typematic) {
 
 dojo.experimental("dojox.widget.MultiSelectCalendar");
 
 dojo.declare(
 	"dojox.widget.MultiSelectCalendar",
-	[dijit.Calendar],
+	[_Widget, _TemplatedMixin, _WidgetsInTemplateMixin, _CssStateMixin],
 	{
 		// summary:
 		//		A simple GUI for choosing several dates in the context of a monthly calendar.
@@ -322,6 +326,38 @@ dojo.declare(
 	}	
 );
 
+//FIXME: can we use dijit.Calendar._MonthDropDown directly?
+dojo.declare("dojox.widget._MonthDropDown", [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+	// summary:
+	//		The month drop down
+
+	// months: String[]
+	//		List of names of months, possibly w/some undefined entries for Hebrew leap months
+	//		(ex: ["January", "February", undefined, "April", ...])
+	months: [],
+
+	templateString: "<div class='dijitCalendarMonthMenu dijitMenu' " +
+		"dojoAttachEvent='onclick:_onClick,onmouseover:_onMenuHover,onmouseout:_onMenuHover'></div>",
+
+	_setMonthsAttr: function(/*String[]*/ months){
+		this.domNode.innerHTML = dojo.map(months, function(month, idx){
+				return month ? "<div class='dijitCalendarMonthLabel' month='" + idx +"'>" + month + "</div>" : "";
+			}).join("");
+	},
+
+	_onClick: function(/*Event*/ evt){
+		this.onChange(dojo.attr(evt.target, "month"));
+	},
+
+	onChange: function(/*Number*/ month){
+		// summary:
+		//		Callback when month is selected from drop down
+	},
+
+	_onMenuHover: function(evt){
+		dojo.toggleClass(evt.target, "dijitCalendarMonthLabelHover", evt.type == "mouseover");
+	}
+});
 
 return dojox.widget.MultiSelectCalendar;
 });

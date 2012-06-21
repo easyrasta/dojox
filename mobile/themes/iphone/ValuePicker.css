@@ -4,22 +4,19 @@
 /* dojox.mobile.ValuePicker */
 .mblValuePicker {
   height: 126px;
-  float: left;
-  border-left: solid 3px #000000;
-  border-right: solid 3px #000000;
-  border-radius: 3px;
 }
 /* dojox.mobile.ValuePickerSlot */
 .mblValuePicker > .mblValuePickerSlot {
   float: left;
-  margin: 0 0;
+  margin: 0 3px;
   border-left: solid 2px #000000;
   border-right: solid 2px #000000;
+  border-radius: 3px;
 }
 .mblValuePickerSlotButton {
   position: relative;
   height: 38px;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #313137), color-stop(0.16, #dfe0e4), color-stop(0.35, #fbfcfc), color-stop(0.5, #fbfcfc), color-stop(0.65, #fbfcfc), color-stop(0.84, #dfe0e4), color-stop(1, #313137));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.1, #9cb1c9), color-stop(0.35, #f0f1f5), color-stop(0.65, #f0f1f5), color-stop(0.9, #9cb1c9));
 }
 .mblValuePickerSlotPlusButton {
   border-top-left-radius: 0;
@@ -41,7 +38,7 @@
   height: 48px;
   border-top: 1px solid #7b797b;
   border-bottom: 1px solid #c6c3c6;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#adaead), to(#e7e3e7), color-stop(0.1, #d6d7d6), color-stop(0.5, #f7f7f7), color-stop(0.9, #f7f3f7));
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.1, #eaeaea), color-stop(0.2, #fafafa), color-stop(0.5, #ffffff), color-stop(0.9, #efefef));
 }
 .mblValuePickerSlotInput {
   display: block;
@@ -54,16 +51,6 @@
   font: bold 24px/44px Helvetica, sans-serif;
 }
 /* dojox.mobile.ValuePickerTimePicker */
-.mblValuePickerTimePicker {
-  border-left: solid 3px #000000;
-  border-right: solid 0 #000000;
-  border-radius: 3px;
-}
 .mblValuePickerTimePicker > .mblToolBarButton {
   top: 45px;
-}
-.mblValuePickerTimePicker > .mblValuePickerTimePickerMinuteSlot {
-  border-right: solid 5px #000000;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
 }

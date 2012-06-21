@@ -1,9 +1,10 @@
-define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query", 
+define(["dojo/_base/array", "dojo/_base/declare", "dojo/query",
 		"dojo/_base/connect", "dojo/_base/Color", "./Legend", "dijit/form/CheckBox", "../action2d/Highlight",
-		"dojox/lang/functional", "dojox/gfx/fx", "dojo/keys", "dojo/_base/event", "dojo/dom-construct",
-		"dojo/dom-prop", "dijit/registry"], 
-	function(lang, arrayUtil, declare, query, hub, Color, Legend, CheckBox,
-			 Highlight, df, fx, keys, event, dom, domProp, registry){
+		"dojox/lang/functional", "dojox/gfx/fx", "dojo/keys", "dojo/dom-construct",
+		"dojo/dom-prop"], 
+	function(arrayUtil, declare, query, hub, Color, Legend, CheckBox,
+			 Highlight, df, fx, keys, dom, domProp){
+
 	var FocusManager = declare(null, {
 		// summary:
 		//		It will take legend as a tab stop, and using
@@ -83,7 +84,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 		connect: function(){}
 	});
 	
-	declare("dojox.charting.widget.SelectableLegend", Legend, {
+	var SelectableLegend = declare("dojox.charting.widget.SelectableLegend", Legend, {
 		// summary:
 		//		An enhanced chart legend supporting interactive events on data series
 		
@@ -96,14 +97,22 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 		postCreate: function(){
 			this.legends = [];
 			this.legendAnim = {};
+			this._cbs = [];
 			this.inherited(arguments);
 			this.legendHighligthHandler = [];
 		},
 		refresh: function(){
 			this.legends = [];
+			this._clearLabels();
 			this.inherited(arguments);
 			this._applyEvents();
 			new FocusManager(this);
+		},
+		_clearLabels: function(){
+			var cbs = this._cbs;
+			while(cbs.length){
+				cbs.pop().destroyRecursive();
+			}
 		},
 		_addLabel: function(dyn, label){
 			this.inherited(arguments);
@@ -113,6 +122,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 			this.legends.push(currentLegendNode);
 			
 			var checkbox = new CheckBox({checked: true});
+			this._cbs.push(checkbox);
 			dom.place(checkbox.domNode, currentLegendNode, "first");
 			// connect checkbox and existed label
 			var clabel = query("label", currentLegendNode)[0];
@@ -267,6 +277,12 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 		},
 		_isCandleStick: function(plotName){
 			return this.chart.stack[this.chart.plots[plotName]].declaredClass == "dojox.charting.plot2d.Candlesticks";
+		},
+
+		destroy: function(){
+			this._clearLabels();
+			this.inherited(arguments);
+
 		}
 	});
 	
@@ -276,5 +292,5 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/query
 		return "on" + type;
 	}
 
-	return dojox.charting.widget.SelectableLegend;
+	return SelectableLegend;
 });

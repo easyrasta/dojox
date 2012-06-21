@@ -1,9 +1,10 @@
 define([
-	"dijit/_Widget",
-	"dijit/_Templated",
+	"dijit/_WidgetBase",
+	"dijit/_TemplatedMixin",
 	"dijit/_Container",
 	"dojo/_base/declare",
 	"dojo/date",
+	"dojo/date/stamp",
 	"dojo/date/locale",
 	"dojo/dom-style",
 	"dojo/dom-class",
@@ -14,8 +15,8 @@ define([
 	"dojo/_base/lang",
 	"dojo/text!./Calendar/Calendar.html",
 	"dijit/typematic"
-], function(_Widget, _Templated, _Container, declare, dojoDate, dojoDateLocale, domStyle, domClass, domConstruct, fx, on, array, lang, template){
-	return declare("dojox.widget._CalendarBase", [_Widget, _Templated, _Container], {
+], function(_WidgetBase, _TemplatedMixin, _Container, declare, dojoDate, stamp, dojoDateLocale, domStyle, domClass, domConstruct, fx, on, array, lang, template){
+	return declare("dojox.widget._CalendarBase", [_WidgetBase, _TemplatedMixin, _Container], {
 		// summary:
 		//		The Root class for all _Calendar extensions
 
@@ -53,18 +54,22 @@ define([
 			this.value = new Date();
 		},
 
-		postMixInProperties: function(){
-			var c = this.constraints;
+		_setConstraintsAttr: function(constraints){
+			// summary:
+			//		Sets minimum and maximum constraints
+			var c = this.constraints = constraints;
 			if(c){
-				var fromISO = dojoDate.stamp.fromISOString;
 				if(typeof c.min == "string"){
-					c.min = fromISO(c.min);
+					c.min = stamp.fromISOString(c.min);
 				}
 				if(typeof c.max == "string"){
-					c.max = fromISO(c.max);
+					c.max = stamp.fromISOString(c.max);
 				}
 			}
 			this.value = this.parseInitialValue(this.value);
+		},
+		postMixInProperties: function(){
+
 		},
 
 		parseInitialValue: function(value){
@@ -195,7 +200,7 @@ define([
 				value = new Date();
 			}
 			if(!value["getFullYear"]){
-				value = dojoDate.stamp.fromISOString(value + "");
+				value = stamp.fromISOString(value + "");
 			}
 			if(this._isInvalidDate(value)){
 				return false;
