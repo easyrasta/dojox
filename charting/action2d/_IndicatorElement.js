@@ -146,7 +146,7 @@ define(["dojo/_base/lang",
 						tmp = cp2;
 						cp2 = cp1;
 						cp1 = tmp;
-					}		
+					}
 				}
 			}
 
@@ -204,7 +204,7 @@ define(["dojo/_base/lang",
 					cp2 = null;
 				}
 			}
-			var coord1, t1, texts = [];
+			var coord1, coord2, t1, t2, texts = [], texts2 = [];
 			array.forEach(data1, function(c1, z1){
 				coord1 = this._coordToPage(c1, hn, vn);
 				if(z1 == 0){
@@ -216,21 +216,27 @@ define(["dojo/_base/lang",
 				
 				
 				//var t1 = this._renderIndicator(c1, cp2?1:0, hn, vn, min, max);
-				/*
+				
 				if(cp2){
 					var c2 = data2[z1];
-					var t2 = this._renderIndicator(c2, 2, hn, vn, min, max);
-					
-					//TODO 
+					coord2 = this._coordToPage(c2, hn, vn);
+					if(z1 == 0){
+						t2 = this._renderLine(coord2, min, max);
+					}
 					var delta = v? c2.y-c1.y: c2.x-c1.y;
-					var text = inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
-						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(v?c1.y:c1.x), true, 2)+"%)");
-					this._renderText(text, inter, this.chart.theme, v?(t1.x+t2.x)/2:t1.x, v?t1.y:(t1.y+t2.y)/2, c1, c2);
+					
+					texts2.push(inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
+						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(v? c1.y: c1.x), true, 2)+"%)"));
+					this._renderMarker(coord2);
+					
+					
+					//this._renderText(text, inter, this.chart.theme, v? (t1.x+t2.x)/2: t1.x, v? t1.y: (t1.y+t2.y)/2, c1, c2);
 				}
-				*/
+				
 			}, this);
 			
 			this._renderText(texts, inter, this.chart.theme, t1.x, t1.y, t1);
+			if(cp2){this._renderText(texts2, inter, this.chart.theme, t2.x, t2.y, t1, t2);}
 		},
 		
 		_coordToPage:  function(coord, hn, vn){
@@ -351,56 +357,62 @@ define(["dojo/_base/lang",
 				label.moveToFront();
 			});
 		},
-		_getData: function(cd, attr, v){
+		_getDataPoint: function(run, cd, attr, v){
 			// we need to find which actual data point is "close" to the data value
-			var datas = [];
-			
-			for(var j = 0 ; j < this.inter.plot.series.length; j++){
-				var run = this.inter.plot.series[j];
-				if(run.hide){
-					continue;
-				}
-			
-				var data = run.data;
-				// let's consider data are sorted because anyway rendering will be "weird" with unsorted data
-				// i is an index in the array, which is different from a x-axis value even for index based data
-				var i, r, l = data.length;
-				for (i = 0; i < l; ++i){
-					r = data[i];
-					if(r == null){
-						// move to next item
-					}else if(typeof r == "number"){
-						if(i + 1 > cd[attr]){
-							break;
-						}
-					}else if(r[attr] > cd[attr]){
+			var data = run.data;
+			// let's consider data are sorted because anyway rendering will be "weird" with unsorted data
+			// i is an index in the array, which is different from a x-axis value even for index based data
+			var i, r, l = data.length;
+			for (i = 0; i < l; ++i){
+				r = data[i];
+				if(r == null){
+					// move to next item
+				}else if(typeof r == "number"){
+					if(i + 1 > cd[attr]){
 						break;
 					}
+				}else if(r[attr] > cd[attr]){
+					break;
 				}
-				var x, y, px, py;
-				if(typeof r == "number"){
-					x = i+1;
-					y = r;
-					if(i>0){
-						px = i;
-						py = data[i-1];
-					}
-				}else{
-					x = r.x;
-					y = r.y;
-					if(i>0){
-						px = data[i-1].x;
-						py = data[i-1].y;
-					}
-				}
+			}
+			var x, y, px, py;
+			if(typeof r == "number"){
+				x = i+1;
+				y = r;
 				if(i>0){
-					var m = v?(x+px)/2:(y+py)/2;
-					if(cd[attr]<=m){
-						x = px;
-						y = py;
-					}
+					px = i;
+					py = data[i-1];
 				}
-				datas.push({x: x, y: y});
+			}else{
+				x = r.x;
+				y = r.y;
+				if(i>0){
+					px = data[i-1].x;
+					py = data[i-1].y;
+				}
+			}
+			if(i>0){
+				var m = v?(x+px)/2:(y+py)/2;
+				if(cd[attr]<=m){
+					x = px;
+					y = py;
+				}
+			}
+			return {x: x, y: y};
+		},
+		_getData: function(cd, attr, v){
+			var datas = [];
+			if(this.inter.opt.series){
+				//To keep backward compat in case there is more than one series
+				datas.push(this._getDataPoint(this.chart.getSeries(this.inter.opt.series), cd, attr, v));
+			}else{
+				for(var j = 0 ; j < this.inter.plot.series.length; j++){
+					var run = this.inter.plot.series[j];
+					if(run.hide){
+						continue;
+					}
+					datas.push(this._getDataPoint(run, cd, attr, v));
+				}
 			}
 			return datas;
 		},
