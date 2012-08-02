@@ -6,12 +6,10 @@ define(["dojo/_base/declare", "dojo/_base/array", "./Bars", "./common"],
 		getBarProperties: function(){
 			var length = this.series.length;
 			array.forEach(this.series, function(serie){if(serie.hide){length--;}});
-			//var f = dc.calculateBarSize(this._vScaler.bounds.scale, this.opt, length);
-
+			
 			var delta = this._getDelta();
-			console.log("delta", delta);
 			var f = dc.calculateBarSize(this._vScaler.scaler.getTransformerFromModel(this._vScaler)(delta), this.opt, length);
-
+			
 			return {gap: f.gap, height: f.size, thickness: f.size, clusterSize: length};
 		}
 		

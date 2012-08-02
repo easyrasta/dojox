@@ -150,7 +150,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAct
 			this.opt = lang.clone(this.defaultParams);
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this._uName = "touchIndicator"+this.opt.series;
+			this._uName = "touchIndicator"+(this.opt.series?this.opt.series:this.chart.id);
 			this.connect();
 		},
 		
@@ -177,7 +177,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAct
 
 		onTouchStart: function(event){
 			// summary:
-			//		Called when touch is started on the chart.		
+			//		Called when touch is started on the chart.
 			if(event.touches.length==1){
 				this._onTouchSingle(event, true);
 			}else if(this.opt.dualIndicator && event.touches.length==2){

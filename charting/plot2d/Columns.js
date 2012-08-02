@@ -53,33 +53,31 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 		},
 		
 		_adjustStats: function(stats){
-			console.log("_adjustStats::_this._hScaler", this._hScaler);
+			//TODO adjust stats with bar width
+			// but it induces problems with zoom
+			/*
 			if(this._hScaler){
 				var bar = this.getBarProperties();
-				console.log("getSeriesStats::width", bar.width);
 				var width = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(bar.width*bar.clusterSize)
-				
-				/*
-				var t = {min: (stats.hmin - width/2), max:  (stats.max + width/2)};
-				if(t.min < this._hScaler.bounds.lower){
-					stats.hmin = this._hScaler.bounds.lower;
-				}else{
-					stats.hmin = t.min;
-				}
-				if(t.max > this._hScaler.bounds.lower){
-					stats.hmax = this._hScaler.bounds.upper;
-				}else{
-					stats.hmax = t.max;
-				}
-				return stats;
-				*/
-				/*if(width < stats.hmax){
-					stats.hmin -= width/2;
-					stats.hmax += width/2;
-					return stats;
-				}
-				*/
+				stats.hmin -= width/2;
+				stats.hmax += width/2;
 			}
+			*/
+			/*
+			var t = {min: (stats.hmin - width/2), max:  (stats.max + width/2)};
+			if(t.min < this._hScaler.bounds.lower){
+				stats.hmin = this._hScaler.bounds.lower;
+			}else{
+				stats.hmin = t.min;
+			}
+			if(t.max > this._hScaler.bounds.lower){
+				stats.hmax = this._hScaler.bounds.upper;
+			}else{
+				stats.hmax = t.max;
+			}
+			return stats;
+			*/
+				
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
 			return stats; // Object
@@ -162,7 +160,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
-				console.log("width", bar.width);
 				for(var j = 0; j < run.data.length; ++j){
 					var value = run.data[j];
 					if(value != null){
@@ -183,7 +180,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 						}
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
-								//x: offsets.l - (bar.width - bar.gap - ht(0.5))/2 + ht(val.x + 0.5)  + bar.gap/2 + bar.thickness * i ,
 								x: offsets.l-1.5 + ht(val.x+1) - (bar.width/2) + (bar.gap/2) - bar.thickness*(length-1)/2  + bar.thickness * z,
 								y: dim.height - offsets.b - (val.y > baseline ? vv : baselineHeight),
 								width: bar.width - bar.gap/2, 
@@ -262,7 +258,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				for(var j = 0; j < serie.data.length; ++j){
 					var data = serie.data[j];
 					if(typeof data == "number"){
-						//delta = this._hScaler.scaler.getTransformerFromPlot(this._hScaler)(this._hScaler.bounds.scale);
 						delta = 1;
 						break;
 					}
@@ -281,33 +276,8 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 		},
 		
 		getBarProperties: function(){
-			console.log("scale", this._hScaler.bounds.scale);
-			
-			/*
-			arr.forEach(this.series, function(serie){
-				if(!serie.hide){
-					
-					arr.forEach(serie.data, function(data){
-						if(!previousData){
-							previousData = data;
-						}else{
-							if(data){
-								var tdelta = data.x - previousData.x;
-								console.log("tdelta", tdelta);
-								delta = Math.min(delta, tdelta);
-								previousData = data;
-							}
-						}
-					});
-				}
-			});
-			*/
 			var delta = this._getDelta();
-			console.log("delta", delta);
-			//var f = dc.calculateBarSize(this._hScaler.bounds.scale, this.opt);
-			//var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt);
 			var bar = dc.calculateBarSize(delta*this._hScaler.bounds.scale, this.opt);
-			console.log("bar", bar);
 			return {gap: bar.gap, width: bar.size, thickness: 0, clusterSize: 1};
 		},
 		

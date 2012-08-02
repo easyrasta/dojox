@@ -145,7 +145,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/connect", "dojo/_ba
 			this.opt = lang.clone(this.defaultParams);
 			du.updateWithObject(this.opt, kwArgs);
 			du.updateWithPattern(this.opt, kwArgs, this.optionalParams);
-			this._uName = "mouseIndicator"+chart.id;
+			this._uName = "mouseIndicator"+(this.opt.series?this.opt.series:this.chart.id);
 			this._handles = [];
 			this.connect();
 		},
