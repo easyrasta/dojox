@@ -234,7 +234,7 @@ define([
 					}
 				}
 			}else{
-				actValue = value;
+				actValue = [value[0] < this.minimum ? this.minimum: value[0], value[1] > this.maximum?this.maximum :value[1]];
 			}
 			// we have to reset this values. don't know the reason for that
 			this._lastValueReported = "";
@@ -246,7 +246,7 @@ define([
 			this.sliderHandleMax.setAttribute("aria-valuenow", actValue[1]);
 			
 			// not calling the _setValueAttr-function of Slider, but the super-super-class (needed for the onchange-event!)
-			FormValueWidget.prototype._setValueAttr.apply(this, arguments);
+			FormValueWidget.prototype._setValueAttr.apply(this, [actValue, priorityChange]);
 			this._printSliderBar(priorityChange, isMaxVal);
 		},
 
