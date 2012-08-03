@@ -97,16 +97,17 @@ define([
 				}
 			});
 		}
-		return {
-			unwatch: function(){
-				for(var s in _handles){
-					_handles[s] && _handles[s].unwatch();
-					delete _handles[s];
-				}
+		var h = {};
+		h.unwatch = h.remove = function(){
+			for(var s in _handles){
+				_handles[s] && _handles[s].unwatch();
+				delete _handles[s];
 			}
 		};
+		return h;
 	}
 
+	// TODO: Like _DataBindingMixin, this should probably just be a plain Object rather than a Class
 	var _atBindingMixin = declare("dojox/mvc/_atBindingMixin", null, {
 		// summary:
 		//		The mixin for dijit/_WidgetBase to support data binding.

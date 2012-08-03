@@ -3,7 +3,7 @@ define(["dojo/_base/declare",
 	    "./common"],
 	function(declare, Element, arr,  common){
 /*=====
-dojox.charting.plot2d.__PlotCtorArgs = function(){
+dojox.charting.plot2d.__PlotCtorArgs = {
 	// summary:
 	//		The base keyword arguments object for plot constructors.
 	//		Note that the parameters for this may change based on the
@@ -43,7 +43,7 @@ return declare("dojox.charting.plot2d.Base", Element, {
 	assignAxes: function(axes){
 		// summary:
 		//		From an array of axes pick the ones that correspond to this plot and
-		// 		assign them to the plot using setAxis method.
+		//		assign them to the plot using setAxis method.
 		// axes: Array
 		//		An array of dojox/charting/axis2d/Base
 		// tags:

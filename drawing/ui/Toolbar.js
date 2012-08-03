@@ -6,13 +6,13 @@ return dojo.declare("dojox.drawing.ui.Toolbar", [], {
 	//		A Toolbar used for holding buttons; typically representing the Stencils
 	//		used for a DojoX Drawing.
 	// description:
-	//		Creates a GFX-based toobar that holds GFX-based buttons. Can be either created
-	//		within the actual drawing or within a seperate DOM element. When within the
+	//		Creates a GFX-based toolbar that holds GFX-based buttons. Can be either created
+	//		within the actual drawing or within a separate DOM element. When within the
 	//		drawing, the toolbar will cover a portion of the drawing; hence the option.
 	//
-	//		A Toolbar can be created programmtically or in markup. Currently markup is as
-	//		a separate DOM element and programmtic is within the drawing.
-	// examples:
+	//		A Toolbar can be created programmatically or in markup. Currently markup is as
+	//		a separate DOM element and programmatic is within the drawing.
+	// example:
 	//		|	dojo.connect(myDrawing, "onSurfaceReady", function(){
 	//		|		new dojox.drawing.ui.Toolbar({
 	//		|			drawing:myDrawing,
@@ -94,16 +94,16 @@ return dojo.declare("dojox.drawing.ui.Toolbar", [], {
 	//		The distance between the tool buttons and plug buttons
 	toolPlugGap:20,
 	
-	// strSelected | selected: String
+	// strSelected: String
 	//		The button that should be selected at startup.
 	strSelected:"",
 
-	// strTools | tools: String
+	// strTools: String
 	//		A comma delineated list of the Stencil-tools to include in the Toolbar.
 	//		If "all" is used, all registered tools are included.
 	strTools:"",
 
-	// strPlugs | plugs: String
+	// strPlugs: String
 	//		A comma delineated list of the plugins to include in the Toolbar.
 	//		If "all" is used, all registered plugins are included.
 	strPlugs:"",
@@ -267,7 +267,7 @@ return dojo.declare("dojox.drawing.ui.Toolbar", [], {
 		//		Plugin click event. May be connected to.
 	},
 	
-	_mixprops: function(/*Array*/props, /*Object | Node*/objNode){
+	_mixprops: function(/*Array*/ props, /*Object|Node*/ objNode){
 		// summary:
 		//		Internally used for mixing in props from an object or
 		//		from a dom node.

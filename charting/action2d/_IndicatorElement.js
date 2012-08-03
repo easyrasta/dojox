@@ -236,6 +236,7 @@ define(["dojo/_base/lang",
 				c = this.chart.getCoords();
 			mark[hn] = coord.x;
 			mark[vn] = coord.y;
+
 			mark = this.inter.plot.toPage(mark);
 	
 			var cx = mark.x - c.x, 
@@ -261,6 +262,7 @@ define(["dojo/_base/lang",
 			var sh = inter.opt.lineShadow? inter.opt.lineShadow: t.indicator.lineShadow,
 				ls = inter.opt.lineStroke? inter.opt.lineStroke: t.indicator.lineStroke,
 				ol = inter.opt.lineOutline? inter.opt.lineOutline: t.indicator.lineOutline;
+
 			if(sh){
 				this.group.createLine({x1: x1 + sh.dx, y1: y1 + sh.dy, x2: x2 + sh.dx, y2: y2 + sh.dy}).setStroke(sh);
 			}
@@ -335,6 +337,7 @@ define(["dojo/_base/lang",
 			sh = inter.opt.shadow? inter.opt.shadow: t.indicator.shadow;
 			ls = inter.opt.stroke? inter.opt.stroke: t.indicator.stroke;
 			ol = inter.opt.outline? inter.opt.outline: t.indicator.outline;
+
 			if(sh){
 				this.group.createRect(rect).setFill(sh.color).setStroke(sh);
 			}

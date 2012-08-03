@@ -12,13 +12,14 @@ define([
 var _PluginManager = declare("dojox.grid.enhanced._PluginManager", null, {
 	// summary:
 	//		Singleton plugin manager
-	//
 	// description:
-	//		Plugin manager is responsible for
-	//		1. Loading required plugins
-	//		2. Handling collaborat	ion and dependencies among plugins
+	//		Plugin manager is responsible for:
 	//
-	//      Some plugin dependencies:
+	//		1. Loading required plugins
+	//		2. Handling collaboration and dependencies among plugins
+	//
+	//		Some plugin dependencies:
+	//
 	//		- "columnReordering" attribute won't work when either DnD or Indirect Selections plugin is on.
 		
 	// _options: Object
@@ -214,7 +215,7 @@ var _PluginManager = declare("dojox.grid.enhanced._PluginManager", null, {
 	getPluginClazz: function(clazz){
 		// summary:
 		//		Load target plugin which must be already required (require(..))
-		// clazz: class | String
+		// clazz: Class|String
 		//		Plugin class
 		if(lang.isFunction(clazz)){
 			return clazz;//return if it's already a clazz

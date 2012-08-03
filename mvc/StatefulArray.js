@@ -2,18 +2,6 @@ define([
 	"dojo/_base/lang",
 	"dojo/Stateful"
 ], function(lang, Stateful){
-	/*=====
-	dojox.mvc.StatefulArray.watchElements.handle = {
-		// summary:
-		//		A handle of setting watch callback for array elements.
-
-		unwatch: function(){
-			// summary:
-			//		Stops watching for array elements.
-		}
-	};
-	=====*/
-
 	function update(/*dojox/mvc/StatefulArray*/ a){
 		// summary:
 		//		Set all array elements as stateful so that watch function runs.
@@ -34,18 +22,18 @@ define([
 		// description:
 		//		Supported methods are:
 		//
-		//			* pop() - Stateful update is done for the removed element, as well as the length.
-		//			* push() - Stateful update is done for the added element, as well as the length.
-		//			* reverse() - Stateful update is done for the elements.
-		//			* shift() - Stateful update is done for the removed element, as well as the length.
-		//			* sort() - Stateful update is done for the elements.
-		//			* splice() - Stateful update is done for the removed/added elements, as well as the length. Returns an instance of StatefulArray instead of the native array.
-		//			* unshift() - Stateful update is done for the added element, as well as the length.
-		//			* concat() - Returns an instance of StatefulArray instead of the native Array.
-		//			* join() - The length as well as the elements are obtained via stateful getters, instead of direct access.
-		//			* slice() - The length as well as the elements are obtained via stateful getters, instead of direct access.
-		//			* Setting an element to this array via set() - Stateful update is done for the new element as well as the new length.
-		//			* Setting a length to this array via set() - Stateful update is done for the removed/added elements as well as the new length.
+		//		- pop() - Stateful update is done for the removed element, as well as the length.
+		//		- push() - Stateful update is done for the added element, as well as the length.
+		//		- reverse() - Stateful update is done for the elements.
+		//		- shift() - Stateful update is done for the removed element, as well as the length.
+		//		- sort() - Stateful update is done for the elements.
+		//		- splice() - Stateful update is done for the removed/added elements, as well as the length. Returns an instance of StatefulArray instead of the native array.
+		//		- unshift() - Stateful update is done for the added element, as well as the length.
+		//		- concat() - Returns an instance of StatefulArray instead of the native Array.
+		//		- join() - The length as well as the elements are obtained via stateful getters, instead of direct access.
+		//		- slice() - The length as well as the elements are obtained via stateful getters, instead of direct access.
+		//		- Setting an element to this array via set() - Stateful update is done for the new element as well as the new length.
+		//		- Setting a length to this array via set() - Stateful update is done for the removed/added elements as well as the new length.
 
 		var array = lang._toArray(a);
 		var ctor = StatefulArray;
@@ -158,16 +146,16 @@ define([
 
 				callbacks.list.push(callback);
 
-				return { // dojox/mvc/StatefulArray/watchElements/handle
-					unwatch: function(){
-						for(var list = callbacks.list, i = 0; i < list.length; i++){
-							if(list[i] == callback){
-								list.splice(i, 1);
-								break;
-							}
+				var h = {};
+				h.unwatch = h.remove = function(){
+					for(var list = callbacks.list, i = 0; i < list.length; i++){
+						if(list[i] == callback){
+							list.splice(i, 1);
+							break;
 						}
 					}
 				}; 
+				return h; // dojo/handle
 			}
 		}, Stateful.prototype, {
 			set: function(/*Number|String*/ name, /*Anything*/ value){

@@ -2,9 +2,6 @@ define(["dojo/_base/lang", "../util/oo", "./_Base", "../manager/_registry"],
 function(lang, oo, Base, registry){
 
 var Rect = oo.declare(
-	// summary:
-	//		Creates a dojox.gfx rectangle based on data or points provided.
-
 	Base,
 	function(options){
 		// summary:
@@ -14,12 +11,15 @@ var Rect = oo.declare(
 		}
 	},
 	{
+		// summary:
+		//		Creates a dojox.gfx rectangle based on data or points provided.
+
 		type:"dojox.drawing.stencil.Rect",
 		anchorType: "group",
 		baseRender:true,
 		
 		dataToPoints: function(/*Object*/d){
-			//summary:
+			// summary:
 			//		Converts data to points.
 			d = d || this.data;
 			this.points = [

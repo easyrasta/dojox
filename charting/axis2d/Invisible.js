@@ -3,14 +3,9 @@ define(["dojo/_base/lang", "dojo/_base/declare", "./Base", "../scaler/linear",
 	function(lang, declare, Base, lin, g, du){
 
 /*=====
-	var __InvisibleAxisCtorArgs = function(
-			vertical, fixUpper, fixLower, natural, leftBottom,
-			includeZero, fixed, majorLabels, minorTicks, minorLabels, microTicks,
-			min, max, from, to, majorTickStep, minorTickStep, microTickStep){
-
+	var __InvisibleAxisCtorArgs = {
 		// summary:
 		//		Optional arguments used in the definition of an invisible axis.
-		//
 		// vertical: Boolean?
 		//		A flag that says whether an axis is vertical (i.e. y axis) or horizontal. Default is false (horizontal).
 		// fixUpper: String?
@@ -41,28 +36,13 @@ define(["dojo/_base/lang", "dojo/_base/declare", "./Base", "../scaler/linear",
 		//		the data range.
 		// microTickStep: Number?
 		//		The amount to skip before a micro tick is drawn. When not set the micro ticks step is computed from
-
-		this.vertical = vertical;
-		this.fixUpper = fixUpper;
-		this.fixLower = fixLower;
-		this.natural = natural;
-		this.leftBottom = leftBottom;
-		this.includeZero = includeZero;
-		this.fixed = fixed;
-		this.min = min;
-		this.max = max;
-		this.from = from;
-		this.to = to;
-		this.majorTickStep = majorTickStep;
-		this.minorTickStep = minorTickStep;
-		this.microTickStep = microTickStep;
 	};
 =====*/
 
 	return declare("dojox.charting.axis2d.Invisible", Base, {
 		// summary:
 		//		A axis object used in dojox.charting.  You can use that axis if you want the axis to be invisible.
-		// 		See dojox.charting.Chart.addAxis for details.
+		//		See dojox.charting.Chart.addAxis for details.
 		//
 		// defaultParams: Object
 		//		The default parameters used to define any axis.

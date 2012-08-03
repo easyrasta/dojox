@@ -15,8 +15,6 @@ define([
 
 	// module:
 	//		dojox/mobile/_ItemBase
-	// summary:
-	//		A base class for item classes (e.g. ListItem, IconItem, etc.).
 
 	return declare("dojox.mobile._ItemBase", [WidgetBase, Container, Contained],{
 		// summary:
@@ -150,15 +148,17 @@ define([
 
 		// _selStartMethod: String
 		//		Specifies how the item enters the selected state.
-		//		"touch": Use touch events to enter the selected state.
-		//		"none": Do not change the selected state.
+		//
+		//		- "touch": Use touch events to enter the selected state.
+		//		- "none": Do not change the selected state.
 		_selStartMethod: "none", // touch or none
 
 		// _selEndMethod: String
 		//		Specifies how the item leaves the selected state.
-		//		"touch": Use touch events to leave the selected state.
-		//		"timer": Use setTimeout to leave the selected state.
-		//		"none": Do not change the selected state.
+		//
+		//		- "touch": Use touch events to leave the selected state.
+		//		- "timer": Use setTimeout to leave the selected state.
+		//		- "none": Do not change the selected state.
 		_selEndMethod: "none", // touch, timer, or none
 
 		// _delayedSelection: Boolean

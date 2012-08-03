@@ -17,7 +17,6 @@ define([
 	return declare("dojox.mobile.Slider", [WidgetBase, FormValueMixin], {
 		// summary:
 		//		A non-templated Slider widget similar to the HTML5 INPUT type=range.
-		//
 
 		// value: [const] Number
 		//		The current slider value.
@@ -47,9 +46,10 @@ define([
 
 		// orientation: [const] String
 		//		The slider direction.
-		//		"H": horizontal
-		//		"V": vertical
-		//		"auto": use width/height comparison at instantiation time (default is "H" if width/height are 0)
+		//
+		//		- "H": horizontal
+		//		- "V": vertical
+		//		- "auto": use width/height comparison at instantiation time (default is "H" if width/height are 0)
 		orientation: "auto",
 
 		// halo: Number

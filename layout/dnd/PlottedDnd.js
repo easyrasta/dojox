@@ -307,7 +307,8 @@ dojo.declare("dojox.layout.dnd.PlottedDnd", [dojo.dnd.Source], {
 	},
 	
 	deleteDashedZone: function() {
-		// summary: hide the dashed zone
+		// summary:
+		//		hide the dashed zone
 		this._drop.style.display = "none";
 			var next = this._drop.nextSibling;
 			while (next != null) {
@@ -505,7 +506,7 @@ dojo.extend(dojo.dnd.Manager, {
 	},
 	
 	makeAvatar: function(){
-		//summary:
+		// summary:
 		//		Makes the avatar, it is separate to be overwritten dynamically, if needed.
 		return (this.source.declaredClass == "dojox.layout.dnd.PlottedDnd") ?
 			new dojox.layout.dnd.Avatar(this, this.source.opacity) :

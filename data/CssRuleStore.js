@@ -7,14 +7,16 @@ return declare("dojox.data.CssRuleStore", null, {
 	// description:
 	//		The CssRuleStore allows users to get information about active CSS rules in the page running the CssRuleStore.
 	//		It can also filter out rules from specific stylesheets.  The attributes it exposes on rules are as follows:
-	//			selector:				The selector text.
-	//			classes:				An array of classes present in this selector.
-	//			rule:					The actual DOM Rule object.
-	//			style:					The actual DOM CSSStyleDeclaration object.
-	//			cssText:				The cssText string provided on the rule object.
-	//			styleSheet:				The originating DOM Stylesheet object.
-	//			parentStyleSheet:		The parent stylesheet to the sheet this rule originates from.
-	//			parentStyleSheetHref:	The href of the parent stylesheet.
+	//
+	//		- selector:				The selector text.
+	//		- classes:				An array of classes present in this selector.
+	//		- rule:					The actual DOM Rule object.
+	//		- style:					The actual DOM CSSStyleDeclaration object.
+	//		- cssText:				The cssText string provided on the rule object.
+	//		- styleSheet:				The originating DOM Stylesheet object.
+	//		- parentStyleSheet:		The parent stylesheet to the sheet this rule originates from.
+	//		- parentStyleSheetHref:	The href of the parent stylesheet.
+	//
 	//		AND every style attribute denoted as style.*, such as style.textAlign or style.backgroundColor
 
 	_storeRef: '_S',
@@ -70,7 +72,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	getFeatures: function(){
 		// summary:
-		//		See dojo.data.api.Read.getFeatures()
+		//		See dojo/data/api/Read.getFeatures()
 		return {
 			"dojo.data.api.Read" : true
 		};
@@ -78,7 +80,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	isItem: function(item){
 		// summary:
-		//		See dojo.data.api.Read.isItem()
+		//		See dojo/data/api/Read.isItem()
 		if(item && item[this._storeRef] == this){
 			return true;
 		}
@@ -87,7 +89,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	hasAttribute: function(item, attribute){
 		// summary:
-		//		See dojo.data.api.Read.hasAttribute()
+		//		See dojo/data/api/Read.hasAttribute()
 		this._assertIsItem(item);
 		this._assertIsAttribute(attribute);
 		var attrs = this.getAttributes(item);
@@ -99,7 +101,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	getAttributes: function(item){
 		// summary:
-		//		See dojo.data.api.Read.getAttributes()
+		//		See dojo/data/api/Read.getAttributes()
 		this._assertIsItem(item);
 		var attrs = ['selector', 'classes', 'rule', 'style', 'cssText', 'styleSheet', 'parentStyleSheet', 'parentStyleSheetHref'];
 		var style = item.rule.style;
@@ -114,7 +116,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	getValue: function(item, attribute, defaultValue){
 		// summary:
-		//		See dojo.data.api.Read.getValue()
+		//		See dojo/data/api/Read.getValue()
 		var values = this.getValues(item, attribute);
 		var value = defaultValue;
 		if(values && values.length > 0){
@@ -125,7 +127,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	getValues: function(item, attribute){
 		// summary:
-		//		See dojo.data.api.Read.getValues()
+		//		See dojo/data/api/Read.getValues()
 		this._assertIsItem(item);
 		this._assertIsAttribute(attribute);
 		var value = null;
@@ -178,14 +180,14 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	getLabel: function(item){
 		// summary:
-		//		See dojo.data.api.Read.getLabel()
+		//		See dojo/data/api/Read.getLabel()
 		this._assertIsItem(item);
 		return this.getValue(item, this._labelAttribute);
 	},
 
 	getLabelAttributes: function(item){
 		// summary:
-		//		See dojo.data.api.Read.getLabelAttributes()
+		//		See dojo/data/api/Read.getLabelAttributes()
 		return [this._labelAttribute];
 	},
 
@@ -193,7 +195,7 @@ return declare("dojox.data.CssRuleStore", null, {
 							/* attribute-name-string */ attribute,
 							/* anything */ value){
 		// summary:
-		//		See dojo.data.api.Read.containsValue()
+		//		See dojo/data/api/Read.containsValue()
 		var regexp = undefined;
 		if(typeof value === "string"){
 			regexp = filter.patternToRegExp(value, false);
@@ -203,19 +205,19 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	isItemLoaded: function(/* anything */ something){
 		// summary:
-		//		See dojo.data.api.Read.isItemLoaded()
+		//		See dojo/data/api/Read.isItemLoaded()
 		return this.isItem(something); //boolean
 	},
 
 	loadItem: function(/* object */ keywordArgs){
 		// summary:
-		//		See dojo.data.api.Read.loadItem()
+		//		See dojo/data/api/Read.loadItem()
 		this._assertIsItem(keywordArgs.item);
 	},
 
 	fetch: function(request){
 		// summary:
-		//		See dojo.data.api.Read.fetch()
+		//		See dojo/data/api/Read.fetch()
 		request = request || {};
 		if(!request.store){
 			request.store = this;
@@ -399,7 +401,7 @@ return declare("dojox.data.CssRuleStore", null, {
 
 	close: function(){
 		// summary:
-		//		See dojo.data.api.Read.close()
+		//		See dojo/data/api/Read.close().
 		//		Clears out the cache and allItems objects, meaning all future fetches will requery
 		//		the stylesheets.
 		this._cache = {};

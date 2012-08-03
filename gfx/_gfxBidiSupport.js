@@ -1,7 +1,14 @@
 define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base/html", "dojo/_base/array",
 		"./utils", "./shape", "dojox/string/BidiEngine"], 
-  function(g, lang, has, dom, html, arr, utils, shapeLib, BidiEngine){
+function(g, lang, has, dom, html, arr, utils, shapeLib, BidiEngine){
 	lang.getObject("dojox.gfx._gfxBidiSupport", true);
+
+	/*=====
+	// Prevent changes here from masking the definitions in _base.js from the doc parser
+	var origG = g;
+	g = {};
+	=====*/
+
 	switch (g.renderer){
 		case 'vml':
 			g.isVml = true;
@@ -28,6 +35,8 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 		RLE : '\u202B'
 	};
 
+	/*===== g = origG; =====*/
+
 	// the object that performs text transformations.
 	var bidiEngine = new BidiEngine();
 
@@ -35,11 +44,12 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 		// textDir: String
 		//		Will be used as default for Text/TextPath/Group objects that created by this surface
 		//		and textDir wasn't directly specified for them, though the bidi support was loaded.
-		//		Can be setted in two ways:
+		//		Can be set in two ways:
+		//
 		//		1. When the surface is created and textDir value passed to it as fourth
 		//		parameter.
 		//		2. Using the setTextDir(String) function, when this function is used the value
-		//		of textDir propogates to all of it's children and the children of children (for Groups) etc.
+		//		of textDir propagates to all of it's children and the children of children (for Groups) etc.
 		textDir: "",
 
 		setTextDir: function(/*String*/newTextDir){
@@ -74,12 +84,13 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 	
 	lang.extend(g.Text, {  
 		// summary:
-		//		Overrides some of dojox.gfx.Text properties, and adds some
+		//		Overrides some of dojox/gfx.Text properties, and adds some
 		//		for bidi support.
 		
 		// textDir: String
 		//		Used for displaying bidi scripts in right layout.
 		//		Defines the base direction of text that displayed, can have 3 values:
+		//
 		//		1. "ltr" - base direction is left to right.
 		//		2. "rtl" - base direction is right to left.
 		//		3. "auto" - base direction is contextual (defined by first strong character).
@@ -93,23 +104,28 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 			// textDir:	
 			//		Text direction.
 			//		Can be:
+			//
 			//		1. "ltr" - for left to right layout.
 			//		2. "rtl" - for right to left layout
 			//		3. "auto" - for contextual layout: the first strong letter decides the direction.
 			// description:
 			//		Finds the right transformation that should be applied on the text, according to renderer.
 			//		Was tested in:
+			//
 			//		Renderers (browser for testing):
-			//			canvas (FF, Chrome, Safari),
-			//			vml (IE),
-			//			svg (FF, Chrome, Safari, Opera),
-			//			silverlight (IE, Chrome, Safari, Opera),
-			//			svgWeb(FF, Chrome, Safari, Opera, IE).
+			//
+			//		- canvas (FF, Chrome, Safari),
+			//		- vml (IE),
+			//		- svg (FF, Chrome, Safari, Opera),
+			//		- silverlight (IE, Chrome, Safari, Opera),
+			//		- svgWeb(FF, Chrome, Safari, Opera, IE).
+			//
 			//		Browsers [browser version that was tested]:
-			//			IE [6,7,8], FF [3.6],
-			//			Chrome (latest for March 2011),
-			//			Safari [5.0.3],
-			//			Opera [11.01].
+			//
+			//		- IE [6,7,8], FF [3.6],
+			//		- Chrome (latest for March 2011),
+			//		- Safari [5.0.3],
+			//		- Opera [11.01].
 
 			if(textDir && text && text.length > 1){
 				var sourceDir = "ltr", targetDir = textDir;
@@ -169,6 +185,7 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 		// textDir: String
 		//		Used for displaying bidi scripts in right layout.
 		//		Defines the base direction of text that displayed, can have 3 values:
+		//
 		//		1. "ltr" - base direction is left to right.
 		//		2. "rtl" - base direction is right to left.
 		//		3. "auto" - base direction is contextual (defined by first strong character).
@@ -182,16 +199,19 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 			// textDir:
 			//		text direction direction.
 			//		Can be:
+			//
 			//		1. "ltr" - for left to right layout.
 			//		2. "rtl" - for right to left layout
 			//		3. "auto" - for contextual layout: the first strong letter decides the direction.
 			// description:
 			//		Finds the right transformation that should be applied on the text, according to renderer.
 			//		Was tested in:
+			//
 			//		Renderers:
-			//			canvas (FF, Chrome, Safari), vml (IE), svg (FF, Chrome, Safari, Opera), silverlight (IE8), svgWeb(FF, Chrome, Safari, Opera, IE).
+			//		canvas (FF, Chrome, Safari), vml (IE), svg (FF, Chrome, Safari, Opera), silverlight (IE8), svgWeb(FF, Chrome, Safari, Opera, IE).
+			//
 			//		Browsers:
-			//			IE [6,7,8], FF [3.6], Chrome (latest for February 2011), Safari [5.0.3], Opera [11.01].
+			//		IE [6,7,8], FF [3.6], Chrome (latest for February 2011), Safari [5.0.3], Opera [11.01].
 
 			if(textDir && text && text.length > 1){
 				var sourceDir = "ltr", targetDir = textDir;
@@ -316,7 +336,7 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 			textDir = validateTextDir(args[0]);
 		}
 		group.setTextDir(textDir ? textDir : this.textDir);
-		return group;	// dojox.gfx.Group				
+		return group;	// dojox/gfx.Group
 	};
 
 	// In creation of Group there's a need to update it's textDir,
@@ -328,7 +348,7 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 	extendMethod(g.Group, "createGroup", null, groupTextDir);
 
 	var textDirPreprocess =  function(text){
-		//  inherit from surface / group  if textDir is defined there
+		// inherit from surface / group  if textDir is defined there
 		if(text){
 			var textDir = text.textDir ? validateTextDir(text.textDir) : this.textDir;
 			if(textDir){
@@ -347,7 +367,12 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 	extendMethod(g.Group,"createText", textDirPreprocess, null);
 	extendMethod(g.Group,"createTextPath", textDirPreprocess, null);
 
-	g.createSurface = function(parentNode, width, height, textDir) {        
+	/*=====
+	// don't mask definition of original createSurface() function from doc parser
+	g = {};
+	=====*/
+
+	g.createSurface = function(parentNode, width, height, textDir) {
 		var s = g[g.renderer].createSurface(parentNode, width, height);
 		var tDir = validateTextDir(textDir);
 		
@@ -368,6 +393,7 @@ define(["./_base", "dojo/_base/lang","dojo/_base/sniff", "dojo/dom", "dojo/_base
 		
 		return s;
 	};
+	/*===== g = origG; =====*/
 
 	// some helper functions
 	
