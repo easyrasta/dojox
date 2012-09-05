@@ -156,8 +156,10 @@ define(["dojo/_base/declare", "dojo/_base/window", "dojo/_base/array", "dojo/_ba
 		
 				var scale = axis.getWindowScale();
 		
-				chart.setAxisWindow(this.axis, scale, this._startOffset - delta / s / scale);
+				var offset = this._startOffset - delta / s / scale;
+				chart.setAxisWindow(this.axis, scale, offset);
 				chart.render();
+				return offset;
 			}
 		},
 	
@@ -231,6 +233,7 @@ define(["dojo/_base/declare", "dojo/_base/window", "dojo/_base/array", "dojo/_ba
 			chart.zoomIn(this.axis, [newStart, newEnd]);
 			// do not scroll browser
 			eventUtil.stop(event);
+			return [newStart, newEnd];
 		}
 	});		
 });
