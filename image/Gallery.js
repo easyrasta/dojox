@@ -2,13 +2,15 @@ define([
 	"dojo/_base/declare", // declare
 	"dojo/dom-style",
 	"dojo/dom-geometry",
+	"dojo/dom-class",
 	"dojo/topic",
+	"dojo/query",
 	"./SlideShow",
 	"./ThumbnailPicker",
 	"dijit/_WidgetBase",
 	"dijit/_TemplatedMixin",
 	"dojo/text!./resources/Gallery.html"
-], function(declare, domStyle, domGeom, topic, SlideShow, ThumbnailPicker,
+], function(declare, domStyle, domGeom, domClass, topic, query, SlideShow, ThumbnailPicker,
 			_WidgetBase, _TemplatedMixin, template){
 
 return declare("dojox.image.Gallery", [_WidgetBase, _TemplatedMixin], {
@@ -90,8 +92,15 @@ return declare("dojox.image.Gallery", [_WidgetBase, _TemplatedMixin], {
 		//When an image is shown in the Slideshow, make sure it is visible
 		//in the ThumbnailPicker
 		topic.subscribe(this.slideShow.getShowTopicName(), function(packet){
-		  console.log(_this.slideShow.getShowTopicName(), packet);
-			_this.thumbPicker._showThumbs(packet.index);
+		    console.log(_this.slideShow.getShowTopicName(), packet);
+			var img = _this.thumbPicker._showThumbs(packet.index);
+			//domClass.add(_this.thumbPicker._thumbs[packet.index], "ThumbnailSelected");
+			console.log("img", img);
+			if(img){
+				//query(".Thumbnail", _this.thumbPicker.thumbsNode).removeClass("ThumbnailSelected");
+				query("." + _this.thumbPicker.cellClass, _this.thumbPicker.thumbsNode).removeClass(_this.thumbPicker.cellClass + "Selected");
+				domClass.add(img, _this.thumbPicker.cellClass + "Selected");
+			}
 		});
 		//When the user clicks a thumbnail, show that image
 		topic.subscribe(this.thumbPicker.getClickTopicName(), function(evt){
@@ -107,7 +116,7 @@ return declare("dojox.image.Gallery", [_WidgetBase, _TemplatedMixin], {
 		//When an image finished loading in the slideshow, update the loading
 		//notification in the ThumbnailPicker
 		topic.subscribe(this.slideShow.getLoadTopicName(), function(index){
-		  console.log(_this.slideShow.getLoadTopicName(), index);
+			console.log(_this.slideShow.getLoadTopicName(), index);
 			_this.thumbPicker.markImageLoaded(index);
 		});
 		this._centerChildren();

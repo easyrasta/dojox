@@ -61,7 +61,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 
 	// loop: Boolean
 	//	true/false - make the slideshow loop
-	loop: true,
+	loop: false,
 
 	// hasNav: Boolean
 	//	toggle to enable/disable the visual navigation controls
@@ -112,6 +112,8 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 	//	Time, in seconds, between image transitions during a slideshow.
 	slideshowInterval: 3,
 	
+	fadeInterval: 50,
+	
 	templateString: template,
 	
 	// _imageCounter: Number
@@ -137,7 +139,10 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 		img.setAttribute("width", this.imageWidth);
 		img.setAttribute("height", this.imageHeight);
 		
+		
+		/*
 		if(this.hasNav){
+			
 			var self = this;
 			on(this.outerNode, mouse.enter, function(evt){
 				self._showNav();
@@ -146,7 +151,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 				self._hideNav(evt);
 			});
 		}
-		
+		*/
 		this.outerNode.style.width = this.imageWidth + "px";
 
 		img.setAttribute("src", this._blankGif);
@@ -159,6 +164,8 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 		this._loadImage(0, lang.hitch(this, "showImage", 0));
 		this._calcNavDimensions();
 		domStyle.set(this.navNode, "opacity", 0);
+		
+		this._showNav();
 	},
 
 	setDataStore: function(dataStore, request, /*optional*/paramNames){
@@ -363,7 +370,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 				_this.largeNode.appendChild(_this.images[index]);
 				_this._currentImage = _this.images[index]._img;
 				_this._fitSize();
-								
+				
 				var onEnd = function(a,b,c){
 
 					var img = _this.images[index].firstChild;
@@ -372,13 +379,9 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 					}
 					var title = img.getAttribute("title") || "";
 					if(_this._navShowing){
-						_this._showNav(true);
+						//_this._showNav(true);
+						_this._showNav();
 					}
-					console.log("publish "+_this.getShowTopicName(), {
-						index: index,
-						title: title,
-						url: img.getAttribute("src")
-					});
 					topic.publish(_this.getShowTopicName(), {
 						index: index,
 						title: title,
@@ -393,7 +396,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 				
 				fx.fadeIn({
 					node: _this.images[index],
-					duration: 300,
+					duration: _this.fadeInterval,
 					onEnd: onEnd
 				}).play();
 				
@@ -410,7 +413,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 		if(current && current.length > 0){
 			fx.fadeOut({
 				node: current[0],
-				duration: 300,
+				duration: _this.fadeInterval,
 				onEnd: function(){
 					_this.hiddenNode.appendChild(current[0]);
 					showOrLoadIt();
@@ -429,6 +432,7 @@ return declare("dojox.image.SlideShow", [_WidgetBase, _TemplatedMixin], {
 		//		If true, the widget is always resized, regardless of the value of 'fixedHeight'
 		if(!this.fixedHeight || force){
 			var height = (this._currentImage.height + (this.hasNav ? 20:0));
+			//console.log("height", height);
 			domStyle.set(this.innerWrapper, "height", height + "px");
 			return;
 		}

@@ -355,7 +355,8 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 		topic.publish(this.getShowTopicName(), {index:index});
 		this._updateNavControls();
 		this._loadingImages = {};
-	
+		
+		console.log("_checkLoad::_thumbIndex", index);
 		this._thumbIndex = index;
 	
 		//If we have not already requested the data from the store, do so.
@@ -387,12 +388,17 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 			(offset + img[this._sizeAttr] <= this.thumbScroller[this._scrollAttr] + this._scrollerSize)
 		){
 			// FIXME: WTF is this checking for?
-			return;
+			// TO check if future showing thumbs is inside scrool view
+			return img;
 		}
 		
 		
 		if(this.isScrollable){
-			var target = this.isHorizontal ? {x: left, y: 0} : { x:0, y:top};
+			if(offset < this.thumbScroller[this._scrollAttr]){
+				offset -= this.thumbScroller[this._scrollAttr];
+			}
+			
+			var target = this.isHorizontal ? {x: offset, y: 0} : { x:0, y:offset};
 			smoothScroll({
 				target: target,
 				win: this.thumbScroller,
@@ -408,6 +414,8 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 			}
 			this._checkLoad(img, index);
 		}
+		
+		return img;
 	},
 	
 	markImageLoaded: function(index){
@@ -432,7 +440,7 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 		if(!this.autoLoad){ return; }
 		domClass.add(thumb, className);
 	},
-                                                 
+
 	_loadNextPage: function(){
 		// summary:
 		//		Loads the next page of thumbnail images
@@ -556,7 +564,7 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 	
 		
 		on(img, "click", function(evt){
-			topic.publish(this.getClickTopicName(),	{
+			topic.publish(self.getClickTopicName(),	{
 				index: evt.target._index,
 				data: evt.target._data,
 				url: img.getAttribute("src"),
@@ -565,6 +573,7 @@ return declare("dojox.image.ThumbnailPicker", [_WidgetBase, _TemplatedMixin], {
 				link: self.imageStore.getValue(data, self.linkAttr)
 			});
 			//
+			console.log("click node", evt.target.parentNode);
 			query("." + self.cellClass, self.thumbsNode).removeClass(self.cellClass + "Selected");
 			domClass.add(evt.target.parentNode, self.cellClass + "Selected");
 			return false;
