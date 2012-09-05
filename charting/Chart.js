@@ -193,14 +193,11 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 			arr.forEach(this.series, destroy);
 			arr.forEach(this.stack,  destroy);
 			func.forIn(this.axes, destroy);
+			this.surface.destroy();
 			if(this.chartTitle && this.chartTitle.tagName){
 				// destroy title if it is a DOM node
 				domConstruct.destroy(this.chartTitle);
 			}
-			if(this.plotGroup){
-				this.plotGroup.destroy();
-			}
-			this.surface.destroy();
 		},
 		getCoords: function(){
 			// summary:
@@ -753,7 +750,6 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 				lower = range[0] < bounds.lower ? bounds.lower : lower;
 				upper = range[1] > bounds.upper ? bounds.upper : upper;
 				scale = (bounds.upper - bounds.lower) / (upper - lower);
-				console.log("zoomIn:scale", scale);
 				offset = lower - bounds.lower;
 				this.setAxisWindow(name, scale, offset);
 				if(delayed){
@@ -1184,7 +1180,6 @@ define(["../main", "dojo/_base/lang", "dojo/_base/array","dojo/_base/declare", "
 		var plots = {}, axes = {};
 		arr.forEach(stack, function(plot){
 			var stats = plots[plot.name] = plot.getSeriesStats();
-			console.log("calculateAxes:stats", stats);
 			if(plot.hAxis){
 				axes[plot.hAxis] = combineStats(axes[plot.hAxis], hSection(stats));
 			}
