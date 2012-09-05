@@ -186,6 +186,9 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			// except if interpolates is false in which case ignore null between valid data
 			for(var j = min; j < max; j++){
 				if(run.data[j] != null && (indexed || run.data[j].y != null)){
+					if(!indexed && (value.x < this._hScaler.bounds.from-1 || value.x > this._hScaler.bounds.to)){
+						continue;
+					}
 					if(!rseg){
 						rseg = [];
 						segments.push({index: j, rseg: rseg});
@@ -247,14 +250,13 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					t.skip();
 					continue;
 				}
+				run.dyn = {};
 
 				var theme = t.next(this.opt.areas ? "area" : "line", [this.opt, run], true),
 					lpoly, height = dim.height - offsets.b,
 					ht = this._hScaler.scaler.getTransformerFromModel(this._hScaler),
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
 				this._eventSeries[run.name] = new Array(run.data.length);
-				
-				run.dyn = {};
 				
 				if(run.hide){
 					if(this.opt.lines){

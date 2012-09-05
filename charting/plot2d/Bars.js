@@ -192,13 +192,14 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				z--;
 				
 				s = run.group;
-				var l = this.getDataLength(run);
 				var indexed = arr.some(run.data, function(item){
 					return typeof item == "number" || (item && !item.hasOwnProperty("x"));
 				});
-				
-
-				for(var j = 0; j < l; ++j){
+				// on indexed charts we can easily just interate from the first visible to the last visible
+				// data point to save time
+				var min = indexed?Math.max(0, Math.floor(this._vScaler.bounds.from - 1)):0;
+				var max = indexed?Math.min(run.data.length, Math.ceil(this._vScaler.bounds.to)):run.data.length;
+				for(var j = min; j < max; ++j){
 					var value = run.data[j];
 					if(value != null){
 						var val = this.getValue(value, j, i, indexed),
@@ -206,6 +207,10 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 							w = Math.abs(hv - baselineWidth),
 							finalTheme,
 							sshape;
+						
+						if(val.x < this._vScaler.bounds.from - 1 || val.x > this._vScaler.bounds.to){
+							continue;
+						}
 						if(this.opt.styleFunc || typeof value != "number"){
 							var tMixin = typeof value != "number" ? [value] : [];
 							if(this.opt.styleFunc){
@@ -262,9 +267,6 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			this.dirty = false;
 			return this;	//	dojox/charting/plot2d/Bars
 		},
-		getDataLength: function(run){
-			return Math.min(run.data.length, Math.ceil(this._vScaler.bounds.to));
-		},
 
 		getValue: function(value, j, seriesIndex, indexed){
 			var y,x;
@@ -294,7 +296,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				for(var j = 0; j < serie.data.length; ++j){
 					var data = serie.data[j];
 					if(typeof data == "number"){
-						delta = 1;
+						delta = 1+this._vScaler.bounds.from;
 						break;
 					}
 					if(!previousData){
@@ -308,6 +310,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 					}
 				}
 			}
+			console.log("delta", delta);
 			return delta;
 		},
 		getBarProperties: function(){

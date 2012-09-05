@@ -8,8 +8,12 @@ define(["dojo/_base/declare", "dojo/_base/array", "./Bars", "./common"],
 			array.forEach(this.series, function(serie){if(serie.hide){length--;}});
 			
 			var delta = this._getDelta();
-			var f = dc.calculateBarSize(this._vScaler.scaler.getTransformerFromModel(this._vScaler)(delta), this.opt, length);
+			//var f = dc.calculateBarSize(this._vScaler.bounds.scale, this.opt, length);
+			//console.log("bar", f);
 			
+			var f = dc.calculateBarSize(this._vScaler.scaler.getTransformerFromModel(this._vScaler)(delta), this.opt, length);
+			//console.log("scaler.bounds.from", );
+		  
 			return {gap: f.gap, height: f.size, thickness: f.size, clusterSize: length};
 		}
 		

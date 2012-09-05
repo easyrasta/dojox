@@ -45,7 +45,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/_base
 			// returns: Array
 			//		The handle as returned from dojo.connect (see dojo.connect).
 			this.dirty = true;
-			//console.log("connect event");
 			return hub.connect(this, "plotEvent", object, method);	//	Array
 		},
 		events: function(){
@@ -53,13 +52,11 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/_base
 			//		Find out if any event handlers have been connected to our plotEvent.
 			// returns: Boolean
 			//		A flag indicating that there are handlers attached.
-			console.log("has events", !!this.plotEvent.after);
 			return !!this.plotEvent.after;
 		},
 		resetEvents: function(){
 			// summary:
 			//		Reset all events attached to our plotEvent (i.e. disconnect).
-			//console.log("reset events", this._shapeEvents);
 			if(this._shapeEvents.length){
 				arr.forEach(this._shapeEvents, function(item){
 					item.shape.disconnect(item.handle);
@@ -69,7 +66,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/_base
 			this.raiseEvent({type: "onplotreset", plot: this});
 		},
 		_connectSingleEvent: function(o, eventName){
-			//console.log("_connectSingleEvent "+eventName, o);
 			this._shapeEvents.push({
 				shape:  o.eventMask,
 				handle: o.eventMask.connect(eventName, this, function(e){
@@ -81,7 +77,6 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "dojo/_base
 			});
 		},
 		_connectEvents: function(o){
-			//console.log("_connectEvents ", o);
 			if(o){
 				o.chart = this.chart;
 				o.plot  = this;
