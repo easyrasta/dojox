@@ -13,6 +13,8 @@ define(["dojo/_base/declare", "./Bars", "./commonStacked"],
 			//stats = this._adjustStats(stats);
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
+			//this._maxRunLength = stats.hmax;
+			stats = this._adjustStats(stats);
 			t = stats.hmin, stats.hmin = stats.vmin, stats.vmin = t;
 			t = stats.hmax, stats.hmax = stats.vmax, stats.vmax = t;
 			return stats; // Object

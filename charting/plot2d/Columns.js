@@ -146,7 +146,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 					run._rectFreePool = (run._rectFreePool?run._rectFreePool:[]).concat(run._rectUsePool?run._rectUsePool:[]);
 					run._rectUsePool = [];
 				}
-				var theme = t.next("column", [this.opt, run])
+				var theme = t.next("column", [this.opt, run]),
 					eventSeries = new Array(run.data.length);
 				
 				 if(run.hide){ 

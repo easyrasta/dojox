@@ -20,7 +20,6 @@ define([
 			on, parser, query){
 
 	// build friendly strings
-
 	var _defaultTransition = "dojox.widget.rotator.swap", // please do NOT change
 	_defaultTransitionDuration = 500,
 	_displayStr = "display",

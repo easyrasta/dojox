@@ -159,7 +159,7 @@ dojo.declare(
 				}else{
 					lastDate = dateB;
 				}
-			}
+			});
 			this.set("currentFocus", lastDate);		
 		},
 		_isValidDate: function(/*Date*/ value){
@@ -736,6 +736,19 @@ dojo.declare(
 			this.rangeJustSelected = true; //Indicates that we just selected a range.
 		},
 
+		_isSelectedDate: function(/*Date*/ dateObject, /*String?*/ locale){
+			// summary:
+			//		Returns true if the passed date is part of the selected dates of the calendar
+			var contains = false;
+			dojo.forEach(this.get("value"), function(item){
+				console.log("item "+item);
+				console.log("item "+dateObject);
+				console.log("comp", !dojo.date.compare(item, dateObject, "date"));
+				if(!dojo.date.compare(item, dateObject, "date"))return true;
+			});
+			return false;
+		},
+
 		onValueSelected: function(/*array of ISO dates*/ dates){
 			// summary:
 			//		Notification that a date cell or more were selected.
@@ -787,7 +800,6 @@ dojo.declare(
 			return ""; // String
 =====*/
 		},
-		
 		_sort : function(){
 			//This function returns a sorted version of the value array that represents the selected dates.
 			if(this.value == {}){return [];}

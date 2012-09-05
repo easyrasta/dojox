@@ -203,6 +203,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 					var value = run.data[j];
 					if(value != null){
 						var val = this.getValue(value, j, i, indexed),
+				
 							hv = ht(val.y),
 							w = Math.abs(hv - baselineWidth),
 							finalTheme,
@@ -267,7 +268,16 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			this.dirty = false;
 			return this;	//	dojox/charting/plot2d/Bars
 		},
-
+/*
+		getValue: function(value, j, indexSerie){
+			var y,x;
+			if(typeof value == "number"){
+				y = value;
+				x = j;
+			}else{
+				y = value.y;
+				x = value.x ? value.x -1: j;
+*/
 		getValue: function(value, j, seriesIndex, indexed){
 			var y,x;
 			if(indexed){
