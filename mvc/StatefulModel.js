@@ -9,13 +9,16 @@ define([
 	"./StatefulArray"
 ], function(kernel, lang, array, declare, Stateful, getStateful, getPlainValue, StatefulArray){
 
+	kernel.deprecated("dojox/mvc/StatefulModel", "Use dojox/mvc/getStateful, dojox/mvc/getPlainValue, dojox/mvc/StatefulArray or one of the dojox/mvc/*RefControllers instead");
+
 	var StatefulModel = declare("dojox.mvc.StatefulModel", [Stateful], {
 		// summary:
+		//		Deprecated.  Use dojox/mvc/getStateful, dojox/mvc/getPlainValue, dojox/mvc/StatefulArray or one of the dojox/mvc/*RefControllers instead.
 		//		The first-class native JavaScript data model based on dojo/Stateful
 		//		that wraps any data structure(s) that may be relevant for a view,
 		//		a view portion, a dijit or any custom view layer component.
 		//
-		//  description:
+		// description:
 		//		A data model is effectively instantiated with a plain JavaScript
 		//		object which specifies the initial data structure for the model.
 		//
@@ -50,13 +53,15 @@ define([
 		//		- It enables dijits or custom components in the view to "bind" to
 		//		  data within the model. A bind creates a bi-directional update
 		//		  mechanism between the bound view and the underlying data:
-		//			- The data model is "live" data i.e. it maintains any updates
-		//			  driven by the view on the underlying data.
-		//			- The data model issues updates to portions of the view if the
-		//			  data they bind to is updated in the model. For example, if two
-		//			  dijits are bound to the same part of a data model, updating the
-		//			  value of one in the view will cause the data model to issue an
-		//			  update to the other containing the new value.
+		//
+		//		a) The data model is "live" data i.e. it maintains any updates
+		//		driven by the view on the underlying data.
+		//
+		//		b) The data model issues updates to portions of the view if the
+		//		data they bind to is updated in the model. For example, if two
+		//		dijits are bound to the same part of a data model, updating the
+		//		value of one in the view will cause the data model to issue an
+		//		update to the other containing the new value.
 		//
 		//		- The data model internally creates a tree of dojo/Stateful
 		//		  objects that matches the input, which is effectively a plain
@@ -77,10 +82,10 @@ define([
 		//		|
 		//		|	// The created dojo/Stateful tree is illustrated below (all nodes are dojo/Stateful objects)
 		//		|	//
-		//		|	//	                o  (root node)
-		//		|	//	               / \
+		//		|	//		            o  (root node)
+		//		|	//		           / \
 		//		|	//	 (prop1 node) o   o (prop2 node)
-		//		|	//	                 / \
+		//		|	//		             / \
 		//		|	//	   (leaf1 node)	o   o (leaf2 node)
 		//		|	//
 		//		|	// The root node is accessed using the expression "model" (the var name above). The prop1
@@ -139,6 +144,9 @@ define([
 		//		outlined above support the flexible development of a number of MVC
 		//		patterns on the client. As an example, CRUD operations can be
 		//		supported with minimal application code.
+		//
+		// tags:
+		//		deprecated
 	
 		// data: Object
 		//		The plain JavaScript object / data structure used to initialize
@@ -183,11 +191,12 @@ define([
 		commit: function(/*"dojo/store/DataStore?"*/ store){
 			// summary:
 			//		Commits this data model:
+			//
 			//		- Saves the current state such that a subsequent reset will not
 			//		  undo any prior changes.
 			//		- Persists client-side changes to the data store, if a store
 			//		  has been supplied as a parameter or at instantiation.
-			//	store:
+			// store:
 			//		dojo/store/DataStore
 			//		Optional dojo/store/DataStore to use for this commit, if none
 			//		provided but one was provided at instantiation time, that store
@@ -234,10 +243,10 @@ define([
 			// summary:
 			//		Adds a dojo/Stateful tree represented by the given
 			//		dojox/mvc/StatefulModel at the given property name.
-			//	name:
+			// name:
 			//		The property name to use whose value will become the given
 			//		dijit/Stateful tree.
-			//	stateful:
+			// stateful:
 			//		The dojox/mvc/StatefulModel to insert.
 			// description:
 			//		In case of arrays, the property names are indices passed
@@ -257,7 +266,7 @@ define([
 		remove: function(/*String*/ name){
 			// summary:
 			//		Removes the dojo/Stateful tree at the given property name.
-			//	name:
+			// name:
 			//		The property name from where the tree will be removed.
 			// description:
 			//		In case of arrays, the property names are indices passed
@@ -307,7 +316,7 @@ define([
 			//		Instantiates a new data model that view components may bind to.
 			//		This is a private constructor, use the factory method
 			//		instead: dojox/mvc/newStatefulModel(args)
-			//	args:
+			// args:
 			//		The mixin properties.
 			// description:
 			//		Creates a tree of dojo/Stateful objects matching the initial
@@ -316,10 +325,21 @@ define([
 			//		the data structure.
 			// tags:
 			//		private
-			var data = (args && "data" in args) ? args.data : this.data; 
+			var data = (args && "data" in args) ? args.data : this.data;
+			this._createModel(data);
+		},
+
+		//////////////////////// PRIVATE METHODS ////////////////////////
+
+		_createModel: function(/*Object*/ data){
+			// summary:
+			//		Create this data model from provided input data.
+			//	obj:
+			//		The input for the model, as a plain JavaScript object.
+			// tags:
+			//		private
 
 			if(data != null){
-				kernel.deprecated("To create dojox/mvc/StatefulModel from data, dojox/mvc/getStateful() should be used.");
 				data = getStateful(data, StatefulModel.getStatefulOptions);
 				if(lang.isArray(data)){
 					// Some consumers of dojox/mvc/StatefulModel inherits it via dojo/declare(), where we cannot use array inheritance technique
@@ -338,8 +358,6 @@ define([
 			}
 		},
 
-		//////////////////////// PRIVATE METHODS ////////////////////////
-
 		_commit: function(){
 			// summary:
 			//		Commits this data model, saves the current state into data to become the saved state, 
@@ -357,9 +375,10 @@ define([
 		_saveToStore: function(/*"dojo/store/DataStore"*/ store){
 			// summary:
 			//		Commit the current values to the data store:
+			//
 			//		- remove() any deleted entries
 			//		- put() any new or updated entries
-			//	store:
+			// store:
 			//		dojo/store/DataStore to use for this commit.
 			// tags:
 			//		private

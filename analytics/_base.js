@@ -1,6 +1,6 @@
 define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload", 
-        "dojo/_base/sniff", "dojo/_base/xhr", "dojo/_base/json", "dojo/io-query", "dojo/io/script"
-], function(lang, config, ready, unload, has, xhr, json, ioQuery, scriptIO){
+        "dojo/_base/sniff", "dojo/_base/xhr", "dojo/json", "dojo/io-query", "dojo/io/script"
+], function(lang, config, ready, unload, has, xhr, JSON, ioQuery, scriptIO){
 
 	var Analytics = function(){
 		// summary:
@@ -28,14 +28,15 @@ define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload
 
 	lang.extend(Analytics, {
 		schedulePusher: function(/* Int */interval){
-			// summary: Schedule the data pushing routines to happen in interval ms
+			// summary:
+			//		Schedule the data pushing routines to happen in interval ms
 			setTimeout(lang.hitch(this, "checkData"), interval || this.sendInterval);
 		},
 
 		addData: function(dataType, data){
 			// summary:
-			//	add data to the queue. Will be pusshed to the server on the next
-			//	data push
+			//		add data to the queue. Will be pusshed to the server on the next
+			//		data push
 
 			if(arguments.length > 2){
 				// FIXME: var c = dojo._toArray(arguments) ?
@@ -46,7 +47,8 @@ define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload
 		},
 
 		checkData: function(){
-			// summary: TODOC?
+			// summary:
+			//		TODOC?
 			if(this._inTransit){
 				this.schedulePusher(this.inTransitRetry);
 				return;
@@ -58,9 +60,9 @@ define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload
 
 		pushData: function(){
 			// summary:
-			//	pushes data to the server if any exists.  If a push is done, return
-			//	the deferred after hooking up completion callbacks.  If there is no data
-			//	to be pushed, return false;
+			//		pushes data to the server if any exists.  If a push is done, return
+			//		the deferred after hooking up completion callbacks.  If there is no data
+			//		to be pushed, return false;
 			if(this._data.length){
 				// clear the queue
 				this._inTransit = this._data;
@@ -80,7 +82,7 @@ define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload
 							url:this.dataUrl,
 							content:{
 								id: this._id++,
-								data: json.toJson(this._inTransit)
+								data: JSON.stringify(this._inTransit)
 							}
 						});
 						break;
@@ -96,7 +98,7 @@ define(["dojo/_base/lang", "dojo/_base/config", "dojo/ready", "dojo/_base/unload
 			while(true){
 				var content = {
 					id: this._id++,
-					data: json.toJson(this._inTransit)
+					data: JSON.stringify(this._inTransit)
 				};
 				
 				// FIXME would like a much better way to get the query down to length

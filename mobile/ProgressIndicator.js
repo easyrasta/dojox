@@ -13,8 +13,6 @@ define([
 
 	// module:
 	//		dojox/mobile/ProgressIndicator
-	// summary:
-	//		A progress indication widget.
 
 	var cls = declare("dojox.mobile.ProgressIndicator", [WidgetBase, Contained], {
 		// summary:
@@ -58,6 +56,8 @@ define([
 		baseClass: "mblProgressIndicator",
 
 		constructor: function(){
+			// summary:
+			//		Creates a new instance of the class.
 			this.colors = [];
 			this._bars = [];
 		},

@@ -9,7 +9,6 @@ define(["dojo/_base/declare", "./Bars", "./commonStacked"],
 			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = commonStacked.collectStats(this.series), t;
-			
 			this._maxRunLength = stats.hmax;
 			stats = this._adjustStats(stats);
 			t = stats.hmin, stats.hmin = stats.vmin, stats.vmin = t;

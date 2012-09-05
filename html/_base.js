@@ -9,11 +9,12 @@ define([
 	"dojo/_base/sniff",
 	"dojo/_base/url",
 	"dojo/_base/xhr",
+	"dojo/when",
 	"dojo/_base/window"
-], function (declare, Deferred, domConstruct, htmlUtil, kernel, lang, ready, has, _Url, xhrUtil, windowUtil) {
+], function(declare, Deferred, domConstruct, htmlUtil, kernel, lang, ready, has, _Url, xhrUtil, when, windowUtil){
 
 /*
-	Status: dont know where this will all live exactly
+	Status: don't know where this will all live exactly
 	Need to pull in the implementation of the various helper methods
 	Some can be static method, others maybe methods of the ContentSetter (?)
 
@@ -50,20 +51,20 @@ define([
 		// description:
 		//		Say we fetch a HTML page from level1/page.html
 		//		It has some inline CSS:
-		//			@import "css/page.css" tv, screen;
-		//			...
-		//			background-image: url(images/aplhaimage.png);
+		//	|		@import "css/page.css" tv, screen;
+		//	|		...
+		//	|		background-image: url(images/aplhaimage.png);
 		//
 		//		as we fetched this HTML and therefore this CSS
 		//		from level1/page.html, these paths needs to be adjusted to:
-		//			@import 'level1/css/page.css' tv, screen;
-		//			...
-		//			background-image: url(level1/images/alphaimage.png);
+		//	|		@import 'level1/css/page.css' tv, screen;
+		//	|		...
+		//	|		background-image: url(level1/images/alphaimage.png);
 		//
 		//		In IE it will also adjust relative paths in AlphaImageLoader()
-		//			filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/alphaimage.png');
+		//	|		filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/alphaimage.png');
 		//		will be adjusted to:
-		//			filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='level1/images/alphaimage.png');
+		//	|		filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='level1/images/alphaimage.png');
 		//
 		//		Please note that any relative paths in AlphaImageLoader in external css files wont work, as
 		//		the paths in AlphaImageLoader is MUST be declared relative to the HTML page,
@@ -116,6 +117,11 @@ define([
 		// if cssUrl is set it will adjust paths accordingly
 		styles.attributes = [];
 
+		cont = cont.replace(/<[!][-][-](.|\s)*?[-][-]>/g,
+			function(comment){
+				return comment.replace(/<(\/?)style\b/ig,"&lt;$1Style").replace(/<(\/?)link\b/ig,"&lt;$1Link").replace(/@import "/ig,"@ import \"");
+			}
+		);
 		return cont.replace(/(?:<style([^>]*)>([\s\S]*?)<\/style>|<link\s+(?=[^>]*rel=['"]?stylesheet)([^>]*?href=(['"])([^>]*?)\4[^>\/]*)\/?>)/gi,
 			function(ignore, styleAttr, cssText, linkAttr, delim, href){
 				// trim attribute
@@ -182,7 +188,7 @@ define([
 		}
 
 		// match <script>, <script type="text/..., but not <script type="dojo(/method)...
-		return cont.replace(/<script\s*(?![^>]*type=['"]?(?:dojo\/|text\/html\b))(?:[^>]*?(?:src=(['"]?)([^>]*?)\1[^>]*)?)*>([\s\S]*?)<\/script>/gi,
+		return cont.replace(/<script\s*(?![^>]*type=['"]?(?:dojo\/|text\/html\b))[^>]*?(?:src=(['"]?)([^>]*?)\1[^>]*)?>([\s\S]*?)<\/script>/gi,
 			function(ignore, delim, src, code){
 				if(src){
 					download(src);
@@ -313,7 +319,22 @@ define([
 				this._renderStyles(styles);
 			}
 
+			// Deferred to signal when this function is complete
+			var d = new Deferred();
+
+			// Setup function to call onEnd() in the superclass, for parsing, and resolve the above Deferred when
+			// parsing is complete.
+			var superClassOnEndMethod = this.getInherited(arguments),
+				args = arguments,
+				callSuperclass = lang.hitch(this, function(){
+					superClassOnEndMethod.apply(this, args);
+
+					// If parser ran (parseContent == true), wait for it to finish, otherwise call d.resolve() immediately
+					when(this.parseDeferred, function(){ d.resolve(); });
+				});
+
 			if(this.executeScripts && code){
+				// Evaluate any <script> blocks in the content
 				if(this.cleanContent){
 					// clean JS from html comments and other crap that browser
 					// parser takes care of in a normal page load
@@ -330,16 +351,21 @@ define([
 				}catch(e){
 					this._onError('Exec', 'Error eval script in '+this.id+', '+e.message, e);
 				}
+
+				// Finally, use ready() to wait for any require() calls from the <script> blocks to complete,
+				// then call onEnd() in the superclass, for parsing, and when that is done resolve the Deferred.
+				// For 2.0, remove the call to ready() (or this whole if() branch?) since the parser can do loading for us.
+				ready(callSuperclass);
+			}else{
+				// There were no <script>'s to execute, so immediately call onEnd() in the superclass, and
+				// when the parser finishes running, resolve the Deferred.
+				callSuperclass();
 			}
 
-			// Call onEnd() in the superclass, for parsing, but only after any require() calls from above executeScripts
-			// code block have executed.  If there were no require() calls the superclass call will execute immediately.
-			var superClassOnEndMethod = this.getInherited(arguments),
-				args = arguments;
-			ready(lang.hitch(this, function(){
-				superClassOnEndMethod.apply(this, args);
-			}));
+			// Return a promise that resolves after the ready() call completes, and after the parser finishes running.
+			return d.promise;
 		},
+
 		tearDown: function() {
 			this.inherited(arguments);
 			delete this._styles;
@@ -368,15 +394,15 @@ define([
 			//		the parent element that will receive the content
 			// cont:
 			//		the content to be set on the parent element.
-			//		This can be an html string, a node reference or a NodeList, dojo.NodeList, Array or other enumerable list of nodes
+			//		This can be an html string, a node reference or a NodeList, dojo/NodeList, Array or other enumerable list of nodes
 			// params:
 			//		Optional flags/properties to configure the content-setting. See dojo.html._ContentSetter
 			// example:
 			//		A safe string/node/nodelist content replacement/injection with hooks for extension
 			//		Example Usage:
-			//		dojo.html.set(node, "some string");
-			//		dojo.html.set(node, contentNode, {options});
-			//		dojo.html.set(node, myNode.childNodes, {options});
+			//	|	dojo.html.set(node, "some string");
+			//	|	dojo.html.set(node, contentNode, {options});
+			//	|	dojo.html.set(node, myNode.childNodes, {options});
 
 		if(!params){
 			// simple and fast

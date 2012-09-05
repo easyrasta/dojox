@@ -19,8 +19,6 @@ define([
 
 	// module:
 	//		dojox/mobile/ViewController
-	// summary:
-	//		A singleton class that controls view transition.
 
 	var Controller = declare("dojox.mobile.ViewController", null, {
 		// summary:
@@ -48,6 +46,10 @@ define([
 		fileTypeMapClass: "dojox/mobile/dh/SuffixFileTypeMap",
 
 		constructor: function(){
+			// summary:
+			//		Creates a new instance of the class.
+			// tags:
+			//		private
 			this.viewMap = {};
 			ready(lang.hitch(this, function(){
 				on(win.body(), "startTransition", lang.hitch(this, "onStartTransition"));
@@ -119,10 +121,8 @@ define([
 			//
 			// example:
 			//		If you want to dynamically create an external view, but do
-			//		not want to perform a view transition to it, you can give
-			//		noTransition:true to transOpts.
-			//		This may be useful when you want to preload external views
-			//		before the user starts using them.
+			//		not want to perform a view transition to it, you can give noTransition:true to transOpts.
+			//		This may be useful when you want to preload external views before the user starts using them.
 			//
 			//	|	var vc = ViewController.getInstance();
 			//	|	vc.openExternalView({

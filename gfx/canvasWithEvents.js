@@ -13,7 +13,7 @@ function(lang, declare, hub, Color, dom, domGeom, g, canvas, shapeLib, m){
 		//		however, if only drawing capabilities are needed, canvas event module can be disabled
 		//		using the dojoConfig option, canvasEvents:true|false.
 		//		The id of the Canvas renderer is 'canvasWithEvents'.  This id can be used when switch Dojo's
-		//		graphics context between renderer implementations.  See dojox.gfx._base switchRenderer
+		//		graphics context between renderer implementations.  See dojox/gfx/_base.switchRenderer
 		//		API.
 	};
 
@@ -339,7 +339,7 @@ function(lang, declare, hub, Color, dom, domGeom, g, canvas, shapeLib, m){
 		destroy: function(){
 			// summary:
 			//		stops the move, deletes all references, so the object can be garbage-collected
-			shapeLib.Surface.prototype.destroy.apply(this);
+			this.inherited(arguments);
 			// destroy events and objects
 			for(var i in this._eventsH){
 				hub.disconnect(this._eventsH[i]);
@@ -626,16 +626,16 @@ function(lang, declare, hub, Color, dom, domGeom, g, canvas, shapeLib, m){
 		s.rawNode = c;
 		s._parent = p;
 		s.surface = s;
-		return s;	// dojox.gfx.Surface
+		return s;	// dojox/gfx.Surface
 	};
 
 
 	// Mouse/Touch event
 	var isEventStopped = function(/*Event*/ evt){
 		// summary:
-		//    queries whether an event has been stopped or not
+		//		queries whether an event has been stopped or not
 		// evt: Event
-		//    The event object.
+		//		The event object.
 		if(evt.cancelBubble !== undefined){
 			return evt.cancelBubble;
 		}
@@ -644,12 +644,12 @@ function(lang, declare, hub, Color, dom, domGeom, g, canvas, shapeLib, m){
 	
 	canvasWithEvents.fixTarget = function(event, gfxElement){
 		// summary:
-		//     Adds the gfxElement to event.gfxTarget if none exists. This new 
-		//     property will carry the GFX element associated with this event.
+		//		Adds the gfxElement to event.gfxTarget if none exists. This new
+		//		property will carry the GFX element associated with this event.
 		// event: Object 
-		//     The current input event (MouseEvent or TouchEvent)
+		//		The current input event (MouseEvent or TouchEvent)
 		// gfxElement: Object
-		//     The GFX target element (a Surface in this case)
+		//		The GFX target element (a Surface in this case)
 		if(isEventStopped(event)){
 			return false;
 		}

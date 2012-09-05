@@ -11,7 +11,7 @@ function(g, lang, arr, declare, win, domGeom, dom, gfxBase, gs, pathLib, ga, m, 
 		//		however, if only drawing capabilities are needed, canvas event module can be disabled
 		//		using the dojoConfig option, canvasEvents:true|false.
 		//		The id of the Canvas renderer is 'canvas'.  This id can be used when switch Dojo's
-		//		graphics context between renderer implementations.  See dojox.gfx._base switchRenderer
+		//		graphics context between renderer implementations.  See dojox/gfx/_base.switchRenderer
 		//		API.
 	};
 	var pattrnbuffer = null,
@@ -744,6 +744,10 @@ function(g, lang, arr, declare, win, domGeom, dom, gfxBase, gs, pathLib, ga, m, 
 			this.pendingImageCount = 0;
 			this.makeDirty();
 		},
+		destroy: function(){
+			gs.Container.clear.call(this, true); // avoid makeDirty() from canvas.Container.clear impl.
+			this.inherited(arguments);
+		},
 		setDimensions: function(width, height){
 			// summary:
 			//		sets the width and height of the rawNode
@@ -878,7 +882,7 @@ function(g, lang, arr, declare, win, domGeom, dom, gfxBase, gs, pathLib, ga, m, 
 		s.rawNode = c;
 		s._parent = p;
 		s.surface = s;
-		return s;	// dojox.gfx.Surface
+		return s;	// dojox/gfx.Surface
 	};
 
 	// Extenders
@@ -923,7 +927,7 @@ function(g, lang, arr, declare, win, domGeom, dom, gfxBase, gs, pathLib, ga, m, 
 			shape.surface = this.surface;
 			shape.setShape(rawShape);
 			this.add(shape);
-			return shape;	// dojox.gfx.Shape
+			return shape;	// dojox/gfx/shape.Shape
 		}
 	};
 
@@ -937,6 +941,8 @@ function(g, lang, arr, declare, win, domGeom, dom, gfxBase, gs, pathLib, ga, m, 
 	
 	// no event support -> nothing to fix. 
 	canvas.fixTarget = function(event, gfxElement){
+		// tags:
+		//		private
 		return true;
 	};
 	 

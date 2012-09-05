@@ -11,8 +11,6 @@ define([
 ], function(dojo, config, declare, lang, win, dom, domClass, registry, Scrollable){
 	// module:
 	//		dojox/mobile/_ScrollableMixin
-	// summary:
-	//		Mixin for widgets to have a touch scrolling capability.
 
 	var cls = declare("dojox.mobile._ScrollableMixin", Scrollable, {
 		// summary:
@@ -39,6 +37,10 @@ define([
 		appBars: true, 
 
 		constructor: function(){
+			// summary:
+			//		Creates a new instance of the class.
+			// tags:
+			//		private
 			this.scrollableParams = {};
 		},
 

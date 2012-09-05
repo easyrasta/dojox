@@ -7,8 +7,9 @@ return declare("dojox.data.CssClassStore", CssRuleStore, {
 	// description:
 	//		The CssClassStore allows users to get information about active Css classes in the page running the CssClassStore.
 	//		It can also filter out classes from specific stylesheets.  The attributes it exposes on classes are as follows:
-	//			class:		The classname, including the '.'.
-	//			classSans:	The classname without the '.'.
+	//
+	//		- class:		The classname, including the '.'.
+	//		- classSans:	The classname without the '.'.
 
 	// _labelAttribute:
 	//		text representation of the Item [label and identifier may need to stay due to method names]
@@ -130,21 +131,21 @@ return declare("dojox.data.CssClassStore", CssRuleStore, {
 	/* Identity API */
 	getIdentity: function(/* item */ item){
 		// summary:
-		//		See dojo.data.api.Identity.getIdentity()
+		//		See dojo/data/api/Identity.getIdentity()
 		this._assertIsItem(item);
 		return this.getValue(item, this._idAttribute);
 	},
 
 	getIdentityAttributes: function(/* item */ item){
 		// summary:
-		//		See dojo.data.api.Identity.getIdentityAttributes()
+		//		See dojo/data/api/Identity.getIdentityAttributes()
 		this._assertIsItem(item);
 		return [this._idAttribute];
 	},
 
 	fetchItemByIdentity: function(/* request */ request){
 		// summary:
-		//		See dojo.data.api.Identity.fetchItemByIdentity()
+		//		See dojo/data/api/Identity.fetchItemByIdentity()
 		request = request || {};
 		if(!request.store){
 			request.store = this;

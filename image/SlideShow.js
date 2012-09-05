@@ -73,7 +73,7 @@ dojo.declare("dojox.image.SlideShow",
 	fixedHeight: false,
 
 	// imageStore: Object
-	//	Implementation of the dojo.data.api.Read API, which provides data on the images
+	//	Implementation of the dojo/data/api/Read API, which provides data on the images
 	//	to be displayed.
 	imageStore: null,
 		
@@ -107,12 +107,13 @@ dojo.declare("dojox.image.SlideShow",
 	_tmpImage: null,
 	
 	// _request: Object
-	//	Implementation of the dojo.data.api.Request API, which defines the query
+	//	Implementation of the dojo/data/api/Request API, which defines the query
 	//	parameters for accessing the store.
 	_request: null,
 
 	postCreate: function(){
-		// summary: Initilizes the widget, sets up listeners and shows the first image
+		// summary:
+		//		Initializes the widget, sets up listeners and shows the first image
 		this.inherited(arguments);
 		var img = document.createElement("img");
 
@@ -149,10 +150,10 @@ dojo.declare("dojox.image.SlideShow",
 		// summary:
 		//		Sets the data store and request objects to read data from.
 		// dataStore:
-		//		An implementation of the dojo.data.api.Read API. This accesses the image
+		//		An implementation of the dojo/data/api/Read API. This accesses the image
 		//		data.
 		// request:
-		//		An implementation of the dojo.data.api.Request API. This specifies the
+		//		An implementation of the dojo/data/api/Request API. This specifies the
 		//		query and paging information to be used by the data store
 		// paramNames:
 		//		An object defining the names of the item attributes to fetch from the

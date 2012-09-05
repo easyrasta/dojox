@@ -21,15 +21,14 @@ dojo.declare("dojox.editor.plugins._SmileyPalette",
 	// description:
 	//		Grid showing various emoticons.
 	//		Can be used standalone, or as a popup.
-	//
 	// example:
 	// |	<div dojoType="dojox.editor.plugins._SmileyPalette"></div>
-	//
 	// example:
 	// |	var picker = new dojox.editor.plugins._SmileyPalette({ },srcNode);
 	// |	picker.startup();
 
-	//templateString: The template of this widget.
+	// templateString:
+	//		The template of this widget.
 	templateString:
 		'<table class="dijitInline dijitEditorSmileyPalette dijitPaletteTable"' +
 		' cellSpacing=0 cellPadding=0><tbody dojoAttachPoint="gridNode"></tbody></table>',
@@ -52,7 +51,7 @@ dojo.declare("dojox.editor.plugins._SmileyPalette",
 		this.inherited(arguments);
 
 		var i18n = dojo.i18n.getLocalization("dojox.editor.plugins", "Smiley");
-		
+
 		// Generate hash from emoticon standard name (like "smile") to translation
 		var emoticonI18n = {};
 		for(var name in i18n){
@@ -83,7 +82,7 @@ dojo.declare("dojox.editor.plugins.Emoticon",
 
 		getValue: function(){
 			// summary:
-			//   Returns a emoticon string in ascii representation, ex: :-)
+			//		Returns a emoticon string in ascii representation, ex: :-)
 			return dojox.editor.plugins.Emoticon.ascii[this.id];
 		},
 

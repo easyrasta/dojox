@@ -35,7 +35,39 @@ dojo.declare(
 			// value: Date
 		//		The currently selected Dates, initially set to an empty object to indicate no selection.
 		value: {},
-	
+
+		// datePackage: String
+		//		JavaScript namespace to find Calendar routines.  Uses Gregorian Calendar routines
+		//		at dojo.date by default.
+		datePackage: "dojo.date",
+
+		// dayWidth: String
+		//		How to represent the days of the week in the calendar header. See dojo.date.locale
+		dayWidth: "narrow",
+
+		// tabIndex: String
+		//		Order fields are traversed when user hits the tab key
+		tabIndex: "0",
+		
+		// if returnIsoRanges is true, the selected dates will be returned as ISO ranges
+		// else each selected date will be returned sequentially
+		returnIsoRanges : false,
+		
+		// currentFocus: Date
+		//		Date object containing the currently focused date, or the date which would be focused
+		//		if the calendar itself was focused.   Also indicates which year and month to display,
+		//		i.e. the current "page" the calendar is on.
+		currentFocus: new Date(),
+
+		baseClass:"dijitCalendar",
+		
+		cssStateNodes: {
+			"decrementMonth": "dijitCalendarArrow",
+			"incrementMonth": "dijitCalendarArrow",
+			"previousYearLabelNode": "dijitCalendarPreviousYear",
+			"nextYearLabelNode": "dijitCalendarNextYear"			
+		},
+
 		_areValidDates: function(/*Date*/ value){
 			// summary:
 			//		Runs various tests on each selected date, checking that they're a valid date, rather
@@ -50,9 +82,8 @@ dojo.declare(
 		},
 
 		_getValueAttr: function(){
-			// summary: this method returns the list of selected dates in an array structure
-			return this.value;
-			
+			// summary:
+			//		this method returns the list of selected dates in an array structure
 			if(this.returnIsoRanges){
 				datesWithRanges = this._returnDatesWithIsoRanges(this._sort());
 				return datesWithRanges;
@@ -61,9 +92,20 @@ dojo.declare(
 			}
 		},
 		
-		_parseAndValid: function(value){
-			// Could be override in case we want to manage other thing than single Date
-			var values = new Array();
+		_setValueAttr: function(/*Date|Number|array*/ value, /*Boolean*/ priorityChange){
+			// summary:
+			//		Support set("value", ...)
+			// description:
+			//		Set the passed dates to the selected date and updates the value of this widget
+			//		to reflect that
+			// value:
+			//		Can be a Date, the number of milliseconds since 1970 or an array of ISO dates (['2011-07-01', '2001-06-01']).
+			// tags:
+			//		protected
+			
+			//If we are passed an array of ISO dates, we are going to mark each date in the list as selected
+			//We perform the normalization of the passed date
+			this.value = {};
 			if(dojo.isArray(value)) {
 				dojo.forEach(value,function(element, i){
 					//Each element of the array could be a date or a date range
@@ -115,12 +157,353 @@ dojo.declare(
 						}
 					
 				}else{
-					update = true;
-					focus = null;
+					lastDate = dateB;
+				}
+			});
+			this.set("currentFocus", lastDate);		
+		},
+		_isValidDate: function(/*Date*/ value){
+			// summary:
+			//		Runs various tests on the value, checking that it's a valid date, rather
+			//		than blank or NaN.
+			// tags:
+			//		private
+			return value && !isNaN(value) && typeof value == "object" &&
+				value.toString() != this.constructor.prototype.value.toString();
+		},
+		_setText: function(node, text){
+			// summary:
+			//		This just sets the content of node to the specified text.
+			//		Can't do "node.innerHTML=text" because of an IE bug w/tables, see #3434.
+			// tags:
+			//		private
+			while(node.firstChild){
+				node.removeChild(node.firstChild);
+			}
+			node.appendChild(dojo.doc.createTextNode(text));
+		},
+
+		_populateGrid: function(){
+			// summary:
+			//		Fills in the calendar grid with each day (1-31)
+			// tags:
+			//		private
+
+			var month = new this.dateClassObj(this.currentFocus);
+			month.setDate(1);
+
+			var firstDay = month.getDay(),
+				daysInMonth = this.dateFuncObj.getDaysInMonth(month),
+				daysInPreviousMonth = this.dateFuncObj.getDaysInMonth(this.dateFuncObj.add(month, "month", -1)),
+				today = new this.dateClassObj(),
+				dayOffset = dojo.cldr.supplemental.getFirstDayOfWeek(this.lang);
+			if(dayOffset > firstDay){ dayOffset -= 7; }
+
+			//List of all 42 displayed days in the calendar
+			this.listOfNodes = dojo.query(".dijitCalendarDateTemplate", this.domNode);
+
+			// Iterate through dates in the calendar and fill in date numbers and style info
+			this.listOfNodes.forEach(function(template, i){
+				i += dayOffset;
+				var date = new this.dateClassObj(month),
+					number, clazz = "dijitCalendar", adj = 0;
+
+				if(i < firstDay){
+					number = daysInPreviousMonth - firstDay + i + 1;
+					adj = -1;
+					clazz += "Previous";
+				}else if(i >= (firstDay + daysInMonth)){
+					number = i - firstDay - daysInMonth + 1;
+					adj = 1;
+					clazz += "Next";
+				}else{
+					number = i - firstDay + 1;
+					clazz += "Current";
+				}
+
+				if(adj){
+					date = this.dateFuncObj.add(date, "month", adj);
+				}
+				date.setDate(number);
+
+				if(!this.dateFuncObj.compare(date, today, "date")){
+					clazz = "dijitCalendarCurrentDate " + clazz;
+				}
+
+				//If the date falls outside of the min or max constraints, we do nothing
+				dateIndex = dojo.date.stamp.toISOString(date).substring(0,10);
+				
+				if(!this.isDisabledDate(date, this.lang)){
+					//If the node is already selected, the user clicking on it once more will deselect it 
+					//so we will destroy it in the value object. If the date was not previously selected
+					//The user wants to select it so we add it to the value object
+					if(this._isSelectedDate(date, this.lang)){
+						if(this.value[dateIndex]){
+							clazz = "dijitCalendarSelectedDate " + clazz;
+						}else{
+							clazz = clazz.replace("dijitCalendarSelectedDate ","");
+						}
+					}
+				}
+				if(this._isSelectedDate(date, this.lang)){
+					clazz = "dijitCalendarBrowsingDate " + clazz;
 				}
 			}, this);
+		},
+
+		goToToday: function(){
+			// summary:
+			//		We go to today but we do no select it
+			this.set('currentFocus', new this.dateClassObj(), false);
+		},
+
+		constructor: function(/*Object*/args){
+			var dateClass = (args.datePackage && (args.datePackage != "dojo.date"))? args.datePackage + ".Date" : "Date";
+			this.dateClassObj = dojo.getObject(dateClass, false);
+			this.datePackage = args.datePackage || this.datePackage;
+			this.dateFuncObj = dojo.getObject(this.datePackage, false);
+			this.dateLocaleModule = dojo.getObject(this.datePackage + ".locale", false);
+		},
+
+		buildRendering: function(){
+			this.inherited(arguments);
+			dojo.setSelectable(this.domNode, false);
+
+			var cloneClass = dojo.hitch(this, function(clazz, n){
+				var template = dojo.query(clazz, this.domNode)[0];
+	 			for(var i=0; i<n; i++){
+					template.parentNode.appendChild(template.cloneNode(true));
+				}
+			});
+
+			// clone the day label and calendar day templates 6 times to make 7 columns
+			cloneClass(".dijitCalendarDayLabelTemplate", 6);
+			cloneClass(".dijitCalendarDateTemplate", 6);
+
+			// now make 6 week rows
+			cloneClass(".dijitCalendarWeekTemplate", 5);
+
+			// insert localized day names in the header
+			var dayNames = this.dateLocaleModule.getNames('days', this.dayWidth, 'standAlone', this.lang);
+			var dayOffset = dojo.cldr.supplemental.getFirstDayOfWeek(this.lang);
+			dojo.query(".dijitCalendarDayLabel", this.domNode).forEach(function(label, i){
+				this._setText(label, dayNames[(i + dayOffset) % 7]);
+			}, this);
+
+			var dateObj = new this.dateClassObj(this.currentFocus);
+
+			this.monthDropDownButton.dropDown = new dojox.widget._MonthDropDown({
+				id: this.id + "_mdd",
+				onChange: dojo.hitch(this, "_onMonthSelect")
+			});
+
+			this.set('currentFocus', dateObj, false);	// draw the grid to the month specified by currentFocus
+
+			// Set up repeating mouse behavior for increment/decrement of months/years
+			var _this = this;
+			var typematic = function(nodeProp, dateProp, adj){
+				_this._connects.push(
+					dijit.typematic.addMouseListener(_this[nodeProp], _this, function(count){
+						if(count >= 0){ _this._adjustDisplay(dateProp, adj); }
+					}, 0.8, 500)
+				);
+			};
+			typematic("incrementMonth", "month", 1);
+			typematic("decrementMonth", "month", -1);
+			typematic("nextYearLabelNode", "year", 1);
+			typematic("previousYearLabelNode", "year", -1);
+		},
+
+		_adjustDisplay: function(/*String*/ part, /*int*/ amount){
+			// summary:
+			//		Moves calendar forwards or backwards by months or years
+			// part:
+			//		"month" or "year"
+			// amount:
+			//		Number of months or years
+			// tags:
+			//		private
+			this._setCurrentFocusAttr(this.dateFuncObj.add(this.currentFocus, part, amount));
+		},
+
+		_setCurrentFocusAttr: function(/*Date*/ date, /*Boolean*/ forceFocus){
+			// summary:
+			//		If the calendar currently has focus, then focuses specified date,
+			//		changing the currently displayed month/year if necessary.
+			//		If the calendar doesn't have focus, updates currently
+			//		displayed month/year, and sets the cell that will get focus.
+			// forceFocus:
+			//		If true, will focus() the cell even if calendar itself doesn't have focus
+
+			var oldFocus = this.currentFocus,
+				oldCell = oldFocus ? dojo.query("[dijitDateValue=" + oldFocus.valueOf() + "]", this.domNode)[0] : null;
+
+			// round specified value to nearest day (1am to avoid issues when DST shift occurs at midnight, see #8521, #9366)
+			date = new this.dateClassObj(date);
+			date.setHours(1, 0, 0, 0); 
+
+			this._set("currentFocus", date);
+			var currentMonth = dojo.date.stamp.toISOString(date).substring(0,7);
+			//We only redraw the grid if we're in a new month
+			if(currentMonth != this.previousMonth){
+				this._populateGrid();
+				this.previousMonth = currentMonth;
+			}
+
+			// set tabIndex=0 on new cell, and focus it (but only if Calendar itself is focused)
+			var newCell = dojo.query("[dijitDateValue=" + date.valueOf() + "]", this.domNode)[0];
+			newCell.setAttribute("tabIndex", this.tabIndex);
+			if(this._focused || forceFocus){
+				newCell.focus();
+			}
+
+			// set tabIndex=-1 on old focusable cell
+			if(oldCell && oldCell != newCell){
+				if(dojo.isWebKit){	// see #11064 about webkit bug
+					oldCell.setAttribute("tabIndex", "-1");
+				}else{
+						oldCell.removeAttribute("tabIndex");				
+				}
+			}
+		},
+
+		focus: function(){
+			// summary:
+			//		Focus the calendar by focusing one of the calendar cells
+			this._setCurrentFocusAttr(this.currentFocus, true);
+		},
+
+		_onMonthSelect: function(/*Number*/ newMonth){
+			// summary:
+			//		Handler for when user selects a month from the drop down list
+			// tags:
+			//		protected
+
+			// move to selected month, bounding by the number of days in the month
+			// (ex: dec 31 --> jan 28, not jan 31)
+			this.currentFocus = this.dateFuncObj.add(this.currentFocus, "month",
+				newMonth - this.currentFocus.getMonth());
+			this._populateGrid();
+		},
+		
+		toggleDate : function(/*date*/ dateToToggle, /*array of dates*/ selectedDates, /*array of dates*/ unselectedDates){
 			
+			//Obtain CSS class before toggling if necessary
+			var dateIndex = dojo.date.stamp.toISOString(dateToToggle).substring(0,10);			 
+			//If previously selected we unselect and vice-versa
+			if(this.value[dateIndex]){
+				this.unselectDate(dateToToggle, unselectedDates);			
+			}else{
+				this.selectDate(dateToToggle, selectedDates);
+			}		
+		},
+		
+		selectDate : function(/*date*/ dateToSelect, /*array of dates*/ selectedDates){
+			//Selects the passed iso date, changes its class and records it in the selected dates array
+			var node = this._getNodeByDate(dateToSelect);
+			var clazz = node.className;
+			var dateIndex = dojo.date.stamp.toISOString(dateToSelect).substring(0,10);
+			this.value[dateIndex] = 1;
+			selectedDates.push(dateIndex);			
+			clazz = "dijitCalendarSelectedDate " + clazz;
+			//We update CSS class
+			node.className = clazz;
+		},
+		
+		unselectDate : function(/*date*/ dateToUnselect, /*array of dates*/ unselectedDates){
+			//Unselects the passed iso date, changes its class and records it in the unselected dates array
+			var node = this._getNodeByDate(dateToUnselect);
+			var clazz = node.className;
+			var dateIndex = dojo.date.stamp.toISOString(dateToUnselect).substring(0,10);
+			delete(this.value[dateIndex]);
+			unselectedDates.push(dateIndex);
+			clazz = clazz.replace("dijitCalendarSelectedDate ","");
+			//We update CSS class
+			node.className = clazz;
+		},
+
+		_getNodeByDate : function(/*ISO date*/ dateNode){
+			//return the node that corresponds to the passed ISO date
+			var firstDate = new this.dateClassObj(this.listOfNodes[0].dijitDateValue);
+			var difference = Math.abs(dojo.date.difference(firstDate, dateNode, "day"));
+			return this.listOfNodes[difference];
+		},
+
+		_onDayClick: function(/*Event*/ evt){
+			// summary:
+			//		Handler for day clicks, selects the date if appropriate
+			// tags:
+			//		protected
 			
+			//If we coming out of selecting a range, we need to skip this onDayClick or else we
+			//are going to deselect a date that has just been selected or deselect one that just was 
+			//selected
+				dojo.stopEvent(evt);
+				for(var node = evt.target; node && !node.dijitDateValue; node = node.parentNode);
+				if(node && !dojo.hasClass(node, "dijitCalendarDisabledDate")){
+					value = new this.dateClassObj(node.dijitDateValue);
+					if(!this.rangeJustSelected){
+						this.toggleDate(value,[],[]);
+						//To record the date that was selected prior to the one currently selected
+						//needed in the event we are selecting a range of dates
+						this.previouslySelectedDay = value;
+						this.set("currentFocus", value);
+						this.onValueSelected([dojo.date.stamp.toISOString(value).substring(0,10)]);
+						
+					}else{
+						this.rangeJustSelected = false;
+						this.set("currentFocus", value);
+					}
+				}
+		},
+
+		_onDayMouseOver: function(/*Event*/ evt){
+			// summary:
+			//		Handler for mouse over events on days, sets hovered style
+			// tags:
+			//		protected
+
+			// event can occur on <td> or the <span> inside the td,
+			// set node to the <td>.
+			var node =
+				dojo.hasClass(evt.target, "dijitCalendarDateLabel") ?
+				evt.target.parentNode :
+				evt.target;
+
+			if(node && (node.dijitDateValue || node == this.previousYearLabelNode || node == this.nextYearLabelNode) ){
+				dojo.addClass(node, "dijitCalendarHoveredDate");
+				this._currentNode = node;
+			}
+		},
+		_setEndRangeAttr: function(/*Date*/ value){
+			// description:
+			//		records the end of a date range
+			// tags:
+			//		protected
+			value = new this.dateClassObj(value);
+			value.setHours(1); // to avoid issues when DST shift occurs at midnight, see #8521, #9366
+			this.endRange = value;
+		},
+		_getEndRangeAttr: function(){
+		//		Returns the EndRange date that is set when selecting a range
+			var value = new this.dateClassObj(this.endRange);
+			value.setHours(0, 0, 0, 0); // return midnight, local time for back-compat
+		
+			// If daylight savings pushes midnight to the previous date, fix the Date
+			// object to point at 1am so it will represent the correct day. See #9366
+			if(value.getDate() < this.endRange.getDate()){
+				value = this.dateFuncObj.add(value, "hour", 1);
+			}
+			return value;
+		},
+
+		_onDayMouseOut: function(/*Event*/ evt){
+			// summary:
+			//		Handler for mouse out events on days, clears hovered style
+			// tags:
+			//		protected
+	
+			if(!this._currentNode){ return; }
 			
 			return {value: vals, update: update, focus: focus};
 		},
@@ -130,7 +513,7 @@ dojo.declare(
 			// summary:
 			//		Provides keyboard navigation of calendar.
 			// description:
-			//		Called from _onKeyPress() to handle keypress on a stand alone Calendar,
+			//		Called from _onKeyDown() to handle keypress on a stand alone Calendar,
 			//		and also from `dijit.form._DateTimeTextBox` to pass a keypress event 
 			//		from the `dijit.form.DateTextBox` to be handled in this widget
 			// returns:
@@ -203,6 +586,113 @@ dojo.declare(
 			return false;
 		},
 
+		_onKeyDown: function(/*Event*/ evt){
+			// summary:
+			//		For handling keypress events on a stand alone calendar
+			if(!this.handleKey(evt)){
+				dojo.stopEvent(evt);
+			}
+		},
+		
+		_removeFromRangeLTR : function(/*date*/ beginning, /*date*/ end, /*array*/selectedDates, /*array*/unselectedDates){
+	//In this method we remove some dates from a range from left to right
+			difference = Math.abs(dojo.date.difference(beginning, end, "day"));
+			for(var i = 0; i <= difference; i++){
+				var nextDay = dojo.date.add(beginning, 'day',i);
+				this.toggleDate(nextDay, selectedDates, unselectedDates);
+			}
+			if(this.previousRangeEnd == null){
+				//necessary to keep track of the previous range's end date
+				this.previousRangeEnd = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeEnd, 'date') > 0 )
+					this.previousRangeEnd = end;
+			}
+			if(this.previousRangeStart == null){
+				//necessary to keep track of the previous range's start date
+				this.previousRangeStart = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeStart, 'date') > 0 )
+					this.previousRangeStart = end;
+			}
+			this.previouslySelectedDay = dojo.date.add(nextDay, 'day',1);	
+		},
+		_removeFromRangeRTL : function(/*date*/ beginning, /*date*/ end, /*array*/selectedDates, /*array*/unselectedDates){
+			//If the end of the range is earlier than the beginning (back in time), 
+			//we are going to start from the end and move backward 
+	
+			difference = Math.abs(dojo.date.difference(beginning, end, "day"));
+			for(var i = 0; i <= difference; i++){
+				var nextDay = dojo.date.add(beginning, 'day',-i);
+				this.toggleDate(nextDay, selectedDates, unselectedDates);
+			}
+			if(this.previousRangeEnd == null){
+				this.previousRangeEnd = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeEnd, 'date') < 0 ){
+					this.previousRangeEnd = end;
+				}
+			}
+			if(this.previousRangeStart == null){
+				this.previousRangeStart = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeStart, 'date') < 0 ){
+					this.previousRangeStart = end;
+				}
+			}
+			this.previouslySelectedDay = dojo.date.add(nextDay, 'day',-1);
+		},
+		_addToRangeRTL : function(/*date*/ beginning, /*date*/ end, /*array*/selectedDates, /*array*/unselectedDates){
+		
+			difference = Math.abs(dojo.date.difference(beginning, end, "day"));
+			//If the end of the range is earlier than the beginning (back in time), 
+			//we are going to start from the end and move backward 
+			for(var i = 1; i <= difference; i++){
+				var nextDay = dojo.date.add(beginning, 'day',-i);
+				this.toggleDate(nextDay, selectedDates, unselectedDates);
+			}
+	
+			if(this.previousRangeStart == null){
+				this.previousRangeStart = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeStart, 'date') < 0 ){
+					this.previousRangeStart = end;
+				}
+			}
+			if(this.previousRangeEnd == null){
+				this.previousRangeEnd = beginning;
+			}else{
+				if(dojo.date.compare(beginning, this.previousRangeEnd, 'date') > 0 ){
+					this.previousRangeEnd = beginning;
+				}
+			}
+			this.previouslySelectedDay = nextDay;
+		},
+		_addToRangeLTR : function(/*date*/ beginning, /*date*/ end, /*array*/selectedDates, /*array*/unselectedDates){
+			//If the end of the range is later than the beginning, 
+			//adding dates from left to right
+			difference = Math.abs(dojo.date.difference(beginning, end, "day"));
+			for(var i = 1; i <= difference; i++){
+				var nextDay = dojo.date.add(beginning, 'day',i);
+				this.toggleDate(nextDay, selectedDates, unselectedDates);
+			}
+			if(this.previousRangeStart == null){
+				this.previousRangeStart = beginning;
+			}else{
+				if(dojo.date.compare(beginning, this.previousRangeStart, 'date') < 0 ){
+					this.previousRangeStart = beginning;
+				}
+			}
+			if(this.previousRangeEnd == null){
+				this.previousRangeEnd = end;
+			}else{
+				if(dojo.date.compare(end, this.previousRangeEnd, 'date') > 0 ){
+					this.previousRangeEnd = end;
+				}
+			}
+			this.previouslySelectedDay = nextDay;
+		},
+
 		_selectRange : function(){
 			//This method will toggle the dates in the selected range.
 			var selectedDates = []; //Will gather the list of ISO dates that are selected
@@ -259,6 +749,57 @@ dojo.declare(
 			return false;
 		},
 
+		onValueSelected: function(/*array of ISO dates*/ dates){
+			// summary:
+			//		Notification that a date cell or more were selected.
+			// description:
+			//		Passes on the list of ISO dates that are selected
+			// tags:
+			//		protected
+		},
+
+		onValueUnselected: function(/*array of ISO dates*/ dates){
+			// summary:
+			//		Notification that a date cell or more were unselected.
+			// description:
+			//		Passes on the list of ISO dates that are unselected
+			// tags:
+			//		protected
+		},
+		onChange: function(/*Date*/ date){
+			// summary:
+			//		Called only when the selected date has changed
+		},
+
+		_isSelectedDate: function(/*Date*/ dateObject, /*String?*/ locale){
+			// summary:
+			//		Returns true if the passed date is part of the selected dates of the calendar
+			
+				dateIndex = dojo.date.stamp.toISOString(dateObject).substring(0,10);
+				return this.value[dateIndex];
+		},
+
+		isDisabledDate: function(/*Date*/ dateObject, /*String?*/ locale){
+			// summary:
+			//		May be overridden to disable certain dates in the calendar e.g. `isDisabledDate=dojo.date.locale.isWeekend`
+			// tags:
+			//		extension
+/*=====
+			return false; // Boolean
+=====*/
+		},
+
+		getClassForDate: function(/*Date*/ dateObject, /*String?*/ locale){
+			// summary:
+			//		May be overridden to return CSS classes to associate with the date entry for the given dateObject,
+			//		for example to indicate a holiday in specified locale.
+			// tags:
+			//		extension
+
+/*=====
+			return ""; // String
+=====*/
+		},
 		_sort : function(){
 			//This function returns a sorted version of the value array that represents the selected dates.
 			if(this.value == {}){return [];}

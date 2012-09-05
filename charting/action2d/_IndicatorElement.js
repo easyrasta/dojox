@@ -269,6 +269,7 @@ define(["dojo/_base/lang",
 			var sh = inter.opt.lineShadow? inter.opt.lineShadow: t.indicator.lineShadow,
 				ls = inter.opt.lineStroke? inter.opt.lineStroke: t.indicator.lineStroke,
 				ol = inter.opt.lineOutline? inter.opt.lineOutline: t.indicator.lineOutline;
+
 			if(sh){
 				this.group.createLine({x1: x1 + sh.dx, y1: y1 + sh.dy, x2: x2 + sh.dx, y2: y2 + sh.dy}).setStroke(sh);
 			}

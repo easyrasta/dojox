@@ -267,7 +267,7 @@ var SingleRowSelector = declare("dojox.grid.cells.SingleRowSelector", RowSelecto
 		//		Event fired on the target row
 		var index = e.rowIndex;
 		if(this.disabledMap[index]){ return; }
-		this._focusEndingCell(index, 0);
+		this._focusEndingCell(index, e.cellIndex);
 		this._nativeSelect(index, !this.grid.selection.selected[index]);
 	}
 });
@@ -338,7 +338,7 @@ var MultipleRowSelector = declare("dojox.grid.cells.MultipleRowSelector", RowSel
 	_onRowMouseOver: function(e){
 		// summary:
 		//		Event fired when mouse moves over a data row(outside of this column).
-		//      - from dojox.grid.enhanced._Events.onRowMouseOver()
+		//		- from dojox.grid.enhanced._Events.onRowMouseOver()
 		// e: Event
 		//		Decorated event object which contains reference to grid, cell, and rowIndex
 		this._updateSelection(e, 0);
@@ -462,7 +462,7 @@ var MultipleRowSelector = declare("dojox.grid.cells.MultipleRowSelector", RowSel
 		var rowIndex = e.rowIndex;
 		if(this.disabledMap[rowIndex]){ return; }
 		evt.stop(e);
-		this._focusEndingCell(rowIndex, 0);
+		this._focusEndingCell(rowIndex, e.cellIndex);
 		
 		var delta = rowIndex - this.lastClickRowIdx;
 		var newValue = !this.grid.selection.selected[rowIndex];
@@ -551,7 +551,7 @@ var IndirectSelection = declare("dojox.grid.enhanced.plugins.IndirectSelection",
 	//
 	// example:
 	// |	<div dojoType="dojox.grid.EnhancedGrid" plugins="{indirectSelection: true}" ...></div>
-	// 		or
+	//		or
 	// |	<div dojoType="dojox.grid.EnhancedGrid" plugins="{indirectSelection: {name: 'xxx', width:'30px', styles:'text-align: center;'}}" ...></div>
 
 	// name: String

@@ -14,16 +14,15 @@ validate._cardInfo = {
 	// description:
 	//		A hash of valid CC abbreviations and regular expressions
 	//
-	//		mc: Mastercard
-	//		ec: Eurocard
-	//		vi: Visa
-	//		ax: American Express
-	//		dc: Diners Club
-	//		bl: Carte Blanch
-	//		di: Discover
-	//		jcb: JCB
-	//		er: Enroute
-	//
+	//		- mc: Mastercard
+	//		- ec: Eurocard
+	//		- vi: Visa
+	//		- ax: American Express
+	//		- dc: Diners Club
+	//		- bl: Carte Blanch
+	//		- di: Discover
+	//		- jcb: JCB
+	//		- er: Enroute
 	// example:
 	//		Define your own card, gift-card, whatever. Starts with 7,
 	//		is 15 total length.
@@ -85,12 +84,12 @@ validate.isValidCreditCardNumber = function(value, ccType){
 			results.push(p);
 		}
 	}
-	return results.length ? results.join('|') : false; // String | boolean
+	return results.length ? results.join('|') : false; // String|Boolean
 };
 
 validate.isValidCvv = function(/* String|Int */value, /* String */ccType) {
 	// summary:
-	//  	Validate the security code (CCV) for a passed credit-card type.
+	//		Validate the security code (CCV) for a passed credit-card type.
 	
 	if(!lang.isString(value)){
 		value = String(value);

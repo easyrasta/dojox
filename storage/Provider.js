@@ -1,15 +1,15 @@
 dojo.provide("dojox.storage.Provider");
 
 dojo.declare("dojox.storage.Provider", null, {
-	// summary: A singleton for working with dojox.storage.
+	// summary:
+	//		A singleton for working with dojox.storage.
 	// description:
 	//		dojox.storage exposes the current available storage provider on this
 	//		platform. It gives you methods such as dojox.storage.put(),
 	//		dojox.storage.get(), etc.
 	//
 	//		For more details on dojox.storage, see the primary documentation
-	//		page at
-	//			http://manual.dojotoolkit.org/storage.html
+	//		page at http://manual.dojotoolkit.org/storage.html.
 	//
 	//		Note for storage provider developers who are creating subclasses-
 	//		This is the base class for all storage providers Specific kinds of
@@ -17,6 +17,7 @@ dojo.declare("dojox.storage.Provider", null, {
 	//		You should avoid initialization in storage provider subclass's
 	//		constructor; instead, perform initialization in your initialize()
 	//		method.
+
 	constructor: function(){
 	},
 	
@@ -81,23 +82,12 @@ dojo.declare("dojox.storage.Provider", null, {
 					/*string?*/ namespace){
 		// summary:
 		//		Puts a key and value into this storage system.
+		// example:
+		// |	var resultsHandler = function(status, key, message, namespace){
+		// |	  alert("status="+status+", key="+key+", message="+message);
+		// |	};
+		// |	dojox.storage.put("test", "hello world", resultsHandler);
 		// description:
-		//		Example-
-		//			var resultsHandler = function(status, key, message, namespace){
-		//			  alert("status="+status+", key="+key+", message="+message);
-		//			};
-		//			dojox.storage.put("test", "hello world", resultsHandler);
-		//
-		//			Arguments:
-		//
-		//			status - The status of the put operation, given by
-		//								dojox.storage.FAILED, dojox.storage.SUCCEEDED, or
-		//								dojox.storage.PENDING
-		//			key - The key that was used for the put
-		//			message - An optional message if there was an error or things failed.
-		//			namespace - The namespace of the key. This comes at the end since
-		//									it was added later.
-		//
 		//		Important note: if you are using Dojo Storage in conjunction with
 		//		Dojo Offline, then you don't need to provide
 		//		a resultsHandler; this is because for Dojo Offline we
@@ -125,7 +115,7 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		The third argument in the call back is an optional message that
 		//		details possible error messages that might have occurred during
 		//		the storage process.
-		//	namespace:
+		// namespace:
 		//		Optional string namespace that this value will be placed into;
 		//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
 		
@@ -138,7 +128,7 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		not in the storage system.
 		// key:
 		//		A string key to get the value of.
-		//	namespace:
+		// namespace:
 		//		Optional string namespace that this value will be retrieved from;
 		//		if left off, the value will be retrieved from dojox.storage.DEFAULT_NAMESPACE
 		// returns:
@@ -147,7 +137,8 @@ dojo.declare("dojox.storage.Provider", null, {
 	},
 
 	hasKey: function(/*string*/ key, /*string?*/ namespace){
-		// summary: Determines whether the storage has the given key.
+		// summary:
+		//		Determines whether the storage has the given key.
 		return !!this.get(key, namespace); // Boolean
 	},
 
@@ -211,13 +202,12 @@ dojo.declare("dojox.storage.Provider", null, {
 							/*string?*/ namespace){
 		// summary:
 		//		Puts multiple keys and values into this storage system.
+		// example:
+		// |	var resultsHandler = function(status, key, message){
+		// |	  alert("status="+status+", key="+key+", message="+message);
+		// |	};
+		// |	dojox.storage.put(["test"], ["hello world"], resultsHandler);
 		// description:
-		//		Example-
-		//			var resultsHandler = function(status, key, message){
-		//			  alert("status="+status+", key="+key+", message="+message);
-		//			};
-		//			dojox.storage.put(["test"], ["hello world"], resultsHandler);
-		//
 		//		Important note: if you are using Dojo Storage in conjunction with
 		//		Dojo Offline, then you don't need to provide
 		//		a resultsHandler; this is because for Dojo Offline we
@@ -247,7 +237,7 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		The third argument in the call back is an optional message that
 		//		details possible error messages that might have occurred during
 		//		the storage process.
-		//	namespace:
+		// namespace:
 		//		Optional string namespace that this value will be placed into;
 		//		if left off, the value will be placed into dojox.storage.DEFAULT_NAMESPACE
 		
@@ -292,7 +282,7 @@ dojo.declare("dojox.storage.Provider", null, {
 		}
 
 		//	JAC: This could be optimized by running the key validity test
-		//  directly over a joined string
+		//	directly over a joined string
 		return !dojo.some(keys, function(key){
 			return !this.isValidKey(key);
 		}, this); // Boolean
@@ -305,13 +295,15 @@ dojo.declare("dojox.storage.Provider", null, {
 	},
 
 	showSettingsUI: function(){
-		// summary: If this provider has a settings UI, determined
-		//     by calling hasSettingsUI(), it is shown.
+		// summary:
+		//		If this provider has a settings UI, determined
+		//		by calling hasSettingsUI(), it is shown.
 		console.warn("dojox.storage.showSettingsUI not implemented");
 	},
 
 	hideSettingsUI: function(){
-		// summary: If this provider has a settings UI, hides it.
+		// summary:
+		//		If this provider has a settings UI, hides it.
 		console.warn("dojox.storage.hideSettingsUI not implemented");
 	},
 	
@@ -339,9 +331,9 @@ dojo.declare("dojox.storage.Provider", null, {
 		//		to cache these resources to ensure the machinery
 		//		used by this storage provider is available offline.
 		//		What is returned is an array of URLs.
-		//  	Note that Dojo Offline uses Gears as its native
-		//  	storage provider, and does not support using other
-		//  	kinds of storage providers while offline anymore.
+		//		Note that Dojo Offline uses Gears as its native
+		//		storage provider, and does not support using other
+		//		kinds of storage providers while offline anymore.
 		
 		return [];
 	}
