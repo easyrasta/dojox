@@ -213,10 +213,6 @@ define(["dojo/_base/lang",
 				texts.push(this.inter.opt.labelFunc ? this.inter.opt.labelFunc(c1, null, this.inter.opt.fixed, this.inter.opt.precision): dcpc.getLabel(v? c1.y: c1.x, this.inter.opt.fixed, this.inter.opt.precision));
 				this._renderMarker(coord1);
 				
-				
-				
-				//var t1 = this._renderIndicator(c1, cp2?1:0, hn, vn, min, max);
-				
 				if(cp2){
 					var c2 = data2[z1];
 					coord2 = this._coordToPage(c2, hn, vn);
@@ -228,11 +224,7 @@ define(["dojo/_base/lang",
 					texts2.push(inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
 						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(v? c1.y: c1.x), true, 2)+"%)"));
 					this._renderMarker(coord2);
-					
-					
-					//this._renderText(text, inter, this.chart.theme, v? (t1.x+t2.x)/2: t1.x, v? t1.y: (t1.y+t2.y)/2, c1, c2);
 				}
-				
 			}, this);
 			
 			this._renderText(texts, inter, this.chart.theme, t1.x, t1.y, t1);
@@ -244,6 +236,7 @@ define(["dojo/_base/lang",
 				c = this.chart.getCoords();
 			mark[hn] = coord.x;
 			mark[vn] = coord.y;
+
 			mark = this.inter.plot.toPage(mark);
 	
 			var cx = mark.x - c.x, 
@@ -329,10 +322,11 @@ define(["dojo/_base/lang",
 				if(index == 0){
 					rect = b;
 				}else{
-					rect = {x: Math.min(rect.x, b.x),
-							y: Math.min(rect.y, b.y),
-							width: Math.max(rect.width, b.width),
-							height: rect.height + b.height
+					rect = {
+						x: Math.min(rect.x, b.x),
+						y: Math.min(rect.y, b.y),
+						width: Math.max(rect.width, b.width),
+						height: rect.height + b.height
 					};
 				}
 			}, this);
@@ -343,6 +337,7 @@ define(["dojo/_base/lang",
 			sh = inter.opt.shadow? inter.opt.shadow: t.indicator.shadow;
 			ls = inter.opt.stroke? inter.opt.stroke: t.indicator.stroke;
 			ol = inter.opt.outline? inter.opt.outline: t.indicator.outline;
+
 			if(sh){
 				this.group.createRect(rect).setFill(sh.color).setStroke(sh);
 			}
@@ -354,7 +349,6 @@ define(["dojo/_base/lang",
 			var f = inter.opt.fillFunc? inter.opt.fillFunc(c1, c2): (inter.opt.fill? inter.opt.fill: t.indicator.fill);
 			this.group.createRect(rect).setFill(this._shapeFill(f, rect)).setStroke(ls);
 			array.forEach(labels, function(label){
-				console.log("label to front", label);
 				label.moveToFront();
 			});
 		},

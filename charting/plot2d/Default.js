@@ -254,6 +254,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 					vt = this._vScaler.scaler.getTransformerFromModel(this._vScaler);
 				this._eventSeries[run.name] = new Array(run.data.length);
 				
+				run.dyn = {};
+				
 				if(run.hide){
 					if(this.opt.lines){
 						run.dyn.stroke = theme.series.stroke;

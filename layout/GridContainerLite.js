@@ -684,6 +684,7 @@ define([
 										break;
 									}
 								}
+
 								if(has("mozilla") || has("webkit")){ i-- };
 
 								widget = registry.byNode(focusNode);

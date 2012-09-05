@@ -7,7 +7,6 @@ define(["dojo/_base/declare", "dojo/_base/array", "./Columns", "./common"],
 			var length = this.series.length;
 			array.forEach(this.series, function(serie){if(serie.hide){length--;}});
 			
-			//var f = dc.calculateBarSize(this._hScaler.scaler.getTransformerFromModel(this._hScaler)(this._hScaler.bounds.to)/this.series[0].data.length, this.opt, length);
 			var delta = this._getDelta();
 			var f = dc.calculateBarSize(delta*this._hScaler.bounds.scale, this.opt, length);
 

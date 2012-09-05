@@ -1,22 +1,18 @@
-dojo.provide("dojox.image.Gallery");
-dojo.experimental("dojox.image.Gallery");
-//
-// dojox.image.Gallery courtesy Shane O Sullivan, licensed under a Dojo CLA
-//
-// For a sample usage, see http://www.skynet.ie/~sos/photos.php
-//
-//	TODO: Make public, document params and privitize non-API conformant methods.
-//	document topics.
+define([
+	"dojo/_base/declare", // declare
+	"dojo/dom-style",
+	"dojo/dom-geometry",
+	"dojo/topic",
+	"./SlideShow",
+	"./ThumbnailPicker",
+	"dijit/_WidgetBase",
+	"dijit/_TemplatedMixin",
+	"dojo/text!./resources/Gallery.html"
+], function(declare, domStyle, domGeom, topic, SlideShow, ThumbnailPicker,
+			_WidgetBase, _TemplatedMixin, template){
 
-dojo.require("dojo.fx");
-dojo.require("dijit._Widget");
-dojo.require("dijit._Templated");
-dojo.require("dojox.image.ThumbnailPicker");
-dojo.require("dojox.image.SlideShow");
+return declare("dojox.image.Gallery", [_WidgetBase, _TemplatedMixin], {
 
-dojo.declare("dojox.image.Gallery",
-	[dijit._Widget, dijit._Templated],
-	{
 	// summary:
 	//		Gallery widget that wraps a dojox.image.ThumbnailPicker and dojox.image.SlideShow widget
 	//
@@ -61,7 +57,7 @@ dojo.declare("dojox.image.Gallery",
 	//		Time, in seconds, between image changes in the slide show.
 	slideshowInterval: 3,
 	
-	templateString: dojo.cache("dojox.image", "resources/Gallery.html"),
+	templateString: template,
 
 	postCreate: function(){
 		// summary:
@@ -69,7 +65,7 @@ dojo.declare("dojox.image.Gallery",
 		this.widgetid = this.id;
 		this.inherited(arguments)
 		
-		this.thumbPicker = new dojox.image.ThumbnailPicker({
+		this.thumbPicker = new ThumbnailPicker({
 			linkAttr: this.linkAttr,
 			imageLargeAttr: this.imageLargeAttr,
 			imageThumbAttr: this.imageThumbAttr,
@@ -79,7 +75,7 @@ dojo.declare("dojox.image.Gallery",
 		}, this.thumbPickerNode);
 		
 		
-		this.slideShow = new dojox.image.SlideShow({
+		this.slideShow = new SlideShow({
 			imageHeight: this.imageHeight,
 			imageWidth: this.imageWidth,
 			autoLoad: this.autoLoad,
@@ -93,21 +89,25 @@ dojo.declare("dojox.image.Gallery",
 		var _this = this;
 		//When an image is shown in the Slideshow, make sure it is visible
 		//in the ThumbnailPicker
-		dojo.subscribe(this.slideShow.getShowTopicName(), function(packet){
+		topic.subscribe(this.slideShow.getShowTopicName(), function(packet){
+		  console.log(_this.slideShow.getShowTopicName(), packet);
 			_this.thumbPicker._showThumbs(packet.index);
 		});
 		//When the user clicks a thumbnail, show that image
-		dojo.subscribe(this.thumbPicker.getClickTopicName(), function(evt){
+		topic.subscribe(this.thumbPicker.getClickTopicName(), function(evt){
+		  console.log(_this.thumbPicker.getClickTopicName(), evt);
 			_this.slideShow.showImage(evt.index);
 		});
 		//When the ThumbnailPicker moves to show a new set of pictures,
 		//make the Slideshow start loading those pictures first.
-		dojo.subscribe(this.thumbPicker.getShowTopicName(), function(evt){
+		topic.subscribe(this.thumbPicker.getShowTopicName(), function(evt){
+		  console.log(_this.thumbPicker.getShowTopicName(), evt);
 			_this.slideShow.moveImageLoadingPointer(evt.index);
 		});
 		//When an image finished loading in the slideshow, update the loading
 		//notification in the ThumbnailPicker
-		dojo.subscribe(this.slideShow.getLoadTopicName(), function(index){
+		topic.subscribe(this.slideShow.getLoadTopicName(), function(index){
+		  console.log(_this.slideShow.getLoadTopicName(), index);
 			_this.thumbPicker.markImageLoaded(index);
 		});
 		this._centerChildren();
@@ -175,15 +175,17 @@ dojo.declare("dojox.image.Gallery",
 		// summary:
 		//		Ensures that the ThumbnailPicker and the SlideShow widgets
 		//		are centered.
-		var thumbSize = dojo.marginBox(this.thumbPicker.outerNode);
-		var slideSize = dojo.marginBox(this.slideShow.outerNode);
+		var thumbSize = domGeom.getMarginBox(this.thumbPicker.outerNode);
+		var slideSize = domGeom.getMarginBox(this.slideShow.outerNode);
 		
 		var diff = (thumbSize.w - slideSize.w) / 2;
 		
 		if(diff > 0) {
-			dojo.style(this.slideShow.outerNode, "marginLeft", diff + "px");
+			domStyle.set(this.slideShow.outerNode, "marginLeft", diff + "px");
 		} else if(diff < 0) {
-			dojo.style(this.thumbPicker.outerNode, "marginLeft", (diff * -1) + "px");
+			domStyle.set(this.thumbPicker.outerNode, "marginLeft", (diff * -1) + "px");
 		}
 	}
+});
+
 });

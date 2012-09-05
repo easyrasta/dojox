@@ -103,9 +103,9 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 		},
 		
 		_adjustStats: function(stats){
+			/*
 			if(this._hScaler){
 				var bar = this.getBarProperties();
-				console.log("getSeriesStats::height", bar.height);
 				var width = this._vScaler.scaler.getTransformerFromPlot(this._vScaler)(bar.height*bar.clusterSize)
 				if(width < stats.hmax){
 					stats.hmin -= width/2;
@@ -113,23 +113,12 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 					return stats;
 				}
 			}
+			*/
 			stats.hmin -= 0.5;
 			stats.hmax += 0.5;
 			return stats; // Object
 		},
-		/*
-		getSeriesStats: function(){
-			// summary:
-			//		Calculate the min/max on all attached series in both directions.
-			// returns: Object
-			//		{hmin, hmax, vmin, vmax} min/max in both directions.
-			var stats = dc.collectSimpleStats(this.series), t;
-			stats.hmin -= 0.5;
-			stats.hmax += 0.5;
-			t = stats.hmin, stats.hmin = stats.vmin, stats.vmin = t;
-			t = stats.hmax, stats.hmax = stats.vmax, stats.vmax = t;
-		},
-		*/
+		
 		createRect: function(run, creator, params){
 			var rect;
 			if(this.opt.enableCache && run._rectFreePool.length > 0){
@@ -214,7 +203,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				for(var j = min; j < max; ++j){
 					var value = run.data[j];
 					if(value != null){
-						var val = this.getValue(value, j, i),
+						var val = this.getValue(value, j, i, indexed),
 				
 							hv = ht(val.y),
 							w = Math.abs(hv - baselineWidth),
@@ -232,7 +221,6 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 						if(w >= 0 && bar.height >= 1){
 							var rect = {
 								x: offsets.l + (val.y < baseline ? hv : baselineWidth),
-								//y: dim.height - offsets.b - vt(val.x + 1.5) + bar.gap + bar.thickness * (length - z - 1),
 								y: dim.height - offsets.b - vt(val.x + 1) - (bar.height/2) + (bar.gap/2) - bar.thickness*(length-1)/2  +  bar.thickness * (length - z - 1),
 								width: w,
 								height: bar.height - bar.gap/2
@@ -277,7 +265,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			this.dirty = false;
 			return this;	//	dojox/charting/plot2d/Bars
 		},
-
+/*
 		getValue: function(value, j, indexSerie){
 			var y,x;
 			if(typeof value == "number"){
@@ -286,8 +274,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			}else{
 				y = value.y;
 				x = value.x ? value.x -1: j;
-/*
-=======
+*/
 		getValue: function(value, j, seriesIndex, indexed){
 			var y,x;
 			if(indexed){
@@ -300,7 +287,6 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			}else{
 				y = value.y;
 				x = value.x -1;
-*/
 			}
 			return {y:y, x:x};
 		},
@@ -316,9 +302,8 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				var previousData = null;
 				for(var j = 0; j < serie.data.length; ++j){
 					var data = serie.data[j];
-					console.log("data "+j, data);
 					if(typeof data == "number"){
-						delta = this._vScaler.scaler.getTransformerFromPlot(this._vScaler)(this._vScaler.bounds.scale);
+						delta = 1;
 						break;
 					}
 					if(!previousData){
@@ -326,7 +311,6 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 					}else{
 						if(data){
 							var tdelta = data.x - previousData.x;
-							console.log("tdelta", tdelta);
 							delta = Math.min(delta, tdelta);
 							previousData = data;
 						}
@@ -336,18 +320,11 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 			return delta;
 		},
 		getBarProperties: function(){
-			console.log("scale", this._vScaler.bounds.scale);
 			var delta = this._getDelta();
-			console.log("delta", delta);
 			var f = dc.calculateBarSize(this._vScaler.scaler.getTransformerFromModel(this._vScaler)(delta), this.opt);
 			return {gap: f.gap, height: f.size, thickness: 0, clusterSize: 1};
 		},
-		/*
-		getBarProperties: function(){
-			var f = dc.calculateBarSize(this._vScaler.bounds.scale, this.opt);
-			return {gap: f.gap, height: f.size, thickness: 0};
-		},
-		*/
+		
 		_animateBar: function(shape, hoffset, hsize){
 			if(hsize==0){
 				hsize = 1;
