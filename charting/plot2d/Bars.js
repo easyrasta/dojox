@@ -224,7 +224,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 						if(w >= 0 && bar.height >= 1){
 							var rect = {
 								x: offsets.l + (val.y < baseline ? hv : baselineWidth),
-								y: dim.height - offsets.b - vt(val.x + 1) - (bar.height/2) + (bar.gap/2) - bar.thickness*(length-1)/2  +  bar.thickness * (length - z - 1),
+								y: dim.height - offsets.b - vt(val.x) - (bar.height/2) + (bar.gap/2) - bar.thickness*(length-1)/2  +  bar.thickness * (length - z - 1),
 								width: w,
 								height: bar.height - bar.gap/2
 							};
@@ -251,7 +251,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 									shape:   shape,
 									shadow:	 sshape,
 									x:       val.y,
-									y:       val.x + 1.5
+									y:       val.x + 0.5
 								};
 								this._connectEvents(o);
 								eventSeries[j] = o;
@@ -289,7 +289,7 @@ define(["dojo/_base/kernel", "dojo/_base/lang", "dojo/_base/array", "dojo/_base/
 				x = j;
 			}else{
 				y = value.y;
-				x = value.x -1;
+				x = value.x;
 			}
 			return {y:y, x:x};
 		},

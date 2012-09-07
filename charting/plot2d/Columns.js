@@ -184,7 +184,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 						}
 						if(bar.width >= 1 && h >= 0){
 							var rect = {
-								x: offsets.l-1.5 + ht(val.x+1) - (bar.width/2) + (bar.gap/2) - bar.thickness*(length-1)/2  + bar.thickness * z,
+								x: offsets.l-1.5 + ht(val.x) - (bar.width/2) + (bar.gap/2) - bar.thickness*(length-1)/2  + bar.thickness * z,
 								y: dim.height - offsets.b - (val.y > baseline ? vv : baselineHeight),
 								width: bar.width - bar.gap/2, 
 								height: h
@@ -212,7 +212,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 									run:     run,
 									shape:   shape,
 									shadow:  sshape,
-									x:       val.x + 0.5,
+									x:       val.x - 0.5,
 									y:       val.y
 								};
 								this._connectEvents(o);
@@ -241,7 +241,7 @@ define(["dojo/_base/lang", "dojo/_base/array", "dojo/_base/declare", "./Cartesia
 				x = j;
 			}else{
 				y = value.y;
-				x = value.x - 1;
+				x = value.x;
 			}
 			return {y:y, x:x};
 		},

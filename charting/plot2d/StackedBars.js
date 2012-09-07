@@ -25,7 +25,7 @@ define(["dojo/_base/declare", "./Bars", "./commonStacked"],
 				x = index;
 				y = commonStacked.getIndexValue(this.series, seriesIndex, x);
 			}else{
-				x = value.x - 1;
+				x = value.x;
 				y = commonStacked.getValue(this.series, seriesIndex, value.x);
 				y = y ? y.y: null;
 			}

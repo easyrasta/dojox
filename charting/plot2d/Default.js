@@ -303,6 +303,9 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 		getSeriesValue: function(i, index, indexed){
 			return this.series[i].data[index];
 		},
+		getValue: function(value, j, seriesIndex, indexed){
+			return value;
+		},
 		
 		interpolatePoly: function(lpoly, segments, seg, ht, vt, height, offsets){
 			// if we are indexed & we interpolate we need to put all the segments as a single one now
