@@ -1,4 +1,4 @@
-define(["dojo/_base/lang", 
+define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang", 
         "dojo/_base/declare",
         "dojo/_base/array", 
         "../plot2d/Base", 
@@ -80,7 +80,7 @@ define(["dojo/_base/lang",
 			this.inter = kwArgs.inter;
 		},
 		_updateVisibility: function(cp, limit, attr){
-			var axis = attr=="x"?this.inter.plot._hAxis:this.inter.plot._vAxis;
+			var axis = attr == "x" ? this.inter.plot._hAxis: this.inter.plot._vAxis;
 			var scale = axis.getWindowScale();
 			this.chart.setAxisWindow(axis.name, scale, axis.getWindowOffset() + (cp[attr] - limit[attr]) / scale);
 			this._noDirty = true;
@@ -127,22 +127,30 @@ define(["dojo/_base/lang",
 			this._updateIndicator(this.pageCoord, this.secondCoord);
 		},
 		_updateIndicator: function(cp1, cp2){
-			var inter = this.inter, plot = inter.plot, v = inter.opt.vertical;
-			var hAxis = this.chart.getAxis(plot.hAxis), vAxis = this.chart.getAxis(plot.vAxis);
-			var hn = hAxis.name, vn = vAxis.name, hb = hAxis.getScaler().bounds, vb = vAxis.getScaler().bounds;
-			var attr = v?"x":"y", n = v?hn:vn, bounds = v?hb:vb;
+			var inter = this.inter, 
+				plot = inter.plot, 
+				isVertical = inter.opt.vertical;
+			var hAxis = this.chart.getAxis(plot.hAxis), 
+				vAxis = this.chart.getAxis(plot.vAxis);
+			var hName = hAxis.name, 
+				vName = vAxis.name, 
+				hBounds = hAxis.getScaler().bounds, 
+				vBounds = vAxis.getScaler().bounds;
+			var attr = isVertical ?"x": "y", 
+				name = isVertical ? hName: vName, 
+				bounds = isVertical ? hBounds: vBounds;
 			
 			// sort data point
 			if(cp2){
 				var tmp;
-				if(v){
-					if(cp1.x>cp2.x){
+				if(isVertical){
+					if(cp1.x > cp2.x){
 						tmp = cp2;
 						cp2 = cp1;
 						cp1 = tmp;
 					}
 				}else{
-					if(cp1.y>cp2.y){
+					if(cp1.y > cp2.y){
 						tmp = cp2;
 						cp2 = cp1;
 						cp1 = tmp;
@@ -156,14 +164,14 @@ define(["dojo/_base/lang",
 			}
 			
 			var o = {};
-			o[hn] = hb.from;
-			o[vn] = vb.from;
+			o[hName] = hBounds.from;
+			o[vName] = vBounds.from;
 			var min = plot.toPage(o);
-			o[hn] = hb.to;
-			o[vn] = vb.to;
+			o[hName] = hBounds.to;
+			o[vName] = vBounds.to;
 			var max = plot.toPage(o);
 			
-			if(cd1[n] < bounds.from){
+			if(cd1[name] < bounds.from){
 				// do not autoscroll if dual indicator
 				if(!cd2 && inter.opt.autoScroll){
 					this._updateVisibility(cp1, min, attr);
@@ -173,7 +181,7 @@ define(["dojo/_base/lang",
 				}
 				// cp1 might have changed, let's update cd1
 				cd1 = plot.toData(cp1);
-			}else if(cd1[n] > bounds.to){
+			}else if(cd1[name] > bounds.to){
 				if(!cd2 && inter.opt.autoScroll){
 					this._updateVisibility(cp1, max, attr);
 					return;
@@ -184,21 +192,21 @@ define(["dojo/_base/lang",
 				cd1 = plot.toData(cp1);
 			}	
 			
-			var data1 = this._getData(cd1, attr, v), data2;
+			var data1 = this._getData(cd1, attr, isVertical), data2;
 			if(!array.some(data1, function(item){ return item.y != null})){
 				// we have no data for that point let's just return
 				return;
 			}
 			
 			if(cp2){
-				if(cd2[n] < bounds.from){
+				if(cd2[name] < bounds.from){
 					cp2[attr] = min[attr];
 					cd2 = plot.toData(cp2);
-				}else if(cd2[n] > bounds.to){
+				}else if(cd2[name] > bounds.to){
 					cp2[attr] = max[attr];
 					cd2 = plot.toData(cp2);	
 				}
-				data2 = this._getData(cd2, attr, v);
+				data2 = this._getData(cd2, attr, isVertical);
 				if(!array.some(data1, function(item){ return item.y != null})){
 					// we have no data for that point let's pretend we have a single touch point
 					cp2 = null;
@@ -206,23 +214,26 @@ define(["dojo/_base/lang",
 			}
 			var coord1, coord2, t1, t2, texts = [], texts2 = [];
 			array.forEach(data1, function(c1, z1){
-				coord1 = this._coordToPage(c1, hn, vn);
+				coord1 = this._coordToPage(c1, hName, vName);
 				if(z1 == 0){
 					t1 = this._renderLine(coord1, min, max);
 				}
-				texts.push(this.inter.opt.labelFunc ? this.inter.opt.labelFunc(c1, null, this.inter.opt.fixed, this.inter.opt.precision): dcpc.getLabel(v? c1.y: c1.x, this.inter.opt.fixed, this.inter.opt.precision));
+				texts.push(inter.opt.labelFunc ? 
+						inter.opt.labelFunc(c1, null, inter.opt.fixed, inter.opt.precision): 
+						dcpc.getLabel(isVertical? c1.y: c1.x, inter.opt.fixed, inter.opt.precision)
+				);
 				this._renderMarker(coord1);
 				
 				if(cp2){
 					var c2 = data2[z1];
-					coord2 = this._coordToPage(c2, hn, vn);
+					coord2 = this._coordToPage(c2, hName, vName);
 					if(z1 == 0){
 						t2 = this._renderLine(coord2, min, max);
 					}
-					var delta = v? c2.y-c1.y: c2.x-c1.y;
+					var delta = isVertical? c2.y-c1.y: c2.x-c1.y;
 					
 					texts2.push(inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
-						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(v? c1.y: c1.x), true, 2)+"%)"));
+						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(isVertical? c1.y: c1.x), true, 2)+"%)"));
 					this._renderMarker(coord2);
 				}
 			}, this);
@@ -231,12 +242,11 @@ define(["dojo/_base/lang",
 			if(cp2){this._renderText(texts2, inter, this.chart.theme, t2.x, t2.y, t1, t2);}
 		},
 		
-		_coordToPage:  function(coord, hn, vn){
+		_coordToPage:  function(coord, hName, vName){
 			var mark = {}, 
 				c = this.chart.getCoords();
-			mark[hn] = coord.x;
-			mark[vn] = coord.y;
-
+			mark[hName] = coord.x;
+			mark[vName] = coord.y;
 			mark = this.inter.plot.toPage(mark);
 	
 			var cx = mark.x - c.x, 
@@ -250,14 +260,14 @@ define(["dojo/_base/lang",
 			var t = this.chart.theme, 
 				c = this.chart.getCoords(), 
 				inter = this.inter, 
-				v = inter.opt.vertical,
+				isVertical = inter.opt.vertical,
 				cx = coord.x, 
 				cy = coord.y;
 			
-			var x1 = v? cx: min.x - c.x,
-				y1 = v? min.y - c.y: cy,
-				x2 = v? x1: max.x - c.x,
-				y2 = v? max.y - c.y: y1;
+			var x1 = isVertical? cx: min.x - c.x,
+				y1 = isVertical? min.y - c.y: cy,
+				x2 = isVertical? x1: max.x - c.x,
+				y2 = isVertical? max.y - c.y: y1;
 			
 			var sh = inter.opt.lineShadow? inter.opt.lineShadow: t.indicator.lineShadow,
 				ls = inter.opt.lineStroke? inter.opt.lineStroke: t.indicator.lineStroke,
@@ -273,7 +283,7 @@ define(["dojo/_base/lang",
 			}
 			this.group.createLine({x1: x1, y1: y1, x2: x2, y2: y2}).setStroke(ls);
 			
-			return v? {x: x1, y: y2+5}: {x: x2+5, y: y1};
+			return isVertical? {x: x1, y: y2+5}: {x: x2+5, y: y1};
 		},
 		
 		_renderMarker: function(coord){
@@ -322,11 +332,10 @@ define(["dojo/_base/lang",
 				if(index == 0){
 					rect = b;
 				}else{
-					rect = {
-						x: Math.min(rect.x, b.x),
-						y: Math.min(rect.y, b.y),
-						width: Math.max(rect.width, b.width),
-						height: rect.height + b.height
+					rect = {x: Math.min(rect.x, b.x),
+							y: Math.min(rect.y, b.y),
+							width: Math.max(rect.width, b.width),
+							height: rect.height + b.height
 					};
 				}
 			}, this);
@@ -349,10 +358,11 @@ define(["dojo/_base/lang",
 			var f = inter.opt.fillFunc? inter.opt.fillFunc(c1, c2): (inter.opt.fill? inter.opt.fill: t.indicator.fill);
 			this.group.createRect(rect).setFill(this._shapeFill(f, rect)).setStroke(ls);
 			array.forEach(labels, function(label){
+				console.log("label to front", label);
 				label.moveToFront();
 			});
 		},
-		_getDataPoint: function(run, cd, attr, v){
+		_getDataPoint: function(run, cd, attr, isVertical){
 			// we need to find which actual data point is "close" to the data value
 			var data = run.data;
 			// let's consider data are sorted because anyway rendering will be "weird" with unsorted data
@@ -387,7 +397,7 @@ define(["dojo/_base/lang",
 				}
 			}
 			if(i>0){
-				var m = v?(x+px)/2:(y+py)/2;
+				var m = isVertical?(x+px)/2:(y+py)/2;
 				if(cd[attr]<=m){
 					x = px;
 					y = py;
@@ -395,18 +405,18 @@ define(["dojo/_base/lang",
 			}
 			return {x: x, y: y};
 		},
-		_getData: function(cd, attr, v){
+		_getData: function(cd, attr, isVertical){
 			var datas = [];
 			if(this.inter.opt.series){
 				//To keep backward compat in case there is more than one series
-				datas.push(this._getDataPoint(this.chart.getSeries(this.inter.opt.series), cd, attr, v));
+				datas.push(this._getDataPoint(this.chart.getSeries(this.inter.opt.series), cd, attr, isVertical));
 			}else{
 				for(var j = 0 ; j < this.inter.plot.series.length; j++){
 					var run = this.inter.plot.series[j];
 					if(run.hide){
 						continue;
 					}
-					datas.push(this._getDataPoint(run, cd, attr, v));
+					datas.push(this._getDataPoint(run, cd, attr, isVertical));
 				}
 			}
 			return datas;
