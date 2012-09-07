@@ -1,11 +1,12 @@
-define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang", 
+define(["dojo/_base/lang", 
         "dojo/_base/declare",
         "dojo/_base/array", 
         "../plot2d/Base", 
         "../plot2d/common",
         "../axis2d/common",
-        "dojox/gfx"
-], function(lang, declare, array, Base, dcpc, dcac, gfx){
+        "dojox/gfx",
+        "dijit/Tooltip"
+], function(lang, declare, array, Base, dcpc, dcac, gfx, Tooltip){
 
 	// all the code below should be removed when http://trac.dojotoolkit.org/ticket/11299 will be available
 	var getBoundingBox = function(shape){
@@ -117,7 +118,7 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 			if(!this.isDirty()){
 				return;
 			}
-
+			console.log("Indicator:render");
 			this.cleanGroup();
 
 			if (!this.pageCoord){
@@ -218,10 +219,12 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 				if(z1 == 0){
 					t1 = this._renderLine(coord1, min, max);
 				}
-				texts.push(inter.opt.labelFunc ? 
-						inter.opt.labelFunc(c1, null, inter.opt.fixed, inter.opt.precision): 
-						dcpc.getLabel(isVertical? c1.y: c1.x, inter.opt.fixed, inter.opt.precision)
-				);
+				if(!inter.opt.tooltip){
+					texts.push(inter.opt.labelFunc ? 
+							inter.opt.labelFunc(c1, null, inter.opt.fixed, inter.opt.precision): 
+							dcpc.getLabel(isVertical? c1.y: c1.x, inter.opt.fixed, inter.opt.precision)
+					);
+				}
 				this._renderMarker(coord1);
 				
 				if(cp2){
@@ -230,16 +233,36 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 					if(z1 == 0){
 						t2 = this._renderLine(coord2, min, max);
 					}
-					var delta = isVertical? c2.y-c1.y: c2.x-c1.y;
-					
-					texts2.push(inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
-						(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(isVertical? c1.y: c1.x), true, 2)+"%)"));
+					if(!inter.opt.tooltip){
+						var delta = isVertical? c2.y-c1.y: c2.x-c1.y;
+						
+						texts2.push(inter.opt.labelFunc ? inter.opt.labelFunc(c1, c2, inter.opt.fixed, inter.opt.precision):
+							(dcpc.getLabel(delta, inter.opt.fixed, inter.opt.precision)+" ("+dcpc.getLabel(100*delta/(isVertical? c1.y: c1.x), true, 2)+"%)"));
+					}
 					this._renderMarker(coord2);
 				}
 			}, this);
+			if(!inter.opt.tooltip){
+				this._renderText(texts, inter, this.chart.theme, t1.x, t1.y, t1);
+				if(cp2){this._renderText(texts2, inter, this.chart.theme, t2.x, t2.y, t1, t2);}
+			}else{
+				this.aroundRect = {type: "rect"};
+				//TODO: use round coord calculate by _IndicatorElement.
+				this.aroundRect.w = this.aroundRect.h = 1;
+				
+				var mark = {};
+				mark[hName] = data1[0].x;
+				mark[vName] = data1[0].y;
+				mark = this.inter.plot.toPage(mark);
+				
+				this.aroundRect.x = mark.x;
+				this.aroundRect.y = cp1.y ;
+				var text = this.inter.opt.text(data1);
+				// TODO: add position and correct span ltr<->rtl -> see action2d/Tooltip
+				Tooltip.show("<span dir = 'ltr'>"+text+"</span>", this.aroundRect);
+			}
 			
-			this._renderText(texts, inter, this.chart.theme, t1.x, t1.y, t1);
-			if(cp2){this._renderText(texts2, inter, this.chart.theme, t2.x, t2.y, t1, t2);}
+			
 		},
 		
 		_coordToPage:  function(coord, hName, vName){
@@ -358,18 +381,19 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 			var f = inter.opt.fillFunc? inter.opt.fillFunc(c1, c2): (inter.opt.fill? inter.opt.fill: t.indicator.fill);
 			this.group.createRect(rect).setFill(this._shapeFill(f, rect)).setStroke(ls);
 			array.forEach(labels, function(label){
-				console.log("label to front", label);
+				//console.log("label to front", label);
 				label.moveToFront();
 			});
 		},
-		_getDataPoint: function(run, cd, attr, isVertical){
+		_getDataPoint: function(run, seriesIndex, indexed, cd, attr, isVertical){
 			// we need to find which actual data point is "close" to the data value
 			var data = run.data;
 			// let's consider data are sorted because anyway rendering will be "weird" with unsorted data
 			// i is an index in the array, which is different from a x-axis value even for index based data
 			var i, r, l = data.length;
 			for (i = 0; i < l; ++i){
-				r = data[i];
+				r = this.inter.plot.getValue(data[i], i, seriesIndex, indexed);
+				//r = data[i];
 				if(r == null){
 					// move to next item
 				}else if(typeof r == "number"){
@@ -386,14 +410,15 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 				y = r;
 				if(i>0){
 					px = i;
-					py = data[i-1];
+					py = this.inter.plot.getValue(data[i-1], i-1, seriesIndex, indexed);
 				}
 			}else{
 				x = r.x;
 				y = r.y;
 				if(i>0){
-					px = data[i-1].x;
-					py = data[i-1].y;
+					var value = this.inter.plot.getValue(data[i-1], i-1, seriesIndex, indexed);
+					px = value.x;
+					py = value.y;
 				}
 			}
 			if(i>0){
@@ -407,18 +432,29 @@ define("dojox/charting/action2d/_IndicatorElement", ["dojo/_base/lang",
 		},
 		_getData: function(cd, attr, isVertical){
 			var datas = [];
+			/*
 			if(this.inter.opt.series){
+				var run = this.chart.getSeries(this.inter.opt.series);
+				
 				//To keep backward compat in case there is more than one series
-				datas.push(this._getDataPoint(this.chart.getSeries(this.inter.opt.series), cd, attr, isVertical));
+				datas.push(this._getDataPoint(run, indexed, cd, attr, isVertical));
 			}else{
+				*/
+				
 				for(var j = 0 ; j < this.inter.plot.series.length; j++){
 					var run = this.inter.plot.series[j];
-					if(run.hide){
+					if(run.hide || (this.inter.opt.series && run.name != this.inter.opt.series)){
 						continue;
 					}
-					datas.push(this._getDataPoint(run, cd, attr, isVertical));
+					
+					var indexed = array.some(run.data, function(item){
+						return typeof item == "number" || (item && !item.hasOwnProperty("x"));
+					});
+					
+					
+					datas.push(this._getDataPoint(run, j, indexed, cd, attr, isVertical));
 				}
-			}
+			//}
 			return datas;
 		},
 		cleanGroup: function(creator){

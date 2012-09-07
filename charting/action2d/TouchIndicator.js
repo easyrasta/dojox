@@ -1,5 +1,12 @@
-define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAction", "./_IndicatorElement", "dojox/lang/utils"],
-	function(lang, declare, eventUtil, ChartAction, IndicatorElement, du){ 
+define([
+	"dojo/_base/lang",
+	"dojo/_base/declare", 
+	"dojo/_base/event", 
+	"./ChartAction", 
+	"./_IndicatorElement", 
+	"dojox/lang/utils",
+	"dijit/Tooltip"
+], function(lang, declare, eventUtil, ChartAction, IndicatorElement, du, Tooltip){ 
 	
 	/*=====
 	var __TouchIndicatorCtorArgs = {
@@ -67,6 +74,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAct
 			dualIndicator: false,
 			vertical: true,
 			autoScroll: true,
+			tooltip: true,
 			fixed: true,
 			precision: 0
 		},
@@ -86,7 +94,8 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAct
 			markerOutline:		{},
 			markerShadow:		{},
 			markerFill:			{},
-			markerSymbol:		""
+			markerSymbol:		"",
+			text: null
 		},	
 
 		constructor: function(chart, plot, kwArgs){
@@ -188,7 +197,13 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/event", "./ChartAct
 			plot.pageCoord = null;
 			plot.secondCoord = null;
 			plot.dirty = true;
+			
+			Tooltip.hide(plot.aroundRect);
+			plot.aroundRect = null;
+			
 			this.chart.delayedRender();
+			
+
 		}
 	});
 });
