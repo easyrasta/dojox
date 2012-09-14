@@ -180,12 +180,17 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 			var run = this.series[i],
 				min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0,
 				max = indexed?Math.min(run.data.length, Math.ceil(this._hScaler.bounds.to)):run.data.length,
-				rseg = null, segments = [];
+				rseg = null, segments = [],
+				value;
 
 			// split the run data into dense segments (each containing no nulls)
 			// except if interpolates is false in which case ignore null between valid data
 			for(var j = min; j < max; j++){
-				if(run.data[j] != null && (indexed || run.data[j].y != null)){
+				
+				value = this.getValue(run.data[j], j, i, indexed);
+				
+				//value = run.data[j];
+				if(value != null && (indexed || value.y != null)){
 					if(!indexed && (value.x < this._hScaler.bounds.from-1 || value.x > this._hScaler.bounds.to)){
 						continue;
 					}
@@ -193,7 +198,7 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 						rseg = [];
 						segments.push({index: j, rseg: rseg});
 					}
-					rseg.push((indexed && run.data[j].hasOwnProperty("y"))?run.data[j].y:run.data[j]);
+					rseg.push((indexed && value.hasOwnProperty("y"))?value.y:value);
 				}else{
 					if(!this.opt.interpolate || indexed){
 						// we break the line only if not interpolating or if we have indexed data
@@ -234,12 +239,13 @@ define(["dojo/_base/lang", "dojo/_base/declare", "dojo/_base/array",
 
 			for(var i = this.series.length - 1; i >= 0; --i){
 				var run = this.series[i];
-				console.log("Serie::"+i, run);
+				
 				if(!this.dirty && !run.dirty){
 					t.skip();
 					this._reconnectEvents(run.name);
 					continue;
 				}
+				console.log("Serie::"+i, run);
 				run.cleanGroup();
 				if(this.opt.enableCache){
 					run._pathFreePool = (run._pathFreePool?run._pathFreePool:[]).concat(run._pathUsePool?run._pathUsePool:[]);

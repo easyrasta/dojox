@@ -12,6 +12,7 @@ define(["dojo/_base/declare", "./Default", "./commonStacked"],
 			// returns: Object
 			//		{hmin, hmax, vmin, vmax} min/max in both directions.
 			var stats = commonStacked.collectStats(this.series);
+			this._maxRunLength = stats.hmax;
 			return stats; // Object
 		},
 		
@@ -19,11 +20,13 @@ define(["dojo/_base/declare", "./Default", "./commonStacked"],
 			var run = this.series[i],
 				min = indexed?Math.max(0, Math.floor(this._hScaler.bounds.from - 1)):0,
 				max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to)):run.data.length-1,
+				//max = indexed?Math.min(run.data.length-1, Math.ceil(this._hScaler.bounds.to-this._hScaler.bounds.from)):run.data.length-1,
 				rseg = null, segments = [];
 			// split the run data into dense segments (each containing no nulls)
 			// except if interpolates is false in which case ignore null between valid data
-			for(var j = min; j <= max; j++){
-				var value = indexed ? commonStacked.getIndexValue(this.series, i, j) : commonStacked.getValue(this.series, i, run.data[j] ?run.data[j].x: null);
+			for(var j = 0; j <= max; j++){
+				//var value = indexed ? commonStacked.getIndexValue(this.series, i, j) : commonStacked.getValue(this.series, i, run.data[j] ?run.data[j].x: null);
+				var value = this.getValue(run.data[j], j, i, indexed);
 				if(value != null && (indexed || value.y != null)){
 					if(!indexed && (value.x < this._hScaler.bounds.from-1 || value.x > this._hScaler.bounds.to)){
 						continue;
@@ -41,6 +44,11 @@ define(["dojo/_base/declare", "./Default", "./commonStacked"],
 				}
 			}
 			return segments;
+		},
+		
+		getValue: function(value, j, seriesIndex, indexed){
+			return indexed ? commonStacked.getIndexValue(this.series, seriesIndex, j) : commonStacked.getValue(this.series, seriesIndex, value ?value.x: null);
+			
 		}
 		
 	});
